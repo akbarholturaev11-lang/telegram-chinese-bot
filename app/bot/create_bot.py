@@ -27,3 +27,15 @@ def create_bot(settings):
     dp.include_router(messages_router)
 
     return bot, dp
+
+import asyncio
+from app.config import settings
+
+
+async def main():
+    bot, dp = create_bot(settings)
+    await dp.start_polling(bot)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
