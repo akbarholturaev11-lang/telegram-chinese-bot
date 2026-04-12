@@ -13,7 +13,7 @@ async_session_maker = async_sessionmaker(
     expire_on_commit=False,
 )
 
-from app.db.models import Base
+from app.db.base import Base
 
 async def init_db():
     async with engine.begin() as conn:
