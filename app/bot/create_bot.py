@@ -4,6 +4,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
+from app.db.session import init_db
 
 from app.bot.handlers.start import router as start_router
 from app.bot.handlers.commands import router as commands_router
@@ -43,6 +44,7 @@ from app.config import settings
 
 
 async def main():
+    await init_db()
     bot, dp = create_bot(settings)
     await dp.start_polling(bot)
 

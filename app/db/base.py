@@ -12,3 +12,4 @@ convention = {
 
 class Base(DeclarativeBase):
     metadata = MetaData(naming_convention=convention)
+from app.db import models

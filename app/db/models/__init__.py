@@ -1,4 +1,8 @@
-from app.db.models.course_lessons import CourseLesson
-from app.db.models.course_progress import CourseProgress
-from app.db.models.course_attempts import CourseAttempt
+from .user import User
+from .referral import Referral
+from .payment import Payment
+from .message import Message
 
+from .course_lessons import CourseLesson
+from .course_attempts import CourseAttempt
+from .course_progress import CourseProgress
