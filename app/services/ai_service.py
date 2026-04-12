@@ -47,7 +47,7 @@ class AIService:
             }
         ]
 
-            messages.extend(history)if history:
+        if history:
             messages.extend(history)
 
         messages.append(
