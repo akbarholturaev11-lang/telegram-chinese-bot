@@ -79,7 +79,7 @@ async def handle_text_message(message: Message, session):
     if message.text and message.text.startswith("/"):
         return
 
-    if user and user.selected_plan_type:
+    if user and user.selected_plan_type and user.payment_status != "approved":
         await message.answer(
             t("payment_send_screenshot_only", user_lang),
             reply_markup=checkout_keyboard(user_lang),
