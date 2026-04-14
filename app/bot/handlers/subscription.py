@@ -1,6 +1,7 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import FSInputFile
+from app.repositories.user_repo import UserRepository as UserRepo
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
