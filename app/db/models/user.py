@@ -3,6 +3,7 @@ from typing import Optional
 
 from sqlalchemy import BigInteger, String, Integer, DateTime, Boolean
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Column
 
 from app.db.base import Base
 
@@ -13,6 +14,8 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     telegram_id: Mapped[int] = mapped_column(BigInteger, unique=True, index=True, nullable=False)
     full_name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+
+    payment_method = Column(String, nullable=True)
 
     language: Mapped[str] = mapped_column(String(8), default="tj", nullable=False)
     level: Mapped[str] = mapped_column(String(32), default="beginner", nullable=False)

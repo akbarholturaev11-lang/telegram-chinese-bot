@@ -39,6 +39,20 @@ class PaymentService:
             return None, "payment_invalid_plan"
 
         discount_applied = bool(user.discount_eligible and not user.discount_used)
+        
+        if user.payment_method in ["alipay", "wechat"]:
+            if plan_type == "10_days":
+                base_amount = 29
+            elif plan_type == "1_month":
+                base_amount = 66
+            currency = "¥"
+        else:
+            if plan_type == "10_days":
+                base_amount = 29
+            elif plan_type == "1_month":
+                base_amount = 89
+        currency = "somoni"
+
         final_amount = (
             self.calculate_discounted_price(base_amount)
             if discount_applied
@@ -51,7 +65,7 @@ class PaymentService:
             "final_amount": final_amount,
             "discount_applied": discount_applied,
             "discount_percent": DISCOUNT_PERCENT if discount_applied else 0,
-            "currency": "somoni",
+            "currency": currency,
         }, ""
 
     async def create_pending_payment(

@@ -307,42 +307,25 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
 
     await callback.answer()
 
-    method = user.payment_method
-
-    text = t(
-        "subscription_checkout_block",
-        lang,
-        plan=checkout_info["plan_name"],
-        price=checkout_info["final_amount"]
+    await callback.message.edit_text(
+        checkout_info["text"],
+        reply_markup=checkout_info["keyboard"],
+        disable_web_page_preview=True,
     )
+@router.callback_query(F.data == "subscription:back")
+async def subscription_back_handler(callback: CallbackQuery, session):
 
-    if method == "visa":
-        await callback.message.edit_text(
-            text,
-            reply_markup=checkout_keyboard(lang),
-            parse_mode="HTML"
-        )
+    await callback.answer()
 
-    elif method == "alipay":
-        photo = FSInputFile("app/static/payments/alipay.jpg")
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
 
-        await callback.message.delete()
+    if not user:
+        return
 
-        await callback.message.answer_photo(
-            photo=photo,
-            caption=text,
-            reply_markup=checkout_keyboard(lang),
-            parse_mode="HTML"
-        )
+    lang = user.language if user.language else "ru"
 
-    elif method == "wechat":
-        photo = FSInputFile("app/static/payments/wechat.jpg")
-
-        await callback.message.delete()
-
-        await callback.message.answer_photo(
-            photo=photo,
-            caption=text,
-            reply_markup=checkout_keyboard(lang),
-            parse_mode="HTML"
-        )
+    await callback.message.edit_text(
+        t("subscription_main_title", lang),
+        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+    )

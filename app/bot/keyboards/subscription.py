@@ -73,6 +73,6 @@ def payment_method_keyboard(lang: str):
             InlineKeyboardButton(text="WeChat Pay", callback_data="payment:wechat"),
         ],
         [
-            InlineKeyboardButton(text=t("btn_back", lang), callback_data="payment:back"),
+            InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
         ]
     ])
