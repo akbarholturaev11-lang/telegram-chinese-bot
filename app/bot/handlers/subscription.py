@@ -9,6 +9,7 @@ from app.bot.keyboards.subscription import (
     subscription_main_keyboard,
     subscription_discount_progress_keyboard,
     subscription_discount_ready_keyboard,
+    payment_method_keyboard,
 )
 from app.bot.keyboards.checkout import checkout_keyboard
 
@@ -125,12 +126,11 @@ async def subscription_open_handler(callback: CallbackQuery, session):
     lang = user.language if user.language else "ru"
 
     await callback.answer()
-    await callback.message.answer(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
-        disable_web_page_preview=True,
+    await callback.message.edit_text(
+        t("payment_method_choose", lang),
+        reply_markup=payment_method_keyboard(lang),
+        parse_mode="HTML"
     )
-
 
 @router.callback_query(F.data == "subscription:referral_discount")
 async def subscription_referral_discount_handler(callback: CallbackQuery, session):

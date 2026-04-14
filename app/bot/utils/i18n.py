@@ -27,6 +27,14 @@ TEXTS = {
         "referral_invite_button": "👥 Дӯст даъват кардан",
         "referral_bonus_received": "Таклифи шумо қабул шуд ✅\nБа шумо +5 саволи бонусӣ дода шуд. Акнун метавонед боз аз бот истифода баред.",
         
+        "btn_visa": "💳 VISA",
+        "btn_alipay": "Alipay",
+        "btn_wechat": "WeChatpay",
+        
+        "payment_method_choose": "<b>💳 Усули пардохтро интихоб кунед:</b>",
+        "subscription_block": "<blockquote>\n💳 <b>Обунаро интихоб кунед:</b>\n\n🚀 Пас аз гирифтани обуна шумо метавонед аз бот бе ягон лимит истифода баред.\n\n📅 10 рӯз — 29 ¥\n📅 1 моҳ — 89 ¥\n\n👥 3 дӯстро даъват кунед ва 🎁 20% тахфиф гиред.\n\n📲 QR кодро скан карда пардохт кунед\n</blockquote>",
+        "subscription_checkout_block": "<blockquote>\n💳 <b>Шумо ин обунаро интихоб кардед:</b>\n\n📦 Тариф: <b>{plan}</b>\n💰 Нарх: <b>{price} ¥</b>\n\n📲 <b>Маълумоти пардохт:</b>\nБо QR-код пардохт кунед\n\n👤 NAME: Akbarshoh\n\n📸 Пас аз пардохт скриншотро фиристед\n</blockquote>",
+
         "subscription_main_title": "Обунаро интихоб кунед:\nПас аз обуна шумо метавонед аз бот бе ягон лимит истифода баред.",
         "subscription_plan_10_days": "10 рӯз — 29 сомонӣ",
         "subscription_plan_1_month": "1 моҳ — 89 сомонӣ",
@@ -114,6 +122,10 @@ TEXTS = {
         "access_payment_pending_review": "Ваш платёж отправлен на проверку. Пожалуйста, дождитесь подтверждения администратора.",
         "subscription_discount_text_blocked": "Вы уже используете скидку. Вернитесь к обычной подписке.",
 
+        "payment_method_choose": "<b>💳 Выберите способ оплаты:</b>",
+        "subscription_block": "<blockquote>\n💳 <b>Выберите подписку:</b>\n\n🚀 После покупки подписки вы сможете пользоваться ботом без ограничений.\n\n📅 10 дней — 29 ¥\n📅 1 месяц — 89 ¥\n\n👥 Пригласите 3 друзей и получите 🎁 скидку 20%.\n\n📲 Отсканируйте QR-код для оплаты\n</blockquote>",
+        "subscription_checkout_block": "<blockquote>\n💳 <b>Вы выбрали подписку:</b>\n\n📦 Тариф: <b>{plan}</b>\n💰 Цена: <b>{price} ¥</b>\n\n📲 <b>Реквизиты для оплаты:</b>\nОплатите через QR-код\n\n👤 NAME: Akbarshoh\n\n📸 После оплаты отправьте скриншот\n</blockquote>",
+
         "subscription_main_title": "Выберите подписку:\nПосле оформления подписки вы сможете пользоваться ботом без каких-либо лимитов.",
         "subscription_plan_10_days": "10 дней — 29 сомони",
         "subscription_plan_1_month": "1 месяц — 89 сомони",
@@ -193,6 +205,10 @@ TEXTS = {
         "access_daily_image_limit_reached": "<b>📸 Rasm limiti tugadi</b>\n\n<blockquote>Bugungi rasm limiti tugadi.\nObuna oling va botdan hech qanday cheklovsiz foydalaning.</blockquote>",
         "referral_invite_button": "👥 Do‘st chaqirish",
         "referral_bonus_received": "Taklifingiz qabul qilindi ✅\nSizga +5 bonus savol berildi. Endi botdan yana foydalanishingiz mumkin.",
+
+        "payment_method_choose": "<b>💳 To‘lov usulini tanlang:</b>",
+        "subscription_block": "<blockquote>\n💳 <b>Obunani tanlang:</b>\n\n🚀 Obuna olganingizdan keyin botdan hech qanday limitsiz foydalanasiz.\n\n📅 10 kunlik — 29 ¥\n📅 1 oylik — 89 ¥\n\n👥 3 ta yangi do‘st taklif qiling va 🎁 20% chegirma oling.\n\n📲 QR kodni skaner qilib to‘lov qiling\n</blockquote>",
+        "subscription_checkout_block": "<blockquote>\n💳 <b>Siz ushbu obunani tanladingiz:</b>\n\n📦 Tarif: <b>{plan}</b>\n💰 Narx: <b>{price} ¥</b>\n\n📲 <b>To‘lov rekviziti:</b>\nQR kod orqali to‘lov qiling\n\n👤 NAME: Akbarshoh\n\n📸 To‘lov qilib bo‘lgach, skrinshotini yuboring\n</blockquote>",
 
         "subscription_main_title": "Obunani tanlang:\nObuna olganingizdan keyin botdan hech qanday limitsiz foydalanasiz.",
         "subscription_plan_10_days": "10 kunlik — 29 somoni",
