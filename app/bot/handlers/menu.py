@@ -2,8 +2,8 @@ from aiogram import Router, F
 from aiogram.types import Message
 
 from app.repositories.user_repo import UserRepository
-from app.bot.handlers.subscription import build_subscription_main_text_for_user
-from app.bot.keyboards.subscription import subscription_main_keyboard
+from app.bot.keyboards.subscription import payment_method_keyboard
+from app.bot.utils.i18n import t
 
 
 router = Router()
@@ -24,7 +24,7 @@ async def handle_subscription_button(message: Message, session):
     lang = user.language if user.language else "ru"
 
     await message.answer(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=subscription_main_keyboard(lang),
-        disable_web_page_preview=True,
+        t("payment_method_choose", lang),
+        reply_markup=payment_method_keyboard(lang),
+        parse_mode="HTML",
     )

@@ -10,7 +10,11 @@ def checkout_keyboard(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=t("checkout_change_plan_button", lang),
                     callback_data="checkout:change_plan",
-                )
+                ),
+                InlineKeyboardButton(
+                    text=t("payment_back", lang),
+                    callback_data="subscription:change_payment_method",
+                ),
             ]
         ]
     )

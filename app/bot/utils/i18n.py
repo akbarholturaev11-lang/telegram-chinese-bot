@@ -42,8 +42,6 @@ TEXTS = {
         "subscription_referral_discount_button": "👥 Дӯст даъват кардан",
         "subscription_button_10_days": "10 рӯз",
         "subscription_button_1_month": "1 моҳ",
-        "subscription_button_10_days": "10 рӯз",
-        "subscription_button_1_month": "1 моҳ",
         "subscription_referral_hint": "3 дӯсти нав даъват кунед ва 20% тахфиф гиред.",
         "subscription_invite_button": "👥 Дӯст даъват кардан",
         "subscription_back_to_main": "⬅️ Ба обунаи оддӣ баргаштан",

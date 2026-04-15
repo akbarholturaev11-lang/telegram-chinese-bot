@@ -22,6 +22,12 @@ def subscription_main_keyboard(lang: str) -> InlineKeyboardMarkup:
                     callback_data="subscription:plan:1_month",
                 ),
             ],
+            [
+                InlineKeyboardButton(
+                    text=t("payment_back", lang),
+                    callback_data="subscription:change_payment_method",
+                ),
+            ],
         ]
     )
 
@@ -56,6 +62,12 @@ def subscription_discount_ready_keyboard(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=t("subscription_button_1_month", lang),
                     callback_data="subscription:plan:1_month",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("payment_back", lang),
+                    callback_data="subscription:change_payment_method",
                 ),
             ],
         ]

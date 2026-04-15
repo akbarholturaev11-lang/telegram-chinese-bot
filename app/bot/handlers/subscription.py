@@ -1,8 +1,5 @@
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.types import FSInputFile
-from app.repositories.user_repo import UserRepository
-from app.bot.keyboards.subscription import subscription_main_keyboard
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
@@ -70,6 +67,12 @@ def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboard
                     InlineKeyboardButton(
                         text=t("subscription_button_1_month", lang),
                         callback_data="subscription:plan:1_month",
+                    ),
+                ],
+                [
+                    InlineKeyboardButton(
+                        text=t("payment_back", lang),
+                        callback_data="subscription:change_payment_method",
                     ),
                 ],
             ]
@@ -209,8 +212,10 @@ async def payment_visa_handler(callback: CallbackQuery, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
-        await callback.answer()
         return
+
+    user.payment_method = "visa"
+    await session.commit()
 
     lang = user.language if user.language else "ru"
 
@@ -227,15 +232,17 @@ async def payment_alipay_handler(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        return
 
     user.payment_method = "alipay"
     await session.commit()
 
-    lang = user.language
+    lang = user.language if user.language else "ru"
 
     await callback.message.edit_text(
-        t("subscription_main_title", lang),
-        reply_markup=subscription_main_keyboard(lang)
+        build_subscription_main_text_for_user(user, lang),
+        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
     )
 
 
@@ -246,15 +253,17 @@ async def payment_wechat_handler(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        return
 
     user.payment_method = "wechat"
     await session.commit()
 
-    lang = user.language
+    lang = user.language if user.language else "ru"
 
     await callback.message.edit_text(
-        t("subscription_main_title", lang),
-        reply_markup=subscription_main_keyboard(lang)
+        build_subscription_main_text_for_user(user, lang),
+        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
     )
 
 
@@ -291,32 +300,36 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
 
     lang = user.language or "ru"
 
+    if not user.payment_method:
+        await callback.message.edit_text(
+            t("payment_method_choose", lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
+        )
+        return
+
     plan = callback.data.split(":")[-1]
 
     payment_service = PaymentService(session)
     checkout_info = await payment_service.get_checkout_info(user, plan)
 
-    if "photo" in checkout_info:
-        await callback.message.delete()
+    if not checkout_info:
+        return
 
-        caption = checkout_info.get("caption", "")
+    await user_repo.set_selected_plan_type(user, plan)
+    await session.commit()
 
-        await callback.message.answer_photo(
-            photo=checkout_info["photo"],
-            caption=caption,
-            reply_markup=checkout_info["keyboard"],
-        )
-    else:
-        await callback.message.edit_text(
-            checkout_info["text"],
-            reply_markup=checkout_info["keyboard"],
-            disable_web_page_preview=True,
-        )
+    text = build_checkout_text(lang, checkout_info)
+
+    await callback.message.edit_text(
+        text,
+        reply_markup=checkout_keyboard(lang),
+        disable_web_page_preview=True,
+    )
 
 
-@router.callback_query(F.data == "subscription:back")
-async def subscription_back_handler(callback: CallbackQuery, session):
-
+@router.callback_query(F.data == "payment:back")
+async def payment_back_handler(callback: CallbackQuery, session):
     await callback.answer()
 
     user_repo = UserRepository(session)
@@ -328,6 +341,28 @@ async def subscription_back_handler(callback: CallbackQuery, session):
     lang = user.language if user.language else "ru"
 
     await callback.message.edit_text(
-        t("subscription_main_title", lang),
+        build_subscription_main_text_for_user(user, lang),
         reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+        disable_web_page_preview=True,
     )
+
+
+@router.callback_query(F.data == "subscription:change_payment_method")
+async def subscription_change_payment_method_handler(callback: CallbackQuery, session):
+    await callback.answer()
+
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+
+    if not user:
+        return
+
+    lang = user.language if user.language else "ru"
+
+    await callback.message.edit_text(
+        t("payment_method_choose", lang),
+        reply_markup=payment_method_keyboard(lang),
+        parse_mode="HTML",
+    )
+
+

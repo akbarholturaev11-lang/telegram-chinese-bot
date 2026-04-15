@@ -27,19 +27,15 @@ class PaymentService:
 
     async def get_checkout_info(
         self,
-        telegram_id: int,
+        user,
         plan_type: str,
     ):
-        user = await self.user_repo.get_by_telegram_id(telegram_id)
-        if not user:
-            return None, "access_start_first"
-
         base_amount = self.get_plan_price(plan_type)
         if base_amount is None:
-            return None, "payment_invalid_plan"
+            return None
 
         discount_applied = bool(user.discount_eligible and not user.discount_used)
-        
+
         if user.payment_method in ["alipay", "wechat"]:
             if plan_type == "10_days":
                 base_amount = 29
@@ -66,12 +62,8 @@ class PaymentService:
             "base_amount": base_amount,
             "final_amount": final_amount,
             "currency": currency,
-            "text": (
-                f"📦 Tarif: {plan_type}\n"
-                f"💰 Narx: {final_amount} {currency}\n\n"
-                f"📤 To‘lovdan keyin chek yuboring"
-            )
-        }, ""
+            "discount_applied": discount_applied,
+        }
 
     async def create_pending_payment(
         self,
@@ -83,12 +75,12 @@ class PaymentService:
         if not user:
             return None, "access_start_first"
 
-        checkout_info, error_key = await self.get_checkout_info(
-            telegram_id=telegram_id,
+        checkout_info = await self.get_checkout_info(
+            user=user,
             plan_type=plan_type,
         )
-        if error_key:
-            return None, error_key
+        if not checkout_info:
+            return None, "payment_invalid_plan"
 
         payment = await self.payment_repo.create(
             user_telegram_id=telegram_id,
