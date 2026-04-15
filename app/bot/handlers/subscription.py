@@ -1,5 +1,5 @@
 from aiogram import Router, F
-from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
@@ -16,12 +16,22 @@ from app.bot.keyboards.checkout import checkout_keyboard
 
 router = Router()
 
+QR_PHOTO_PATHS = {
+    "alipay": "/app/static/payments/alipay.jpg",
+    "wechat": "/app/static/payments/wechat.jpg",
+}
+
 
 def build_subscription_main_text_for_user(user, lang: str) -> str:
+    use_yuan = getattr(user, "payment_method", None) in ("alipay", "wechat")
+
+    plan_10_key = "subscription_plan_10_days_yuan" if use_yuan else "subscription_plan_10_days"
+    plan_1m_key = "subscription_plan_1_month_yuan" if use_yuan else "subscription_plan_1_month"
+
     base = (
         f"{t('subscription_main_title', lang)}\n\n"
-        f"{t('subscription_plan_10_days', lang)}\n"
-        f"{t('subscription_plan_1_month', lang)}"
+        f"{t(plan_10_key, lang)}\n"
+        f"{t(plan_1m_key, lang)}"
     )
 
     if not user.discount_used:
@@ -54,30 +64,7 @@ def build_subscription_discount_progress_text(
     return base
 
 
-
 def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboardMarkup:
-    if user.discount_used:
-        return InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(
-                        text=t("subscription_button_10_days", lang),
-                        callback_data="subscription:plan:10_days",
-                    ),
-                    InlineKeyboardButton(
-                        text=t("subscription_button_1_month", lang),
-                        callback_data="subscription:plan:1_month",
-                    ),
-                ],
-                [
-                    InlineKeyboardButton(
-                        text=t("payment_back", lang),
-                        callback_data="subscription:change_payment_method",
-                    ),
-                ],
-            ]
-        )
-
     return subscription_main_keyboard(lang)
 
 
@@ -87,6 +74,7 @@ def build_checkout_text(lang: str, checkout_info: dict) -> str:
     final_amount = checkout_info["final_amount"]
     discount_applied = checkout_info["discount_applied"]
     currency = checkout_info["currency"]
+    is_qr = (currency == "¥")
 
     if lang == "tj":
         plan_label = "10 рӯз" if plan_type == "10_days" else "1 моҳ"
@@ -98,8 +86,10 @@ def build_checkout_text(lang: str, checkout_info: dict) -> str:
         plan_label = "10 дней" if plan_type == "10_days" else "1 месяц"
         plan_line = f"Тариф: {plan_label}"
 
+    title_key = "checkout_title_qr" if is_qr else "checkout_title_visa"
+
     lines = [
-        t("subscription_checkout_title", lang),
+        t(title_key, lang),
         plan_line,
         "",
     ]
@@ -110,9 +100,14 @@ def build_checkout_text(lang: str, checkout_info: dict) -> str:
     else:
         lines.append(f"{t('subscription_price_label', lang)}: {final_amount} {currency}")
 
+    lines.append("")
+
+    if is_qr:
+        lines.append(t("checkout_qr_scan", lang))
+    else:
+        lines.append(f"{t('payment_details_label', lang)}: {settings.PAYMENT_DETAILS}")
+
     lines.extend([
-        "",
-        f"{t('payment_details_label', lang)}: {settings.PAYMENT_DETAILS}",
         "",
         t("payment_send_screenshot", lang),
     ])
@@ -281,11 +276,25 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
     await user_repo.set_selected_plan_type(user, None)
     await session.commit()
 
-    await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
-        disable_web_page_preview=True,
-    )
+    text = build_subscription_main_text_for_user(user, lang)
+    keyboard = build_subscription_main_keyboard_for_user(user, lang)
+
+    try:
+        await callback.message.edit_text(
+            text,
+            reply_markup=keyboard,
+            disable_web_page_preview=True,
+        )
+    except Exception:
+        # message is a photo (QR checkout) — delete and send new text message
+        await callback.message.delete()
+        await callback.message.answer(
+            text,
+            reply_markup=keyboard,
+            disable_web_page_preview=True,
+        )
+
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("subscription:plan:"))
@@ -320,31 +329,41 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
     await session.commit()
 
     text = build_checkout_text(lang, checkout_info)
+    keyboard = checkout_keyboard(lang)
 
-    await callback.message.edit_text(
-        text,
-        reply_markup=checkout_keyboard(lang),
-        disable_web_page_preview=True,
-    )
+    if checkout_info["currency"] == "¥":
+        # Send QR photo for Alipay / WeChat
+        photo_path = QR_PHOTO_PATHS.get(user.payment_method)
+        if photo_path:
+            photo = FSInputFile(photo_path)
+            await callback.message.delete()
+            await callback.message.answer_photo(
+                photo,
+                caption=text,
+                reply_markup=keyboard,
+            )
+        else:
+            await callback.message.edit_text(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+    else:
+        # VISA — text message
+        await callback.message.edit_text(
+            text,
+            reply_markup=keyboard,
+            disable_web_page_preview=True,
+        )
 
 
 @router.callback_query(F.data == "payment:back")
 async def payment_back_handler(callback: CallbackQuery, session):
     await callback.answer()
-
-    user_repo = UserRepository(session)
-    user = await user_repo.get_by_telegram_id(callback.from_user.id)
-
-    if not user:
-        return
-
-    lang = user.language if user.language else "ru"
-
-    await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
-        disable_web_page_preview=True,
-    )
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
 
 
 @router.callback_query(F.data == "subscription:change_payment_method")
@@ -364,5 +383,3 @@ async def subscription_change_payment_method_handler(callback: CallbackQuery, se
         reply_markup=payment_method_keyboard(lang),
         parse_mode="HTML",
     )
-
-

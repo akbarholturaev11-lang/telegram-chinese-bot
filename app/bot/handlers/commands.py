@@ -11,7 +11,7 @@ from aiogram.types import (
 from app.config import settings
 from app.repositories.user_repo import UserRepository
 from app.bot.handlers.subscription import build_subscription_main_text_for_user
-from app.bot.keyboards.subscription import subscription_main_keyboard
+from app.bot.keyboards.subscription import subscription_main_keyboard, payment_method_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.utils.i18n import t
 
@@ -238,9 +238,9 @@ async def subscription_command_handler(message: Message, session):
     lang = user.language if user.language else "ru"
 
     await message.answer(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=subscription_main_keyboard(lang),
-        disable_web_page_preview=True,
+        t("payment_method_choose", lang),
+        reply_markup=payment_method_keyboard(lang),
+        parse_mode="HTML",
     )
 
 
