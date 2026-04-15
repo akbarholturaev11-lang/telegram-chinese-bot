@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 
@@ -16,9 +18,12 @@ from app.bot.keyboards.checkout import checkout_keyboard
 
 router = Router()
 
+# subscription.py → bot/handlers/ → bot/ → app/ → project root → app/static/payments/
+_STATIC_PAYMENTS = Path(__file__).parent.parent.parent / "static" / "payments"
+
 QR_PHOTO_PATHS = {
-    "alipay": "/app/static/payments/alipay.jpg",
-    "wechat": "/app/static/payments/wechat.jpg",
+    "alipay": str(_STATIC_PAYMENTS / "alipay.jpg"),
+    "wechat": str(_STATIC_PAYMENTS / "wechat.jpg"),
 }
 
 
