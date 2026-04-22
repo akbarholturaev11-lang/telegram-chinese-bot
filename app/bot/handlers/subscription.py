@@ -39,6 +39,7 @@ def build_subscription_main_text_for_user(user, lang: str) -> str:
         f"{t(plan_1m_key, lang)}"
     )
 
+    # Show discount hint only if user hasn't used it yet
     if not user.discount_used:
         base += f"\n\n{t('subscription_referral_hint', lang)}"
 
@@ -51,6 +52,7 @@ def build_subscription_discount_progress_text(
     count: int,
     discount_eligible: bool = False,
     discount_used: bool = False,
+    payment_method: str = None,
 ) -> str:
     base = (
         f"{t('subscription_discount_title', lang)}\n\n"
@@ -60,10 +62,15 @@ def build_subscription_discount_progress_text(
     )
 
     if discount_eligible and not discount_used:
+        # Show correct currency prices based on payment method
+        is_yuan = payment_method in ("alipay", "wechat")
+        plan_10_key = "subscription_discount_plan_10_days_yuan" if is_yuan else "subscription_discount_plan_10_days"
+        plan_1m_key = "subscription_discount_plan_1_month_yuan" if is_yuan else "subscription_discount_plan_1_month"
+
         base += (
             f"\n\n{t('subscription_discount_ready', lang)}\n\n"
-            f"{t('subscription_discount_plan_10_days', lang)}\n"
-            f"{t('subscription_discount_plan_1_month', lang)}"
+            f"{t(plan_10_key, lang)}\n"
+            f"{t(plan_1m_key, lang)}"
         )
 
     return base
@@ -126,7 +133,7 @@ def build_checkout_text(lang: str, checkout_info: dict) -> str:
 
     if discount_applied:
         lines.append(f"{t('subscription_original_price_label', lang)}: {base_amount} {currency}")
-        lines.append(f"{t('subscription_discounted_price_label', lang)}: {final_amount} {currency}")
+        lines.append(f"💎 {t('subscription_discounted_price_label', lang)}: {final_amount} {currency}")
     else:
         lines.append(f"{t('subscription_price_label', lang)}: {final_amount} {currency}")
 
@@ -172,8 +179,17 @@ async def subscription_referral_discount_handler(callback: CallbackQuery, sessio
         await callback.answer()
         return
 
+    # Guard: if user already used discount — ignore silently
+    if user.discount_used:
+        await callback.answer()
+        return
+
     await user_repo.ensure_referral_code(user)
-    await user_repo.start_discount_offer(user)
+
+    # Only start the offer once — do NOT reset count on repeated clicks
+    if not user.discount_offer_started_at:
+        await user_repo.start_discount_offer(user)
+
     await session.flush()
 
     lang = user.language if user.language else "ru"
@@ -186,6 +202,7 @@ async def subscription_referral_discount_handler(callback: CallbackQuery, sessio
         count,
         discount_eligible=user.discount_eligible,
         discount_used=user.discount_used,
+        payment_method=user.payment_method,
     )
     keyboard = (
         subscription_discount_ready_keyboard(lang)
@@ -366,7 +383,10 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
         photo_path = QR_PHOTO_PATHS.get(user.payment_method)
         if photo_path:
             photo = FSInputFile(photo_path)
-            await callback.message.delete()
+            try:
+                await callback.message.delete()
+            except Exception:
+                pass
             await callback.message.answer_photo(
                 photo,
                 caption=text,
@@ -380,11 +400,19 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
             )
     else:
         # VISA — text message
-        await callback.message.edit_text(
-            text,
-            reply_markup=keyboard,
-            disable_web_page_preview=True,
-        )
+        try:
+            await callback.message.edit_text(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+        except Exception:
+            await callback.message.delete()
+            await callback.message.answer(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
 
 
 @router.callback_query(F.data == "payment:back")

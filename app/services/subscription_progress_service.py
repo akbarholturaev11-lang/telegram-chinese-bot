@@ -30,6 +30,7 @@ class SubscriptionProgressService:
             count,
             discount_eligible=referrer_user.discount_eligible,
             discount_used=referrer_user.discount_used,
+            payment_method=referrer_user.payment_method,
         )
         keyboard = (
             subscription_discount_ready_keyboard(lang)

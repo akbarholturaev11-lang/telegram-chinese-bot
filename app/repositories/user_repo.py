@@ -167,6 +167,26 @@ class UserRepository:
         user.selected_plan_type = plan_type
         await self.session.flush()
 
+    async def get_all_users(self) -> list[User]:
+        result = await self.session.execute(select(User))
+        return list(result.scalars().all())
+
+    async def get_filtered_users(
+        self,
+        language: Optional[str] = None,
+        status: Optional[str] = None,
+        level: Optional[str] = None,
+    ) -> list[User]:
+        query = select(User)
+        if language:
+            query = query.where(User.language == language)
+        if status:
+            query = query.where(User.status == status)
+        if level:
+            query = query.where(User.level == level)
+        result = await self.session.execute(query)
+        return list(result.scalars().all())
+
     async def list_active_users_expiring_on(
         self,
         target_date: date,
