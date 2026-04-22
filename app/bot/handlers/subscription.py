@@ -70,7 +70,32 @@ def build_subscription_discount_progress_text(
 
 
 def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboardMarkup:
-    return subscription_main_keyboard(lang)
+    rows = [
+        [
+            InlineKeyboardButton(
+                text=t("subscription_button_10_days", lang),
+                callback_data="subscription:plan:10_days",
+            ),
+            InlineKeyboardButton(
+                text=t("subscription_button_1_month", lang),
+                callback_data="subscription:plan:1_month",
+            ),
+        ],
+    ]
+    if not user.discount_used:
+        rows.append([
+            InlineKeyboardButton(
+                text=t("subscription_referral_discount_button", lang),
+                callback_data="subscription:referral_discount",
+            )
+        ])
+    rows.append([
+        InlineKeyboardButton(
+            text=t("payment_back", lang),
+            callback_data="subscription:change_payment_method",
+        ),
+    ])
+    return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
 def build_checkout_text(lang: str, checkout_info: dict) -> str:
