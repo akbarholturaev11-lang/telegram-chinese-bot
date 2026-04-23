@@ -55,7 +55,6 @@ async def _redraw_panel(callback: CallbackQuery, data: dict) -> None:
 
 @router.message(Command("broadcast"))
 async def broadcast_command(message: Message, state: FSMContext):
-    print(f"[broadcast_command] user_id={message.from_user.id} is_admin={_is_admin(message.from_user.id)}", flush=True)
     if not _is_admin(message.from_user.id):
         return
 
