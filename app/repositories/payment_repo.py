@@ -104,3 +104,10 @@ class PaymentRepository:
         payment.admin_comment = admin_comment
         payment.reviewed_at = datetime.now(timezone.utc)
         await self.session.flush()
+
+    async def count_pending(self) -> int:
+        from sqlalchemy import func
+        result = await self.session.execute(
+            select(func.count()).where(Payment.payment_status == "pending")
+        )
+        return result.scalar() or 0

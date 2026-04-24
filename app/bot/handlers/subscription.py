@@ -424,6 +424,25 @@ async def payment_back_handler(callback: CallbackQuery, session):
         pass
 
 
+@router.callback_query(F.data == "payment:retry")
+async def payment_retry_handler(callback: CallbackQuery, session):
+    from app.repositories.user_repo import UserRepository
+    from app.bot.keyboards.subscription import subscription_main_keyboard
+
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+    await callback.answer()
+    await callback.message.answer(
+        t("subscription_main_title", lang),
+        reply_markup=subscription_main_keyboard(lang, show_discount=not user.discount_used),
+    )
+
+
 @router.callback_query(F.data == "subscription:change_payment_method")
 async def subscription_change_payment_method_handler(callback: CallbackQuery, session):
     await callback.answer()

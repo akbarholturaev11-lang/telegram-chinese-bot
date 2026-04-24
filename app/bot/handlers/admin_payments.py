@@ -5,10 +5,18 @@ from app.repositories.payment_repo import PaymentRepository
 from app.repositories.user_repo import UserRepository
 from app.services.subscription_service import SubscriptionService
 from app.services.payment_notify_service import PaymentNotifyService
-from app.bot.utils.i18n import t
+from app.bot.keyboards.admin_review import admin_reject_reason_keyboard
 
 
 router = Router()
+
+REJECT_REASON_LABELS = {
+    "wrong_amount": "Summa noto'g'ri",
+    "unclear_screenshot": "Screenshot noaniq edi",
+    "fake_suspected": "Shubhali ko'rindi",
+    "old_payment": "Eski to'lov",
+    "other": "Boshqa sabab",
+}
 
 
 @router.callback_query(F.data.startswith("admin_payment:approve:"))
@@ -21,11 +29,11 @@ async def admin_payment_approve_handler(callback: CallbackQuery, session):
     payment_id = int(callback.data.split(":")[2])
     payment = await payment_repo.get_by_id(payment_id)
     if not payment:
-        await callback.answer(t("admin_payment_not_found", "uz"), show_alert=True)
+        await callback.answer("To'lov topilmadi", show_alert=True)
         return
 
     if payment.payment_status != "pending":
-        await callback.answer(t("admin_payment_already_reviewed", "uz"), show_alert=True)
+        await callback.answer("Bu to'lov allaqachon ko'rib chiqilgan", show_alert=True)
         return
 
     await payment_repo.approve(payment, admin_comment="approved by admin")
@@ -37,7 +45,7 @@ async def admin_payment_approve_handler(callback: CallbackQuery, session):
     user = await user_repo.get_by_telegram_id(payment.user_telegram_id)
     await session.commit()
 
-    await callback.answer(t("admin_payment_approved", "uz"), show_alert=True)
+    await callback.answer("✅ Tasdiqlandi!", show_alert=True)
     await callback.message.edit_reply_markup(reply_markup=None)
 
     await payment_notify_service.notify_payment_approved(
@@ -52,14 +60,15 @@ async def admin_payment_reject_handler(callback: CallbackQuery, session):
     user_repo = UserRepository(session)
     payment_notify_service = PaymentNotifyService()
 
-    payment_id = int(callback.data.split(":")[2])
+    parts = callback.data.split(":")
+    payment_id = int(parts[2])
     payment = await payment_repo.get_by_id(payment_id)
     if not payment:
-        await callback.answer(t("admin_payment_not_found", "uz"), show_alert=True)
+        await callback.answer("To'lov topilmadi", show_alert=True)
         return
 
     if payment.payment_status != "pending":
-        await callback.answer(t("admin_payment_already_reviewed", "uz"), show_alert=True)
+        await callback.answer("Bu to'lov allaqachon ko'rib chiqilgan", show_alert=True)
         return
 
     await payment_repo.reject(payment, admin_comment="rejected by admin")
@@ -68,10 +77,60 @@ async def admin_payment_reject_handler(callback: CallbackQuery, session):
         await user_repo.set_selected_plan_type(user, payment.plan_type)
     await session.commit()
 
-    await callback.answer(t("admin_payment_rejected", "uz"), show_alert=True)
+    await callback.answer("❌ Rad etildi", show_alert=True)
     await callback.message.edit_reply_markup(reply_markup=None)
 
     await payment_notify_service.notify_payment_rejected(
         bot=callback.bot,
         user=user,
+        reason=None,
+        plan_type=payment.plan_type,
+    )
+
+
+@router.callback_query(F.data.startswith("admin_payment:reject_reason:"))
+async def admin_payment_reject_reason_select_handler(callback: CallbackQuery, session):
+    payment_id = int(callback.data.split(":")[2])
+    await callback.answer()
+    await callback.message.answer(
+        f"To'lov #{payment_id} uchun rad sababini tanlang:",
+        reply_markup=admin_reject_reason_keyboard(payment_id),
+    )
+
+
+@router.callback_query(F.data.startswith("admin_payment:reject_with:"))
+async def admin_payment_reject_with_reason_handler(callback: CallbackQuery, session):
+    payment_repo = PaymentRepository(session)
+    user_repo = UserRepository(session)
+    payment_notify_service = PaymentNotifyService()
+
+    parts = callback.data.split(":")
+    payment_id = int(parts[2])
+    reason_code = parts[3]
+
+    payment = await payment_repo.get_by_id(payment_id)
+    if not payment:
+        await callback.answer("To'lov topilmadi", show_alert=True)
+        return
+
+    if payment.payment_status != "pending":
+        await callback.answer("Bu to'lov allaqachon ko'rib chiqilgan", show_alert=True)
+        return
+
+    reason_label = REJECT_REASON_LABELS.get(reason_code, "Boshqa sabab")
+    await payment_repo.reject(payment, admin_comment=reason_label)
+
+    user = await user_repo.get_by_telegram_id(payment.user_telegram_id)
+    if user:
+        await user_repo.set_selected_plan_type(user, payment.plan_type)
+    await session.commit()
+
+    await callback.answer(f"❌ Rad etildi: {reason_label}", show_alert=True)
+    await callback.message.edit_reply_markup(reply_markup=None)
+
+    await payment_notify_service.notify_payment_rejected(
+        bot=callback.bot,
+        user=user,
+        reason=reason_label,
+        plan_type=payment.plan_type,
     )
