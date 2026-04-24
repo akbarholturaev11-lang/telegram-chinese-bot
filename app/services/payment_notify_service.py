@@ -1,5 +1,4 @@
 from aiogram import Bot
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 from app.bot.utils.i18n import t
 
@@ -14,11 +13,6 @@ REASON_TRANSLATIONS = {
 
 def _translate_reason(reason_code: str, lang: str) -> str:
     return REASON_TRANSLATIONS.get(reason_code, {}).get(lang, reason_code)
-
-
-def _retry_keyboard(lang: str) -> InlineKeyboardMarkup:
-    label = {"uz": "🔄 Qayta yuborish", "tj": "🔄 Аз нав фиристодан", "ru": "🔄 Отправить снова"}.get(lang, "🔄 Qayta yuborish")
-    return InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text=label, callback_data="payment:retry")]])
 
 
 class PaymentNotifyService:
@@ -41,6 +35,6 @@ class PaymentNotifyService:
             prefix = {"uz": "Sabab", "tj": "Сабаб", "ru": "Причина"}.get(lang, "Sabab")
             text += f"\n\n{prefix}: {translated}"
         try:
-            await bot.send_message(chat_id=user.telegram_id, text=text, reply_markup=_retry_keyboard(lang))
+            await bot.send_message(chat_id=user.telegram_id, text=text)
         except Exception:
             pass
