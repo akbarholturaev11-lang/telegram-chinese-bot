@@ -5,7 +5,6 @@ from aiogram.fsm.context import FSMContext
 
 from app.services.onboarding_service import OnboardingService
 from app.bot.utils.i18n import t
-from app.bot.keyboards.mode import mode_keyboard
 from app.bot.keyboards.onboarding import language_keyboard, level_keyboard
 from app.bot.fsm.onboarding import OnboardingStates
 
@@ -39,15 +38,13 @@ async def cmd_start(
         )
         return
 
-    welcome_msg = await message.answer(t("welcome", user.language, name=first_name))
-    choose_lang_msg = await message.answer(
-        t("choose_language", user.language),
+    onboarding_msg = await message.answer(
+        f"{t('welcome', user.language, name=first_name)}\n\n{t('choose_language', user.language)}",
         reply_markup=language_keyboard(),
     )
 
     await state.update_data(
-        welcome_message_id=welcome_msg.message_id,
-        choose_language_message_id=choose_lang_msg.message_id,
+        onboarding_message_id=onboarding_msg.message_id,
         first_name=first_name,
     )
     await state.set_state(OnboardingStates.choosing_language)
@@ -69,36 +66,21 @@ async def process_language(callback: CallbackQuery, state: FSMContext, session):
     await callback.answer()
 
     data = await state.get_data()
-    welcome_message_id = data.get("welcome_message_id")
-    choose_language_message_id = data.get("choose_language_message_id")
+    onboarding_message_id = data.get("onboarding_message_id")
     first_name = data.get("first_name", "Friend")
 
     try:
-        if welcome_message_id:
+        if onboarding_message_id:
             await callback.bot.edit_message_text(
                 chat_id=callback.message.chat.id,
-                message_id=welcome_message_id,
-                text=t("welcome", lang, name=first_name),
+                message_id=onboarding_message_id,
+                text=f"{t('welcome', lang, name=first_name)}\n\n{t('choose_level', lang)}",
+                reply_markup=level_keyboard(lang),
             )
     except Exception:
         pass
 
-    try:
-        if choose_language_message_id:
-            await callback.bot.delete_message(
-                callback.message.chat.id,
-                choose_language_message_id,
-            )
-    except Exception:
-        pass
-
-    await callback.message.answer(t("language_selected", lang))
-    choose_level_msg = await callback.message.answer(
-        t("choose_level", lang),
-        reply_markup=level_keyboard(lang),
-    )
-
-    await state.update_data(choose_level_message_id=choose_level_msg.message_id)
+    await state.update_data(lang=lang)
     await state.set_state(OnboardingStates.choosing_level)
 
 
@@ -113,26 +95,24 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
         full_name=callback.from_user.full_name if callback.from_user else None,
     )
     user.level = level
+    user.learning_mode = "qa"
     await session.commit()
 
     await callback.answer()
 
     data = await state.get_data()
-    choose_level_message_id = data.get("choose_level_message_id")
+    onboarding_message_id = data.get("onboarding_message_id")
 
     try:
-        if choose_level_message_id:
-            await callback.bot.delete_message(
-                callback.message.chat.id,
-                choose_level_message_id,
+        if onboarding_message_id:
+            await callback.bot.edit_message_text(
+                chat_id=callback.message.chat.id,
+                message_id=onboarding_message_id,
+                text=t("level_saved_explained", user.language),
             )
     except Exception:
         pass
 
-    await callback.message.answer(t("level_saved_explained", user.language))
-    await callback.message.answer(
-        t("choose_mode_after_level", user.language),
-        reply_markup=mode_keyboard(user.language),
-        parse_mode="HTML",
-    )
+    await callback.message.answer(t("trial_started_info", user.language))
+    await callback.message.answer(t("send_first_message", user.language))
     await state.clear()
