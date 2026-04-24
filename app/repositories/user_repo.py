@@ -200,5 +200,13 @@ class UserRepository:
             if user.end_date and user.end_date.date() == target_date
         ]
 
+    async def delete_by_telegram_id(self, telegram_id: int) -> bool:
+        user = await self.get_by_telegram_id(telegram_id)
+        if not user:
+            return False
+        await self.session.delete(user)
+        await self.session.flush()
+        return True
+
     def _generate_referral_code(self) -> str:
         return secrets.token_hex(4)
