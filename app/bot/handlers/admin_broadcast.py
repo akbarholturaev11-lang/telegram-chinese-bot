@@ -256,9 +256,13 @@ async def delete_user_command(message: Message, session):
 
     telegram_id = int(parts[1])
     repo = UserRepository(session)
-    deleted = await repo.delete_by_telegram_id(telegram_id)
-
-    if deleted:
-        await message.answer(f"✅ User {telegram_id} o'chirildi.")
-    else:
-        await message.answer(f"❌ User {telegram_id} topilmadi.")
+    try:
+        deleted = await repo.delete_by_telegram_id(telegram_id)
+        await session.commit()
+        if deleted:
+            await message.answer(f"✅ User {telegram_id} o'chirildi.")
+        else:
+            await message.answer(f"❌ User {telegram_id} topilmadi.")
+    except Exception as e:
+        await session.rollback()
+        await message.answer(f"❌ Xato: {e}")
