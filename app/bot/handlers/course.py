@@ -475,7 +475,7 @@ async def course_progress_handler(callback: CallbackQuery, session):
         return
 
     current_lesson = lesson.title if lesson else "-"
-    completed_count = progress.completed_lessons_count if progress else 0
+    completed_count = getattr(progress, "completed_lessons_count", 0) or 0
 
     text = (
         f"📊 {t('course_progress', lang)}\n\n"
@@ -586,7 +586,7 @@ async def course_retry_test_handler(callback: CallbackQuery, session):
         user_message=t("course_start_quiz", lang),
     )
 
-    await message.answer(text)
+    await callback.message.answer(text)
 
 
 @router.callback_query(F.data == "course:satisfied_yes")
