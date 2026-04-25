@@ -205,6 +205,48 @@ def _profile_text(user, lang: str) -> str:
         text += "\n\n✅ <b>У вас активная подписка.</b> Вы можете пользоваться всеми функциями бота."
     return text
 
+def profile_menu_keyboard(lang: str) -> InlineKeyboardMarkup:
+    labels = {
+        "tj": {
+            "subscription": "💎 Обуна",
+            "language": "🌐 Забон",
+            "level": "📊 Дараҷа",
+            "course": "📚 Курс",
+            "qa": "💬 Саволу ҷавоб",
+        },
+        "uz": {
+            "subscription": "💎 Obuna",
+            "language": "🌐 Til",
+            "level": "📊 Daraja",
+            "course": "📚 Kurs",
+            "qa": "💬 Savol-javob",
+        },
+        "ru": {
+            "subscription": "💎 Подписка",
+            "language": "🌐 Язык",
+            "level": "📊 Уровень",
+            "course": "📚 Курс",
+            "qa": "💬 Вопрос-ответ",
+        },
+    }
+    l = labels.get(lang, labels["ru"])
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text=l["subscription"], callback_data="subscription:open"),
+                InlineKeyboardButton(text=l["language"], callback_data="profile_menu:language"),
+            ],
+            [
+                InlineKeyboardButton(text=l["level"], callback_data="profile_menu:level"),
+                InlineKeyboardButton(text=l["course"], callback_data="profile_menu:course"),
+            ],
+            [
+                InlineKeyboardButton(text=l["qa"], callback_data="profile_menu:qa"),
+            ],
+        ]
+    )
+
+
 @router.message(Command("profile"))
 async def profile_command(message: Message, session):
     user = await UserRepository(session).get_by_telegram_id(message.from_user.id)
@@ -215,18 +257,11 @@ async def profile_command(message: Message, session):
         return
 
     text = _profile_text(user, lang)
-
-    if getattr(user, "status", "") != "active":
-        await message.answer(
-            text,
-            parse_mode="HTML",
-            reply_markup=photo_limit_subscription_keyboard(lang),
-        )
-    else:
-        await message.answer(
-            text,
-            parse_mode="HTML",
-        )
+    await message.answer(
+        text,
+        parse_mode="HTML",
+        reply_markup=profile_menu_keyboard(lang),
+    )
 
 
 @router.message(Command("subscription"))
@@ -489,4 +524,50 @@ async def admin_stats_handler(message: Message, session):
     )
 
     await message.answer(text, parse_mode="HTML")
+
+
+@router.callback_query(F.data == "profile_menu:language")
+async def profile_menu_language(callback: CallbackQuery, session):
+    user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
+    lang = user.language if user and user.language else "ru"
+    await callback.answer()
+    await callback.message.answer(
+        t("choose_language", lang),
+        reply_markup=command_language_keyboard(),
+    )
+
+@router.callback_query(F.data == "profile_menu:level")
+async def profile_menu_level(callback: CallbackQuery, session):
+    from app.bot.keyboards.onboarding import level_keyboard
+    user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
+    lang = user.language if user and user.language else "ru"
+    await callback.answer()
+    await callback.message.answer(
+        t("choose_level", lang),
+        reply_markup=level_keyboard(lang),
+    )
+
+@router.callback_query(F.data == "profile_menu:course")
+async def profile_menu_course(callback: CallbackQuery, session):
+    from app.bot.handlers.course import _run_course_entry_flow
+    await callback.answer()
+    await _run_course_entry_flow(
+        session=session,
+        telegram_id=callback.from_user.id,
+        respond=callback.message.answer,
+    )
+
+@router.callback_query(F.data == "profile_menu:qa")
+async def profile_menu_qa(callback: CallbackQuery, session):
+    from app.repositories.user_repo import UserRepository as UR
+    user_repo = UR(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+    user.learning_mode = "qa"
+    await session.commit()
+    lang = user.language if user.language else "ru"
+    await callback.answer()
+    await callback.message.answer(t("send_first_message", lang))
 
