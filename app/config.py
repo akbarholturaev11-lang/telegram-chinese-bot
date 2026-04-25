@@ -36,4 +36,4 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
-COURSE_MODE_ENABLED = False
+COURSE_MODE_ENABLED = True
