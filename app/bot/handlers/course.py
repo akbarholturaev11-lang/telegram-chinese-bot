@@ -8,7 +8,7 @@ from app.services.course_engine_service import CourseEngineService
 from app.services.course_tutor_service import CourseTutorService
 from app.bot.utils.i18n import t
 from app.bot.keyboards.course import course_menu_keyboard, lesson_selection_keyboard, review_choice_keyboard
-from app.bot.keyboards.referral import photo_limit_subscription_keyboard
+from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
     course_resume_keyboard,
     course_review_offer_keyboard,
@@ -111,7 +111,8 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
         await callback.answer()
         await callback.message.answer(
             t("course_only_active_users", lang),
-            reply_markup=photo_limit_subscription_keyboard(lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
         )
         return
 
@@ -199,7 +200,8 @@ async def _run_course_entry_flow(
     if user.status != "active":
         await respond(
             t("course_only_active_users", lang),
-            reply_markup=photo_limit_subscription_keyboard(lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
         )
         return
 
@@ -424,7 +426,8 @@ async def course_progress_handler(callback: CallbackQuery, session):
         await callback.answer()
         await callback.message.answer(
             t("course_only_active_users", lang),
-            reply_markup=photo_limit_subscription_keyboard(lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
         )
         return
 
@@ -469,7 +472,8 @@ async def course_review_last_handler(callback: CallbackQuery, session):
         await callback.answer()
         await callback.message.answer(
             t("course_only_active_users", lang),
-            reply_markup=photo_limit_subscription_keyboard(lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
         )
         return
 
@@ -516,7 +520,8 @@ async def course_retry_test_handler(callback: CallbackQuery, session):
         await callback.answer()
         await callback.message.answer(
             t("course_only_active_users", lang),
-            reply_markup=photo_limit_subscription_keyboard(lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
         )
         return
 
