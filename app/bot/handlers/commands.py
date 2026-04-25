@@ -7,6 +7,8 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton,
 )
+from sqlalchemy import select, func
+from app.db.models.user import User
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
@@ -404,4 +406,87 @@ async def help_command_handler(message: Message, session):
         parse_mode="HTML",
         disable_web_page_preview=True,
     )
+
+
+@router.message(Command("admin_stats"))
+async def admin_stats_handler(message: Message, session):
+    from app.config import settings
+
+    admin_ids = [int(x.strip()) for x in settings.ADMIN_IDS.split(",") if x.strip()]
+    if message.from_user.id not in admin_ids:
+        return
+
+    # Count users by status
+    result = await session.execute(
+        select(User.status, func.count().label("cnt")).group_by(User.status)
+    )
+    status_counts = {row.status: row.cnt for row in result.fetchall()}
+
+    # Count users by language
+    result = await session.execute(
+        select(User.language, func.count().label("cnt")).group_by(User.language)
+    )
+    lang_counts = {row.language: row.cnt for row in result.fetchall()}
+
+    # Total users
+    result = await session.execute(select(func.count()).select_from(User))
+    total = result.scalar() or 0
+
+    # Users who asked at least 1 question
+    result = await session.execute(
+        select(func.count()).select_from(User).where(User.questions_used > 0)
+    )
+    active_users = result.scalar() or 0
+
+    # Users registered in last 7 days
+    from datetime import datetime, timezone, timedelta
+    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
+    result = await session.execute(
+        select(func.count()).select_from(User).where(User.created_at >= week_ago)
+    )
+    new_this_week = result.scalar() or 0
+
+    # Pending payments
+    from app.db.models.payment import Payment
+    result = await session.execute(
+        select(func.count()).select_from(Payment).where(Payment.payment_status == "pending")
+    )
+    pending_payments = result.scalar() or 0
+
+    # Approved payments total
+    result = await session.execute(
+        select(func.count()).select_from(Payment).where(Payment.payment_status == "approved")
+    )
+    total_paid = result.scalar() or 0
+
+    trial = status_counts.get("trial", 0)
+    active = status_counts.get("active", 0)
+    expired = status_counts.get("expired", 0)
+    blocked = status_counts.get("blocked", 0)
+
+    conversion = round(active / total * 100, 1) if total > 0 else 0
+    engagement = round(active_users / total * 100, 1) if total > 0 else 0
+
+    lang_str = " | ".join(f"{k}: {v}" for k, v in sorted(lang_counts.items()))
+
+    text = (
+        f"📊 <b>Admin statistika</b>\n\n"
+        f"<b>👥 Foydalanuvchilar:</b>\n"
+        f"  Jami: {total}\n"
+        f"  Trial: {trial}\n"
+        f"  Aktiv obuna: {active}\n"
+        f"  Tugagan: {expired}\n"
+        f"  Bloklangan: {blocked}\n\n"
+        f"<b>📈 Konversiya:</b>\n"
+        f"  Trial → Obuna: {conversion}%\n"
+        f"  Savol berganlar: {active_users} ({engagement}%)\n"
+        f"  Bu hafta yangilar: +{new_this_week}\n\n"
+        f"<b>💳 To'lovlar:</b>\n"
+        f"  Kutilmoqda: {pending_payments}\n"
+        f"  Jami tasdiqlangan: {total_paid}\n\n"
+        f"<b>🌐 Tillar:</b>\n"
+        f"  {lang_str}"
+    )
+
+    await message.answer(text, parse_mode="HTML")
 
