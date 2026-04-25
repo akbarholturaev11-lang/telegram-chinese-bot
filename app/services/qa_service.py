@@ -71,8 +71,8 @@ class QAService:
             history.insert(
                 0,
                 {
-                    "role": "system",
-                    "content": onboarding_challenge.content,
+                    "role": "user",
+                    "content": f"[Context for this conversation: {onboarding_challenge.content}]",
                 },
             )
 
