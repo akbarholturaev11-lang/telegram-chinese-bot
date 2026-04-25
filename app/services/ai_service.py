@@ -35,20 +35,13 @@ class AIService:
             {
                 "role": "system",
                 "content": system_prompt,
-            },
-            {
-                "role": "system",
-                "content": f"""
-        CRITICAL:
-        You MUST answer ONLY in {user_language}.
-        IGNORE the language of the user message.
-        If you use another language — the answer is WRONG.
-        """
             }
         ]
 
         if history:
-            messages.extend(history)
+            for msg in history:
+                if msg.get("role") in ("user", "assistant"):
+                    messages.append(msg)
 
         messages.append(
             {
@@ -58,8 +51,9 @@ class AIService:
         )
 
         response = await self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=messages,
+            temperature=0.7,
         )
 
         return response.choices[0].message.content or ""
@@ -74,7 +68,7 @@ class AIService:
         data_url = f"data:{mime_type};base64,{image_b64}"
 
         response = await self.client.chat.completions.create(
-            model="gpt-4o-mini",
+            model="gpt-4o",
             messages=[
                 {
                     "role": "user",
