@@ -52,7 +52,7 @@ class AIService:
         )
 
         response = await self.client.chat.completions.create(
-            model=model_override or "gpt-4o-mini",
+            model=model_override or "gpt-4o",
             messages=messages,
             temperature=0.7,
         )

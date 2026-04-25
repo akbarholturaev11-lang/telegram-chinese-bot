@@ -2,7 +2,7 @@ import json
 from typing import Any
 from app.services.ai_service import AIService
 
-COURSE_MODEL = "gpt-4o"
+COURSE_MODEL = "gpt-4.1"
 
 class CourseTutorService:
     def __init__(self):
