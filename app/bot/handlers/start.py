@@ -295,5 +295,6 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
             content=ai_context,
             content_type="onboarding_challenge",
         )
+        await session.commit()
 
     await state.clear()
