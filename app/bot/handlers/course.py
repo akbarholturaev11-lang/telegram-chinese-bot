@@ -90,6 +90,43 @@ def get_course_keyboard_for_step(lang: str, step: str):
         return course_next_lesson_keyboard(lang)
     return course_resume_keyboard(lang)
 
+@router.callback_query(F.data.startswith("course:lessons_page:"))
+async def course_lessons_page_handler(callback: CallbackQuery, session):
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+
+    if user.status != "active":
+        await callback.answer()
+        await callback.message.answer(
+            t("course_only_active_users", lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
+        )
+        return
+
+    try:
+        page = int(callback.data.split(":")[-1])
+    except Exception:
+        page = 0
+
+    lessons = await engine.lesson_repo.list_by_level(user.level)
+
+    await callback.answer()
+    await callback.message.edit_reply_markup(
+        reply_markup=lesson_selection_keyboard(lessons, page=page, lang=lang)
+    )
+
+
 @router.callback_query(F.data.startswith("course:pick_lesson:"))
 async def course_pick_lesson_handler(callback: CallbackQuery, session):
     if await _block_if_course_disabled(callback, session):
@@ -222,7 +259,7 @@ async def _run_course_entry_flow(
         lessons = await engine.lesson_repo.list_by_level(user.level)
         await respond(
             f"HSK {user.level[-1] if user.level and user.level.startswith('hsk') else user.level}. {t('course_choose_lesson', lang)}",
-            reply_markup=lesson_selection_keyboard(lessons),
+            reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang),
         )
         return
 
