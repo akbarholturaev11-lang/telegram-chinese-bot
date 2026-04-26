@@ -257,8 +257,18 @@ async def _run_course_entry_flow(
 
     if not progress.current_lesson_id:
         lessons = await engine.lesson_repo.list_by_level(user.level)
+
+        if not lessons:
+            # Fallback: try hsk2 if no lessons for current level
+            lessons = await engine.lesson_repo.list_by_level("hsk2")
+
+        if not lessons:
+            await respond(t("course_no_lessons_available", lang))
+            return
+
+        level_label = user.level.upper() if user.level else "HSK"
         await respond(
-            f"HSK {user.level[-1] if user.level and user.level.startswith('hsk') else user.level}. {t('course_choose_lesson', lang)}",
+            f"{level_label}. {t('course_choose_lesson', lang)}",
             reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang),
         )
         return
