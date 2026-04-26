@@ -285,6 +285,11 @@ async def _run_course_entry_flow(
         await respond(t(error_key, lang))
         return
 
+    from app.bot.keyboards.course import (
+        course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
+        course_grammar_keyboard, course_exercise_keyboard,
+    )
+
     text = await tutor.generate_step_response(
         user_language=user.language,
         user_level=user.level,
@@ -293,7 +298,16 @@ async def _run_course_entry_flow(
         user_message="",
     )
 
-    await respond(text)
+    step_keyboards = {
+        "intro":    lambda: course_intro_keyboard(lang),
+        "vocab":    lambda: course_vocab_keyboard(lang),
+        "dialogue": lambda: course_dialogue_keyboard(lang),
+        "grammar":  lambda: course_grammar_keyboard(lang),
+        "exercise": lambda: course_exercise_keyboard(lang),
+    }
+
+    keyboard = step_keyboards.get(progress.current_step, lambda: None)()
+    await respond(text, reply_markup=keyboard)
 
 @router.message(F.text == "/course")
 async def course_command_handler(message: Message, session):
@@ -741,6 +755,132 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
 
     await callback.answer()
     await callback.message.answer(text)
+
+
+async def _go_to_step(callback, session, step: str):
+    """Helper: advance to a specific step and generate response."""
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    from app.bot.keyboards.course import (
+        course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
+        course_grammar_keyboard, course_exercise_keyboard,
+    )
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+    tutor = CourseTutorService()
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+    user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)
+    if error_key:
+        await callback.answer()
+        await callback.message.answer(t(error_key, lang))
+        return
+
+    await engine.progress_repo.set_current_lesson_and_step(
+        progress=progress,
+        lesson_id=lesson.id,
+        step=step,
+        waiting_for="none",
+    )
+    await session.commit()
+
+    text = await tutor.generate_step_response(
+        user_language=user.language,
+        user_level=user.level,
+        lesson=lesson,
+        step=step,
+        user_message="",
+    )
+
+    step_keyboards = {
+        "intro":    lambda: course_intro_keyboard(lang),
+        "vocab":    lambda: course_vocab_keyboard(lang),
+        "dialogue": lambda: course_dialogue_keyboard(lang),
+        "grammar":  lambda: course_grammar_keyboard(lang),
+        "exercise": lambda: course_exercise_keyboard(lang),
+    }
+
+    keyboard = step_keyboards.get(step, lambda: None)()
+
+    await callback.answer()
+    await callback.message.answer(text, reply_markup=keyboard)
+
+
+@router.callback_query(F.data == "course:go_vocab")
+async def course_go_vocab(callback: CallbackQuery, session):
+    await _go_to_step(callback, session, "vocab")
+
+@router.callback_query(F.data == "course:go_dialogue")
+async def course_go_dialogue(callback: CallbackQuery, session):
+    await _go_to_step(callback, session, "dialogue")
+
+@router.callback_query(F.data == "course:go_grammar")
+async def course_go_grammar(callback: CallbackQuery, session):
+    await _go_to_step(callback, session, "grammar")
+
+@router.callback_query(F.data == "course:go_exercise")
+async def course_go_exercise(callback: CallbackQuery, session):
+    await _go_to_step(callback, session, "exercise")
+
+@router.callback_query(F.data == "course:go_quiz")
+async def course_go_quiz(callback: CallbackQuery, session):
+    await _go_to_step(callback, session, "quiz")
+
+@router.callback_query(F.data == "course:repeat_step")
+async def course_repeat_step(callback: CallbackQuery, session):
+    """Repeat current step."""
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    from app.bot.keyboards.course import (
+        course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
+        course_grammar_keyboard, course_exercise_keyboard,
+    )
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+    tutor = CourseTutorService()
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+    user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)
+    if error_key:
+        await callback.answer()
+        await callback.message.answer(t(error_key, lang))
+        return
+
+    step = progress.current_step
+
+    text = await tutor.generate_step_response(
+        user_language=user.language,
+        user_level=user.level,
+        lesson=lesson,
+        step=step,
+        user_message="",
+    )
+
+    step_keyboards = {
+        "intro":    lambda: course_intro_keyboard(lang),
+        "vocab":    lambda: course_vocab_keyboard(lang),
+        "dialogue": lambda: course_dialogue_keyboard(lang),
+        "grammar":  lambda: course_grammar_keyboard(lang),
+        "exercise": lambda: course_exercise_keyboard(lang),
+    }
+
+    keyboard = step_keyboards.get(step, lambda: None)()
+    await callback.answer()
+    await callback.message.answer(text, reply_markup=keyboard)
 
 
 @router.callback_query(F.data == "course:skip_next_study_time")
