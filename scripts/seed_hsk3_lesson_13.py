@@ -3,7 +3,7 @@ import json
 
 from sqlalchemy import select
 
-from app.db.session import SessionLocal
+from app.db.session import async_session_maker as SessionLocal
 from app.db.models.course_lessons import CourseLesson
 
 
