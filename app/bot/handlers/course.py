@@ -22,6 +22,7 @@ from app.bot.utils.course_formatter import (
     format_intro, format_vocab, format_dialogue,
     format_grammar, format_exercise,
 )
+from app.bot.keyboards.main_menu import course_menu_keyboard, main_menu_keyboard
 
 
 
@@ -178,7 +179,7 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
         await callback.message.delete()
     except Exception:
         pass
-    await _run_course_entry_flow(
+    await run_course_entry_flow(
         session=session,
         telegram_id=callback.from_user.id,
         respond=callback.message.answer,
@@ -212,7 +213,7 @@ async def course_mode_open_handler(callback: CallbackQuery, session):
         return
 
     await callback.answer()
-    await _run_course_entry_flow(
+    await run_course_entry_flow(
         session=session,
         telegram_id=callback.from_user.id,
         respond=callback.message.answer,
@@ -221,7 +222,7 @@ async def course_mode_open_handler(callback: CallbackQuery, session):
 
 
 
-async def _run_course_entry_flow(
+async def run_course_entry_flow(
     *,
     session,
     telegram_id: int,
@@ -246,8 +247,12 @@ async def _run_course_entry_flow(
         )
         return
 
+    was_in_course = user.learning_mode == "course"
     user.learning_mode = "course"
     await session.commit()
+
+    if not was_in_course:
+        await respond(t("course_menu_title", lang), reply_markup=course_menu_keyboard(lang))
 
     progress = await engine.progress_repo.get_by_user_id(user.id)
     if not progress:
@@ -340,7 +345,7 @@ async def course_command_handler(message: Message, session):
         await message.answer(msg_map.get(lang, msg_map["ru"]))
         return
 
-    await _run_course_entry_flow(
+    await run_course_entry_flow(
         session=session,
         telegram_id=message.from_user.id,
         respond=message.answer,
@@ -366,7 +371,7 @@ async def course_back_to_qa_handler(callback: CallbackQuery, session):
     lang = user.language if user.language else "ru"
 
     await callback.answer()
-    await callback.message.answer(t("send_first_message", lang))
+    await callback.message.answer(t("send_first_message", lang), reply_markup=main_menu_keyboard(lang))
 
 
 
@@ -377,7 +382,7 @@ async def course_continue_handler(callback: CallbackQuery, session):
         return
 
     await callback.answer()
-    await _run_course_entry_flow(
+    await run_course_entry_flow(
         session=session,
         telegram_id=callback.from_user.id,
         respond=callback.message.answer,

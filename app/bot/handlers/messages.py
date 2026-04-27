@@ -5,8 +5,9 @@ from aiogram import F, Router
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 
 from app.bot.utils.response_effect import ResponseEffect
-from app.bot.handlers.course import get_course_keyboard_for_step
+from app.bot.handlers.course import get_course_keyboard_for_step, run_course_entry_flow
 from app.bot.keyboards.checkout import checkout_keyboard
+from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.keyboards.referral import referral_daily_limit_keyboard
 from app.repositories.message_repo import MessageRepository
@@ -89,6 +90,36 @@ async def handle_text_message(message: Message, session):
     if user and user.learning_mode == "course":
         engine = CourseEngineService(session)
         tutor = CourseTutorService()
+
+        msg_text = (message.text or "").strip()
+
+        if msg_text == t("course_continue_button", user_lang):
+            await run_course_entry_flow(
+                session=session,
+                telegram_id=message.from_user.id,
+                respond=message.answer,
+            )
+            return
+
+        if msg_text == t("course_progress", user_lang):
+            current_user, progress, lesson, error_key = await engine.get_current_lesson(message.from_user.id)
+            if error_key:
+                await message.answer(t(error_key, user_lang))
+                return
+            current_lesson = lesson.title if lesson else "-"
+            completed_count = getattr(progress, "completed_lessons_count", 0) or 0
+            await message.answer(
+                f"📊 {t('course_progress', user_lang)}\n\n"
+                f"{t('course_current_lesson', user_lang)}: {current_lesson}\n"
+                f"{t('course_completed_lessons', user_lang)}: {completed_count}"
+            )
+            return
+
+        if msg_text == t("course_back_to_qa_button", user_lang):
+            user.learning_mode = "qa"
+            await session.commit()
+            await message.answer(t("send_first_message", user_lang), reply_markup=main_menu_keyboard(user_lang))
+            return
 
         current_user, progress, lesson, error_key = await engine.get_current_lesson(message.from_user.id)
         if error_key:
