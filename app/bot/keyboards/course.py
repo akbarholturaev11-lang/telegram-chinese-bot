@@ -77,6 +77,15 @@ def course_homework_keyboard(lang: str) -> InlineKeyboardMarkup:
     ]])
 
 
+def review_choice_keyboard(lang: str) -> InlineKeyboardMarkup:
+    yes_labels = {"uz": "✅ Ha, takrorlaymiz", "tj": "✅ Бале, такрор мекунем", "ru": "✅ Да, повторим"}
+    no_labels  = {"uz": "➡️ Yo'q, keyingisiga", "tj": "➡️ Не, ба навбатӣ", "ru": "➡️ Нет, к следующему"}
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=yes_labels.get(lang, yes_labels["ru"]), callback_data="course:review_yes"),
+        InlineKeyboardButton(text=no_labels.get(lang, no_labels["ru"]),  callback_data="course:review_no"),
+    ]])
+
+
 def lesson_selection_keyboard(
     lessons: list,
     page: int = 0,

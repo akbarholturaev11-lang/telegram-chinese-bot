@@ -7,7 +7,7 @@ from app.repositories.user_repo import UserRepository
 from app.services.course_engine_service import CourseEngineService
 from app.services.course_tutor_service import CourseTutorService
 from app.bot.utils.i18n import t
-from app.bot.keyboards.course import course_menu_keyboard, lesson_selection_keyboard, review_choice_keyboard
+from app.bot.keyboards.course import lesson_selection_keyboard, review_choice_keyboard
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
     course_resume_keyboard,
