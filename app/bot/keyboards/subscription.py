@@ -75,13 +75,13 @@ def subscription_discount_ready_keyboard(lang: str) -> InlineKeyboardMarkup:
 def payment_method_keyboard(lang: str):
     return InlineKeyboardMarkup(inline_keyboard=[
         [
-            InlineKeyboardButton(text="VISA", callback_data="payment:visa"),
+            InlineKeyboardButton(text="💳 VISA card", callback_data="payment:visa"),
         ],
         [
-            InlineKeyboardButton(text="Alipay", callback_data="payment:alipay"),
+            InlineKeyboardButton(text="🇨🇳 Alipay", callback_data="payment:alipay"),
         ],
         [
-            InlineKeyboardButton(text="WeChat Pay", callback_data="payment:wechat"),
+            InlineKeyboardButton(text="🇨🇳 WeChat Pay", callback_data="payment:wechat"),
         ],
         [
             InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
