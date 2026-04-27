@@ -253,6 +253,8 @@ async def run_course_entry_flow(
 
     if not was_in_course:
         await respond(t("course_menu_title", lang), reply_markup=course_menu_keyboard(lang))
+    else:
+        await respond("📚", reply_markup=course_menu_keyboard(lang))
 
     progress = await engine.progress_repo.get_by_user_id(user.id)
     if not progress:
