@@ -157,26 +157,9 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
     if await _block_if_course_disabled(callback, session):
         return
 
-    user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     lang = callback.from_user.language_code if callback.from_user.language_code in ["ru", "uz", "tj"] else "ru"
-    user = await user_repo.get_by_telegram_id(callback.from_user.id)
-
-    if not user:
-        await callback.answer()
-        await callback.message.answer(t("user_not_found", lang))
-        return
-
-    if user.status != "active":
-        await callback.answer()
-        await callback.message.answer(
-            t("course_only_active_users", lang),
-            reply_markup=payment_method_keyboard(lang),
-            parse_mode="HTML",
-        )
-        return
 
     try:
         lesson_id = int(callback.data.split(":")[-1])
@@ -184,26 +167,22 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
         await callback.answer()
         return
 
-    user, progress, lesson, error_key = await engine.pick_lesson(callback.from_user.id, lesson_id)
+    _, _, _, error_key = await engine.pick_lesson(callback.from_user.id, lesson_id)
     if error_key:
         await callback.answer()
         await callback.message.answer(t(error_key, lang))
         return
-
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step=progress.current_step,
-        user_message="",
-    )
 
     await callback.answer()
     try:
         await callback.message.delete()
     except Exception:
         pass
-    await callback.message.answer(text)
+    await _run_course_entry_flow(
+        session=session,
+        telegram_id=callback.from_user.id,
+        respond=callback.message.answer,
+    )
 
 
 
