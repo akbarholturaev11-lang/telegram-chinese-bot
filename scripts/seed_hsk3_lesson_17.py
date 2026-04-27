@@ -11,7 +11,8 @@ LESSON = {
     "level": "hsk3",
     "lesson_order": 17,
     "lesson_code": "HSK3-L17",
-    "title": "谁都有办法看好你的"病"",
+    "title": '谁都有办法看好你的"病"',
+
     "goal": "using suggestions, methods, and indefinite pronouns",
     "intro_text": "This lesson focuses on using suggestions, methods, and indefinite pronouns. It uses 5 key vocabulary words and covers the main grammar patterns 双音节动词重叠 and 疑问代词活用 3.",
     "vocabulary_json": json.dumps(
@@ -63,9 +64,11 @@ LESSON = {
                         "dialogue": [
                                 {
                                         "speaker": "A",
-                                        "zh": "谁都有办法看好你的"病"。",
+                                        "zh": '谁都有办法看好你的"病"。',
+
                                         "pinyin": "",
-                                        "translation": "Anyone can find a way to cure your \"illness\"."
+                                        "translation": 'Anyone can find a way to cure your \"illness\".'
+
                                 },
                                 {
                                         "speaker": "B",
@@ -105,7 +108,8 @@ LESSON = {
                         "explanation": "This topic shows how repeating a verb can soften the tone or make the meaning more natural.",
                         "examples": [
                                 {
-                                        "zh": "谁都有办法看好你的"病"。",
+                                        "zh": '谁都有办法看好你的"病"。',
+
                                         "pinyin": "",
                                         "meaning": "The main pattern from the lesson title."
                                 },
@@ -233,7 +237,8 @@ LESSON = {
                 {
                         "no": 2,
                         "instruction": "Write a short text of 4-5 sentences about the lesson topic:",
-                        "topic": "谁都有办法看好你的"病""
+                        "topic": '谁都有办法看好你的"病"'
+
                 }
         ],
         ensure_ascii=False,

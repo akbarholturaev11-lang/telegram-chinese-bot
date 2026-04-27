@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L05",
     "title": "我最近越来越胖了",
     "goal": "expressing health changes and progressive states",
-    "intro_text": "This lesson is dedicated to expressing health changes and progressive states. It uses 5 key vocabulary words and covers core grammar patterns such as "了" expressing change and 越来越 + Adj/Mental V.",
+    "intro_text": 'This lesson is dedicated to expressing health changes and progressive states. It uses 5 key vocabulary words and covers core grammar patterns such as "了" expressing change and 越来越 + Adj/Mental V.',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""了"表示变化",
+                        "title_zh": '"了"表示变化',
+
                         "explanation": "This grammar topic helps to practise the core sentence patterns of the lesson in context.",
                         "examples": [
                                 {

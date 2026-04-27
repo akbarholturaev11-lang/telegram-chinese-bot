@@ -101,7 +101,7 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""还是"和"或者"",
+                        "title_zh": '"还是"和"或者"',
                         "explanation": "This grammar topic helps to practice the core sentence patterns of the lesson in context.",
                         "examples": [
                                 {

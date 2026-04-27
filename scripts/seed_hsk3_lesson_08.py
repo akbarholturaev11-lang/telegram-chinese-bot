@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L08",
     "title": "你去哪儿我就去哪儿",
     "goal": "freely using interrogative pronouns and expressing direction",
-    "intro_text": "This lesson is dedicated to freely using interrogative pronouns and expressing direction. It introduces 5 key vocabulary words and covers core grammar patterns such as "又"和"再" and 疑问代词活用 1.",
+    "intro_text": 'This lesson is dedicated to freely using interrogative pronouns and expressing direction. It introduces 5 key vocabulary words and covers core grammar patterns such as "又"和"再" and 疑问代词活用 1.',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""又"和"再"",
+                        "title_zh": '"又"和"再"',
+
                         "explanation": "This grammar topic helps practice the core sentence patterns used in the lesson.",
                         "examples": [
                                 {

@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L11",
     "title": "别忘了把空调关了",
     "goal": "giving reminders and using the 把 sentence structure",
-    "intro_text": "This lesson is dedicated to giving reminders and using the 把 sentence structure. It uses 5 key vocabulary words and covers core grammar patterns such as "把"字句 1：A 把 B + V + …… and 概数的表达 2：左右.",
+    "intro_text": 'This lesson is dedicated to giving reminders and using the 把 sentence structure. It uses 5 key vocabulary words and covers core grammar patterns such as "把"字句 1：A 把 B + V + …… and 概数的表达 2：左右.',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""把"字句 1：A 把 B + V + ……",
+                        "title_zh": '"把"字句 1：A 把 B + V + ……',
+
                         "explanation": "This structure moves the affected object to the front to emphasise the result or direction.",
                         "examples": [
                                 {

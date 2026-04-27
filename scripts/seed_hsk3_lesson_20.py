@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L20",
     "title": "我被他影响了",
     "goal": "using passive voice and restrictive conditions",
-    "intro_text": "This lesson is dedicated to using passive voice and restrictive conditions. It uses 5 key vocabulary words and covers core grammar patterns such as "被"字句 and 只有……才……",
+    "intro_text": 'This lesson is dedicated to using passive voice and restrictive conditions. It uses 5 key vocabulary words and covers core grammar patterns such as "被"字句 and 只有……才……',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""被"字句",
+                        "title_zh": '"被"字句',
+
                         "explanation": "This structure expresses a passive meaning and shows who or what is affected by the action.",
                         "examples": [
                                 {

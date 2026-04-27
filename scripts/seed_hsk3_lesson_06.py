@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L06",
     "title": "怎么突然找不到了",
     "goal": "searching for lost items and asking about location",
-    "intro_text": "This lesson is dedicated to searching for lost items and asking about location. It uses 5 key vocabulary words and covers core grammar patterns such as 可能补语：V得/不 + Complements and "呢" asking about location.",
+    "intro_text": 'This lesson is dedicated to searching for lost items and asking about location. It uses 5 key vocabulary words and covers core grammar patterns such as 可能补语：V得/不 + Complements and "呢" asking about location.',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -118,7 +119,8 @@ LESSON = {
                 },
                 {
                         "no": 2,
-                        "title_zh": ""呢"问处所",
+                        "title_zh": '"呢"问处所',
+
                         "explanation": "This usage is used to softly ask about location, state, or an ongoing situation.",
                         "examples": [
                                 {

@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L14",
     "title": "你把水果拿过来",
     "goal": "expressing commands, sequence, and direction",
-    "intro_text": "This lesson is dedicated to expressing commands, sequence, and direction. It uses 5 key vocabulary words and covers core grammar patterns such as "把"字句 3：A 把 B + V + 结果补语/趋向补语 and 先……，再/又……，然后……",
+    "intro_text": 'This lesson is dedicated to expressing commands, sequence, and direction. It uses 5 key vocabulary words and covers core grammar patterns such as "把"字句 3：A 把 B + V + 结果补语/趋向补语 and 先……，再/又……，然后……',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""把"字句 3：A 把 B + V + 结果补语/趋向补语",
+                        "title_zh": '"把"字句 3：A 把 B + V + 结果补语/趋向补语',
+
                         "explanation": "This pattern indicates that an action has been completed successfully or satisfactorily.",
                         "examples": [
                                 {

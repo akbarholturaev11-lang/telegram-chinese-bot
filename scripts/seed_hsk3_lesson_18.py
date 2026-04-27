@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L18",
     "title": "我相信他们会同意的",
     "goal": "talking about belief, conditions, and topics",
-    "intro_text": "This lesson is dedicated to talking about belief, conditions, and topics. It uses 5 key vocabulary words and covers core grammar patterns such as 只要……就…… and the preposition "关于".",
+    "intro_text": 'This lesson is dedicated to talking about belief, conditions, and topics. It uses 5 key vocabulary words and covers core grammar patterns such as 只要……就…… and the preposition "关于".',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -118,7 +119,8 @@ LESSON = {
                 },
                 {
                         "no": 2,
-                        "title_zh": "介词"关于"",
+                        "title_zh": '介词"关于"',
+
                         "explanation": "This topic helps to naturally connect parts of a sentence and enhance clarity of meaning.",
                         "examples": [
                                 {

@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L12",
     "title": "把重要的东西放在我这儿吧",
     "goal": "expressing leaving something in a place and handing things over",
-    "intro_text": "This lesson is dedicated to expressing leaving something in a place and handing things over. It uses 5 key vocabulary words and covers core grammar patterns such as "才"和"就" and "把"字句 2：A 把 B + V + 在/到/给……",
+    "intro_text": 'This lesson is dedicated to expressing leaving something in a place and handing things over. It uses 5 key vocabulary words and covers core grammar patterns such as "才"和"就" and "把"字句 2：A 把 B + V + 在/到/给……',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -101,7 +102,8 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": ""才"和"就"",
+                        "title_zh": '"才"和"就"',
+
                         "explanation": "This grammar topic helps to practise the core sentence patterns of the lesson in context.",
                         "examples": [
                                 {
@@ -118,7 +120,8 @@ LESSON = {
                 },
                 {
                         "no": 2,
-                        "title_zh": ""把"字句 2：A 把 B + V + 在/到/给……",
+                        "title_zh": '"把"字句 2：A 把 B + V + 在/到/给……',
+
                         "explanation": "This structure moves the affected object to the front to emphasise the result or direction.",
                         "examples": [
                                 {

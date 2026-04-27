@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L19",
     "title": "你没看出来吗",
     "goal": "expressing resultative direction and causation",
-    "intro_text": "This lesson is dedicated to expressing resultative direction and causation. It uses 5 key vocabulary words and covers core grammar patterns such as 趋向补语的引申义 and "使""叫""让".",
+    "intro_text": 'This lesson is dedicated to expressing resultative direction and causation. It uses 5 key vocabulary words and covers core grammar patterns such as 趋向补语的引申义 and "使""叫""让".',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -118,7 +119,8 @@ LESSON = {
                 },
                 {
                         "no": 2,
-                        "title_zh": ""使""叫""让"",
+                        "title_zh": '"使""叫""让"',
+
                         "explanation": "This grammar topic helps to practise the core sentence patterns of the lesson in context.",
                         "examples": [
                                 {

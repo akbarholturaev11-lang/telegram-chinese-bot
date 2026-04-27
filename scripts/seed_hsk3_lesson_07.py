@@ -13,7 +13,8 @@ LESSON = {
     "lesson_code": "HSK3-L07",
     "title": "我跟她都认识五年了",
     "goal": "expressing duration and acquaintance",
-    "intro_text": "This lesson is dedicated to expressing duration and acquaintance. It uses 5 key vocabulary words and covers core grammar patterns such as 时段的表达 and using "半" "刻" "差" to express time.",
+    "intro_text": 'This lesson is dedicated to expressing duration and acquaintance. It uses 5 key vocabulary words and covers core grammar patterns such as 时段的表达 and using "半" "刻" "差" to express time.',
+
     "vocabulary_json": json.dumps(
         [
                 {
@@ -118,7 +119,8 @@ LESSON = {
                 },
                 {
                         "no": 2,
-                        "title_zh": "用"半""刻""差"表示时间",
+                        "title_zh": '用"半""刻""差"表示时间',
+
                         "explanation": "This topic teaches how to express time and duration naturally.",
                         "examples": [
                                 {
