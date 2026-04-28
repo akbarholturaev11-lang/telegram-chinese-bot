@@ -13,26 +13,19 @@ def _parse(value: Any, default: Any = None):
         return default
 
 
-def _lang(item: dict, key: str, lang: str, fallback: str = "") -> str:
-    return item.get(f"{key}_{lang}") or item.get(key) or fallback
-
-
 def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     vocab = _parse(lesson.vocabulary_json, [])
     title = lesson.title or ""
 
-    lines = []
-    lines.append(f"【1/{lesson_total_steps}】 {title} · Yangi so'zlar 🇨🇳" if lang == "uz"
-                 else f"【1/{lesson_total_steps}】 {title} · Калимаҳои нав 🇨🇳" if lang == "tj"
-                 else f"【1/{lesson_total_steps}】 {title} · Новые слова 🇨🇳")
-    lines.append("")
+    label = {"uz": "Yangi so'zlar 🇨🇳", "tj": "Калимаҳои нав 🇨🇳", "ru": "Новые слова 🇨🇳"}
+    lines = [f"【1/{lesson_total_steps}】 {title} · {label.get(lang, label['ru'])}", ""]
 
-    intro_hint = {
+    hint = {
         "uz": f"✨ Bugun {len(vocab)} ta so'z — darsni tugatgach ishlatishni bilasiz!",
         "tj": f"✨ Имрӯз {len(vocab)} калима — пас аз дарс истифода карда метавонед!",
         "ru": f"✨ Сегодня {len(vocab)} слов — после урока сможете их использовать!",
     }
-    lines.append(intro_hint.get(lang, intro_hint["ru"]))
+    lines.append(hint.get(lang, hint["ru"]))
     lines.append("")
 
     nums = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
@@ -65,9 +58,6 @@ def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         lines.append("")
 
     lines.append("━━━━━━━━━━━━━━")
-    next_btn = {"uz": "▶️ Davom etish", "tj": "▶️ Идома додан", "ru": "▶️ Продолжить"}
-    lines.append(next_btn.get(lang, next_btn["ru"]))
-
     return "\n".join(lines)
 
 
@@ -76,28 +66,43 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     title = lesson.title or ""
 
     step_label = {"uz": "Jonli dialog 🎭", "tj": "Муколамаи зинда 🎭", "ru": "Живой диалог 🎭"}
-    lines = []
-    lines.append(f"【2/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}")
-    lines.append("")
+    lines = [f"【2/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
 
     for block in dialogues:
         if not isinstance(block, dict):
             continue
 
-        scene = block.get(f"scene_{lang}") or block.get("scene_uz") or ""
-        if scene:
-            lines.append(f"📍 {scene}")
+        # section label (课文 1, 课文 2 ...)
+        section = block.get("section_label", "")
+        scene = (
+            block.get(f"scene_{lang}")
+            or block.get("scene_uz")
+            or block.get("scene_label_zh")
+            or ""
+        )
+
+        header = " · ".join(filter(None, [section, scene]))
+        if header:
+            lines.append(f"📍 {header}")
             lines.append("")
 
         lines.append("━━━━━━━━━━━━━━")
 
-        for line in block.get("lines", []):
+        # actual key is "dialogue", fallback to "lines"
+        dialogue_lines = block.get("dialogue") or block.get("lines") or []
+        for line in dialogue_lines:
             if not isinstance(line, dict):
                 continue
             speaker = line.get("speaker", "")
             zh = line.get("zh", "")
             pinyin = line.get("pinyin", "")
-            translation = line.get(lang) or line.get("uz") or ""
+            # actual key is "translation", fallback to lang key
+            translation = (
+                line.get("translation")
+                or line.get(lang)
+                or line.get("uz")
+                or ""
+            )
 
             icon = "👤" if speaker == "A" else "👥"
             lines.append(f"{icon} {speaker}:  {zh}")
@@ -110,17 +115,16 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         notes = block.get("notes", [])
         if notes:
             lines.append("")
-            lines.append("💡 Bilasizmi?" if lang == "uz" else "💡 Медонед?" if lang == "tj" else "💡 Знаете ли вы?")
+            tip = {"uz": "💡 Bilasizmi?", "tj": "💡 Медонед?", "ru": "💡 Знаете ли вы?"}
+            lines.append(tip.get(lang, tip["ru"]))
             for note in notes:
                 note_text = note.get(lang) or note.get("uz") or ""
                 if note_text:
                     lines.append(note_text)
+
         lines.append("")
 
-    next_btn = {"uz": "▶️ Davom etish", "tj": "▶️ Идома додан", "ru": "▶️ Продолжить"}
-    lines.append(next_btn.get(lang, next_btn["ru"]))
-
-    return "\n".join(lines)
+    return "\n".join(lines).rstrip()
 
 
 def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
@@ -128,16 +132,14 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     title = lesson.title or ""
 
     step_label = {"uz": "Grammatika 📐", "tj": "Грамматика 📐", "ru": "Грамматика 📐"}
-    lines = []
-    lines.append(f"【3/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}")
-    lines.append("")
+    lines = [f"【3/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
 
     for i, g in enumerate(grammar, 1):
         if not isinstance(g, dict):
             continue
 
         g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
-        rule = g.get(f"rule_{lang}") or g.get(f"rule_uz") or ""
+        rule = g.get(f"rule_{lang}") or g.get("rule_uz") or ""
 
         lines.append("━━━━━━━━━━━━━━")
         lines.append(f"📌 {i}. {g_title}")
@@ -159,20 +161,15 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         lines.append("")
 
     lines.append("━━━━━━━━━━━━━━")
-    next_btn = {"uz": "▶️ Davom etish", "tj": "▶️ Идома додан", "ru": "▶️ Продолжить"}
-    lines.append(next_btn.get(lang, next_btn["ru"]))
-
     return "\n".join(lines)
 
 
-def format_exercise(lesson, lang: str, exercise_index: int = 0, lesson_total_steps: int = 6) -> str:
+def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     exercises = _parse(lesson.exercise_json, [])
     title = lesson.title or ""
 
     step_label = {"uz": "Test vaqti! 🧠", "tj": "Вақти санҷиш! 🧠", "ru": "Время теста! 🧠"}
-    lines = []
-    lines.append(f"【5/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}")
-    lines.append("")
+    lines = [f"【5/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
 
     hint = {
         "uz": "Siz tayyor deb o'ylaymiz... Isbotlang! 😄",
@@ -182,22 +179,35 @@ def format_exercise(lesson, lang: str, exercise_index: int = 0, lesson_total_ste
     lines.append(hint.get(lang, hint["ru"]))
     lines.append("")
 
-    if exercise_index < len(exercises):
-        ex = exercises[exercise_index]
-        if isinstance(ex, dict):
-            question = ex.get(f"question_{lang}") or ex.get("question_uz") or ""
-            options = ex.get(f"options_{lang}") or ex.get("options_uz") or []
+    answer_hint = {
+        "uz": "Javobingizni yozing ⬇️",
+        "tj": "Посухатонро нависед ⬇️",
+        "ru": "Напишите ответ ⬇️",
+    }
 
-            lines.append("━━━━━━━━━━━━━━")
-            lines.append(f"❓ {question}")
-            lines.append("")
-            for opt in options:
-                lines.append(f"   {opt}")
-            lines.append("━━━━━━━━━━━━━━")
+    for ex in exercises:
+        if not isinstance(ex, dict):
+            continue
+
+        instruction = ex.get("instruction", "")
+        items = ex.get("items", [])
+
+        lines.append("━━━━━━━━━━━━━━")
+        if instruction:
+            lines.append(f"📝 {instruction}")
             lines.append("")
 
-            answer_hint = {"uz": "Javobingizni yozing ⬇️", "tj": "Посухатонро нависед ⬇️", "ru": "Напишите ответ ⬇️"}
-            lines.append(answer_hint.get(lang, answer_hint["ru"]))
+        for i, item in enumerate(items, 1):
+            if not isinstance(item, dict):
+                continue
+            prompt = item.get("prompt", "")
+            if prompt:
+                lines.append(f"  {i}. {prompt}")
+
+        lines.append("")
+
+    lines.append("━━━━━━━━━━━━━━")
+    lines.append(answer_hint.get(lang, answer_hint["ru"]))
 
     return "\n".join(lines)
 
@@ -213,17 +223,14 @@ def format_intro(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         intro = intro_raw
 
     step_label = {"uz": "Darsga xush kelibsiz! 🎉", "tj": "Хуш омадед ба дарс! 🎉", "ru": "Добро пожаловать на урок! 🎉"}
-    lines = []
-    lines.append(f"【Dars {lesson.lesson_order}】 {title}")
-    lines.append("")
-    lines.append(step_label.get(lang, step_label["ru"]))
-    lines.append("")
-    lines.append("━━━━━━━━━━━━━━")
-    lines.append(intro)
-    lines.append("━━━━━━━━━━━━━━")
-    lines.append("")
-
-    start_btn = {"uz": "▶️ Boshlash", "tj": "▶️ Оғоз кардан", "ru": "▶️ Начать"}
-    lines.append(start_btn.get(lang, start_btn["ru"]))
+    lines = [
+        f"【Dars {lesson.lesson_order}】 {title}",
+        "",
+        step_label.get(lang, step_label["ru"]),
+        "",
+        "━━━━━━━━━━━━━━",
+        intro,
+        "━━━━━━━━━━━━━━",
+    ]
 
     return "\n".join(lines)
