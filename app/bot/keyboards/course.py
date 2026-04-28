@@ -62,7 +62,7 @@ def course_exercise_keyboard(lang: str) -> InlineKeyboardMarkup:
         "ru": "🏁 Завершаем урок",
     }
     return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:go_homework")
+        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:show_homework")
     ]])
 
 

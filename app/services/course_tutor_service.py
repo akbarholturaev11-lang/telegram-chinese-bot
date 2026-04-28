@@ -4,6 +4,16 @@ from app.services.ai_service import AIService
 
 COURSE_MODEL = "gpt-4.1"
 
+# Steps that have the "I understood" advance button — append hint to AI response
+_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise", "quiz"}
+
+_PRESS_BUTTON_HINT = {
+    "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",
+    "ru": "\n\n✅ <i>Если поняли — нажмите кнопку ниже.</i>",
+    "tj": "\n\n✅ <i>Агар фаҳмидед, тугмаи поёниро пахш кунед.</i>",
+}
+
+
 class CourseTutorService:
     def __init__(self):
         self.ai_service = AIService()
@@ -34,22 +44,22 @@ class CourseTutorService:
             "lesson_title": title,
             "intro_text": intro_text,
             "vocabulary_preview": vocab[:3],
-            "grammar_preview": grammar[:2],
+            "grammar_preview": grammar[:1],
             "dialogue_preview": dialogue[:1],
         }
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: introduce this lesson warmly and clearly.
+        prompt = f"""You are a friendly HSK Chinese tutor. Welcome the student to this lesson warmly.
 
 LESSON DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Give a short, engaging introduction (3-5 lines)
-- Preview what the student will learn: vocabulary, grammar, dialogue topic
+- Reply ONLY in {user_language}, adapted for {user_level} level
+- Use <b>...</b> for Chinese characters, <code>...</code> for pinyin
+- Max 4 lines total
+- Preview 2-3 vocabulary words and the main grammar topic to spark curiosity
 - Do NOT teach yet — just introduce
-- End with: "Ready? Let's begin!" (in {user_language})"""
+- End with an energetic line like "Ready? Let's go! 🚀" (in {user_language})"""
 
         return prompt, data
 
@@ -59,19 +69,18 @@ RULES:
 
         data = {"lesson_title": title, "vocabulary": vocab}
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: teach the vocabulary for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Teach the vocabulary for this lesson engagingly.
 
 VOCABULARY DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Present ONLY the words in the vocabulary list above — no other words
-- For each word show: Chinese character, pinyin, meaning in {user_language}, 1 short example sentence
-- If the user asks about a word — explain only from this list
-- If the user asks about something outside this list — politely redirect to the current vocabulary
-- Keep it clear and structured"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese characters, <code>...</code> for pinyin
+- Format each word: <b>汉字</b> [<code>pīnyīn</code>] — meaning — one short example sentence
+- If similar words exist (e.g. 我/你, 大/小, 去/来), compare them side by side to show the difference
+- Max 2 lines per word, total response under 15 lines
+- If student asks about a word outside this list, politely redirect to the current vocabulary"""
 
         return prompt, data
 
@@ -81,19 +90,19 @@ RULES:
 
         data = {"lesson_title": title, "dialogue": dialogue}
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: teach the dialogue for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Teach this dialogue step by step.
 
 DIALOGUE DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Present ONLY the dialogue above — no other scenarios
-- Explain each line: Chinese, pinyin, meaning in {user_language}
-- Explain the context and when this dialogue would be used
-- If user asks questions — answer only about this dialogue
-- Do NOT introduce new vocabulary outside the dialogue"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese, <code>...</code> for pinyin
+- Present each line: <b>Chinese</b> [<code>pinyin</code>] — meaning in {user_language}
+- After presenting, briefly explain the context (where/when this conversation happens)
+- Highlight 1-2 useful patterns from the dialogue with a real-life comparison
+- Max 12 lines total
+- Answer student questions ONLY about this dialogue"""
 
         return prompt, data
 
@@ -108,19 +117,18 @@ RULES:
             "lesson_vocabulary": vocab[:5],
         }
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: teach the grammar points for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Teach the grammar points clearly and concisely.
 
 GRAMMAR DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Teach ONLY the grammar points listed above
-- For each grammar point: explain the rule, show the pattern, give 2 examples using lesson vocabulary
-- Examples must use ONLY the lesson_vocabulary list above
-- Do NOT introduce grammar from other lessons
-- Keep explanations clear and concise"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese, <code>...</code> for pinyin
+- For each grammar point: rule → pattern with blanks → 2 examples using lesson_vocabulary
+- If there are similar-looking structures (e.g. 的/地/得, 吗/呢, 在/有), compare them with a quick tip
+- Examples must use ONLY lesson_vocabulary — no outside words
+- Max 10 lines total"""
 
         return prompt, data
 
@@ -146,19 +154,19 @@ RULES:
             "allowed_grammar": grammar[:3],
         }
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: conduct exercises for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Give short practice exercises.
 
 EXERCISE DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Give exercises using ONLY the allowed_vocabulary and allowed_grammar above
-- Do NOT use vocabulary or grammar from other lessons
-- Check the user's answers against correct_answers if provided
-- Give clear feedback: what is correct, what needs improvement
-- Encourage the student briefly"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese, <code>...</code> for pinyin
+- Create 2-3 exercises using ONLY allowed_vocabulary and allowed_grammar
+- Mix formats: fill-in-the-blank AND translate a sentence
+- When checking: ✅ correct answer or ❌ + correct answer with a short tip
+- Be encouraging: "Well done! 👏" or "Almost! Here's a tip..."
+- Max 10 lines total"""
 
         return prompt, data
 
@@ -173,19 +181,19 @@ RULES:
             "test_grammar": grammar[:3],
         }
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: conduct a quiz for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Give a short quiz to test understanding.
 
 QUIZ DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Create a short quiz using ONLY test_vocabulary and test_grammar above
-- Quiz format: 3-5 questions (multiple choice or fill in the blank)
-- Do NOT test vocabulary or grammar outside the lists above
-- When user answers: check correctness, give score, explain mistakes
-- Be encouraging"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese, <code>...</code> for pinyin
+- 3-4 questions only (multiple choice or fill-in-the-blank)
+- Use ONLY test_vocabulary and test_grammar — no outside content
+- After student answers: show score, mark ✅/❌ per question, briefly explain mistakes
+- Be encouraging
+- Max 10 lines per interaction"""
 
         return prompt, data
 
@@ -193,16 +201,16 @@ RULES:
         title = self._safe(getattr(lesson, "title", ""))
         data = {"lesson_title": title}
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: check if the student understood this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Check if the student understood this lesson.
 
 LESSON: {title}
 
 RULES:
 - Reply ONLY in {user_language}
-- Ask ONE simple question: did the student understand the lesson?
-- Offer two choices: yes (understood) or no (need more explanation)
-- Do NOT teach new content here
-- Do NOT move to the next step yourself — wait for the student's answer"""
+- Ask ONE simple question: did you understand the lesson?
+- Keep it to 2 lines maximum
+- Do NOT teach new content
+- Do NOT move forward — wait for the student's answer via the buttons"""
 
         return prompt, data
 
@@ -226,18 +234,18 @@ RULES:
             "allowed_grammar": grammar[:3],
         }
 
-        prompt = f"""You are an HSK Chinese teacher. Your task: give and check homework for this lesson.
+        prompt = f"""You are a friendly HSK Chinese tutor. Assign and evaluate homework.
 
 HOMEWORK DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
 RULES:
-- Reply ONLY in {user_language}
-- Level: {user_level}
-- Give homework using ONLY allowed_vocabulary and allowed_grammar above
-- Do NOT create tasks outside this lesson scope
-- When student submits: check it, give clear feedback, give score 0-100
-- Be encouraging and specific about what was good and what needs work"""
+- Reply ONLY in {user_language}, {user_level} level
+- Use <b>...</b> for Chinese, <code>...</code> for pinyin
+- Give ONE clear homework task using ONLY allowed_vocabulary and allowed_grammar
+- When student submits: give score 0-100, mark each item ✅/❌, short specific feedback
+- Be encouraging and concrete about what was good and what needs work
+- Max 8 lines"""
 
         return prompt, data
 
@@ -275,13 +283,19 @@ RULES:
         if user_message:
             full_text += f"\n\nSTUDENT MESSAGE:\n{user_message}"
 
-        return await self.ai_service.generate_reply(
+        response = await self.ai_service.generate_reply(
             text=full_text,
             user_language=user_language,
             user_level=user_level,
             history=history or [],
             model_override=COURSE_MODEL,
         )
+
+        if step in _CONVERSATIONAL_STEPS:
+            hint = _PRESS_BUTTON_HINT.get(user_language, _PRESS_BUTTON_HINT["ru"])
+            response = response.rstrip() + hint
+
+        return response
 
     def _build_homework_evaluation_prompt(self, user_language, user_level, lesson, submission_text) -> str:
         vocab = self._parse(getattr(lesson, "vocabulary_json", None), [])

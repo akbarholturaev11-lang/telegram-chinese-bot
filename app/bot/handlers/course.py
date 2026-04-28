@@ -14,9 +14,10 @@ from app.bot.keyboards.course import (
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
-    course_resume_keyboard,
+    course_understood_keyboard,
     course_review_offer_keyboard,
     course_satisfaction_keyboard,
+    course_homework_keyboard as _ctx_homework_keyboard,
     course_next_lesson_keyboard,
 )
 
@@ -114,10 +115,10 @@ def get_course_keyboard_for_step(lang: str, step: str):
     if step == "satisfaction_check":
         return course_satisfaction_keyboard(lang)
     if step == "homework":
-        return course_homework_keyboard(lang)
+        return _ctx_homework_keyboard(lang)
     if step == "completed":
         return course_next_lesson_keyboard(lang)
-    return course_resume_keyboard(lang)
+    return course_understood_keyboard(lang, step)
 
 @router.callback_query(F.data.startswith("course:lessons_page:"))
 async def course_lessons_page_handler(callback: CallbackQuery, session):
@@ -469,13 +470,7 @@ async def course_review_no_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=next_lesson,
-        step="intro",
-        user_message="",
-    )
+    text = format_intro(next_lesson, lang)
 
     await callback.answer()
     await callback.message.answer(t("course_skip_review_next_lesson", lang))
@@ -562,13 +557,15 @@ async def course_review_last_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step=progress.current_step,
-        user_message=t("course_review", lang),
-    )
+    step = progress.current_step
+    formatter_map = {
+        "intro":    lambda: format_intro(lesson, lang),
+        "vocab":    lambda: format_vocab(lesson, lang),
+        "dialogue": lambda: format_dialogue(lesson, lang),
+        "grammar":  lambda: format_grammar(lesson, lang),
+        "exercise": lambda: format_exercise(lesson, lang),
+    }
+    text = formatter_map[step]() if step in formatter_map else ""
 
     await callback.answer()
     await callback.message.answer(text)
@@ -760,20 +757,13 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
         await callback.message.answer(t("course_completed_title", lang))
         return
 
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=next_lesson,
-        step="intro",
-        user_message="",
-    )
+    text = format_intro(next_lesson, lang)
 
     await callback.answer()
     await callback.message.answer(text)
 
 
 async def _go_to_step(callback, session, step: str):
-    """Helper: advance to a specific step and generate response."""
     if await _block_if_course_disabled(callback, session):
         return
 
@@ -784,7 +774,6 @@ async def _go_to_step(callback, session, step: str):
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
@@ -806,13 +795,14 @@ async def _go_to_step(callback, session, step: str):
     )
     await session.commit()
 
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step=step,
-        user_message="",
-    )
+    formatter_map = {
+        "intro":    lambda: format_intro(lesson, lang),
+        "vocab":    lambda: format_vocab(lesson, lang),
+        "dialogue": lambda: format_dialogue(lesson, lang),
+        "grammar":  lambda: format_grammar(lesson, lang),
+        "exercise": lambda: format_exercise(lesson, lang),
+    }
+    text = formatter_map[step]() if step in formatter_map else ""
 
     step_keyboards = {
         "intro":    lambda: course_intro_keyboard(lang),
@@ -825,7 +815,7 @@ async def _go_to_step(callback, session, step: str):
     keyboard = step_keyboards.get(step, lambda: None)()
 
     await callback.answer()
-    await callback.message.answer(text, reply_markup=keyboard)
+    await callback.message.answer(text, reply_markup=keyboard, parse_mode="HTML")
 
 
 @router.callback_query(F.data == "course:go_vocab")
@@ -850,7 +840,6 @@ async def course_go_quiz(callback: CallbackQuery, session):
 
 @router.callback_query(F.data == "course:repeat_step")
 async def course_repeat_step(callback: CallbackQuery, session):
-    """Repeat current step."""
     if await _block_if_course_disabled(callback, session):
         return
 
@@ -861,7 +850,6 @@ async def course_repeat_step(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
@@ -877,13 +865,14 @@ async def course_repeat_step(callback: CallbackQuery, session):
 
     step = progress.current_step
 
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step=step,
-        user_message="",
-    )
+    formatter_map = {
+        "intro":    lambda: format_intro(lesson, lang),
+        "vocab":    lambda: format_vocab(lesson, lang),
+        "dialogue": lambda: format_dialogue(lesson, lang),
+        "grammar":  lambda: format_grammar(lesson, lang),
+        "exercise": lambda: format_exercise(lesson, lang),
+    }
+    text = formatter_map[step]() if step in formatter_map else ""
 
     step_keyboards = {
         "intro":    lambda: course_intro_keyboard(lang),

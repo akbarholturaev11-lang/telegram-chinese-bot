@@ -151,6 +151,7 @@ async def handle_text_message(message: Message, session):
             await message.answer(
                 tutor_text,
                 reply_markup=get_course_keyboard_for_step(user_lang, refreshed_progress.current_step),
+                parse_mode="HTML",
             )
             return
 
@@ -265,6 +266,7 @@ async def handle_text_message(message: Message, session):
         await message.answer(
             tutor_text,
             reply_markup=get_course_keyboard_for_step(user_lang, progress.current_step),
+            parse_mode="HTML",
         )
         return
 

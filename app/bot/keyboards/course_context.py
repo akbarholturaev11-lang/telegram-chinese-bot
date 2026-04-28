@@ -3,23 +3,31 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from app.bot.utils.i18n import t
 
 
-def course_resume_keyboard(lang: str) -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text=t("course_resume_lesson", lang),
-                    callback_data="course:continue",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text=t("course_back_to_qa", lang),
-                    callback_data="course:back_to_qa",
-                )
-            ],
-        ]
-    )
+# Step → callback for "I understood, continue" button
+_STEP_NEXT_CALLBACK = {
+    "intro":    "course:go_vocab",
+    "vocab":    "course:go_dialogue",
+    "dialogue": "course:go_grammar",
+    "grammar":  "course:go_exercise",
+    "exercise": "course:show_homework",
+    "quiz":     "course:show_homework",
+}
+
+_UNDERSTOOD_LABELS = {
+    "uz": "✅ Tushundim, davom etamiz",
+    "ru": "✅ Понял(а), продолжаем",
+    "tj": "✅ Фаҳмидам, давом медиҳем",
+}
+
+
+def course_understood_keyboard(lang: str, step: str) -> InlineKeyboardMarkup | None:
+    callback = _STEP_NEXT_CALLBACK.get(step)
+    if not callback:
+        return None
+    label = _UNDERSTOOD_LABELS.get(lang, _UNDERSTOOD_LABELS["ru"])
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=label, callback_data=callback)
+    ]])
 
 
 def course_review_offer_keyboard(lang: str) -> InlineKeyboardMarkup:
@@ -35,12 +43,6 @@ def course_review_offer_keyboard(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=t("course_skip_review", lang),
                     callback_data="course:continue",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text=t("course_back_to_qa", lang),
-                    callback_data="course:back_to_qa",
                 )
             ],
         ]
@@ -60,12 +62,6 @@ def course_satisfaction_keyboard(lang: str) -> InlineKeyboardMarkup:
                     callback_data="course:satisfied_no",
                 ),
             ],
-            [
-                InlineKeyboardButton(
-                    text=t("course_back_to_qa", lang),
-                    callback_data="course:back_to_qa",
-                )
-            ],
         ]
     )
 
@@ -79,12 +75,6 @@ def course_homework_keyboard(lang: str) -> InlineKeyboardMarkup:
                     callback_data="course:show_homework",
                 )
             ],
-            [
-                InlineKeyboardButton(
-                    text=t("course_back_to_qa", lang),
-                    callback_data="course:back_to_qa",
-                )
-            ],
         ]
     )
 
@@ -96,12 +86,6 @@ def course_next_lesson_keyboard(lang: str) -> InlineKeyboardMarkup:
                 InlineKeyboardButton(
                     text=t("course_start_next_lesson", lang),
                     callback_data="course:start_next_lesson",
-                )
-            ],
-            [
-                InlineKeyboardButton(
-                    text=t("course_back_to_qa", lang),
-                    callback_data="course:back_to_qa",
                 )
             ],
         ]
