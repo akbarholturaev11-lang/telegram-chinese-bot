@@ -455,7 +455,6 @@ async def course_review_no_handler(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
@@ -529,7 +528,6 @@ async def course_review_last_handler(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
@@ -725,7 +723,6 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
-    tutor = CourseTutorService()
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
