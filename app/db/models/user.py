@@ -60,6 +60,7 @@ class User(Base):
     discount_progress_chat_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     discount_progress_message_id: Mapped[Optional[int]] = mapped_column(BigInteger, nullable=True)
     selected_plan_type: Mapped[Optional[str]] = mapped_column(String(32), nullable=True)
+    pending_checkout_msg_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     expiry_reminder_sent_at: Mapped[Optional[datetime]] = mapped_column(
         DateTime(timezone=True),
         nullable=True,

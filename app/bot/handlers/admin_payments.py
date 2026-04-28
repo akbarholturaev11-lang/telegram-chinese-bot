@@ -48,6 +48,14 @@ async def admin_payment_approve_handler(callback: CallbackQuery, session):
     await callback.answer("✅ Tasdiqlandi!", show_alert=True)
     await callback.message.edit_reply_markup(reply_markup=None)
 
+    chat_id = payment.user_telegram_id
+    for msg_id in [payment.checkout_msg_id, payment.screenshot_msg_id, payment.waiting_msg_id]:
+        if msg_id:
+            try:
+                await callback.bot.delete_message(chat_id=chat_id, message_id=msg_id)
+            except Exception:
+                pass
+
     await payment_notify_service.notify_payment_approved(
         bot=callback.bot,
         user=user,

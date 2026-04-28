@@ -384,6 +384,8 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
     text = build_checkout_text(lang, checkout_info)
     keyboard = checkout_keyboard(lang)
 
+    checkout_msg_id: int | None = None
+
     if checkout_info["currency"] == "¥":
         # Send QR photo for Alipay / WeChat — pick correct image by method + plan + discount
         qr_key = f"{user.payment_method}_{plan}"
@@ -396,17 +398,19 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
                 await callback.message.delete()
             except Exception:
                 pass
-            await callback.message.answer_photo(
+            sent = await callback.message.answer_photo(
                 photo,
                 caption=text,
                 reply_markup=keyboard,
             )
+            checkout_msg_id = sent.message_id
         else:
-            await callback.message.edit_text(
+            sent = await callback.message.edit_text(
                 text,
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
+            checkout_msg_id = callback.message.message_id
     else:
         # VISA — text message
         try:
@@ -415,13 +419,18 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
+            checkout_msg_id = callback.message.message_id
         except Exception:
             await callback.message.delete()
-            await callback.message.answer(
+            sent = await callback.message.answer(
                 text,
                 reply_markup=keyboard,
                 disable_web_page_preview=True,
             )
+            checkout_msg_id = sent.message_id
+
+    await user_repo.set_pending_checkout_msg_id(user, checkout_msg_id)
+    await session.commit()
 
 
 @router.callback_query(F.data == "payment:back")

@@ -21,6 +21,10 @@ class Payment(Base):
     screenshot_file_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     admin_comment: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
+    checkout_msg_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    screenshot_msg_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    waiting_msg_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
     submitted_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),

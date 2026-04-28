@@ -167,6 +167,14 @@ class UserRepository:
         user.selected_plan_type = plan_type
         await self.session.flush()
 
+    async def set_pending_checkout_msg_id(
+        self,
+        user: User,
+        msg_id: Optional[int],
+    ) -> None:
+        user.pending_checkout_msg_id = msg_id
+        await self.session.flush()
+
     async def get_all_users(self) -> list[User]:
         result = await self.session.execute(select(User))
         return list(result.scalars().all())

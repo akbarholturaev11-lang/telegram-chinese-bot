@@ -70,10 +70,17 @@ async def payment_screenshot_handler(message: Message, session):
         await message.answer(t(status_or_error, lang))
         return
 
+    checkout_msg_id = user.pending_checkout_msg_id
     await user_repo.set_selected_plan_type(user, None)
+    await user_repo.set_pending_checkout_msg_id(user, None)
     await session.commit()
 
-    await message.answer(_waiting_message(lang, _is_night()))
+    waiting_msg = await message.answer(_waiting_message(lang, _is_night()))
+
+    payment.checkout_msg_id = checkout_msg_id
+    payment.screenshot_msg_id = message.message_id
+    payment.waiting_msg_id = waiting_msg.message_id
+    await session.commit()
 
     payment_repo = PaymentRepository(session)
     pending_count = await payment_repo.count_pending()
