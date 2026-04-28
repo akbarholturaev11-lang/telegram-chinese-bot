@@ -1,9 +1,11 @@
+import json
 from typing import Optional
 
 from app.repositories.user_repo import UserRepository
 from app.repositories.course_lesson_repo import CourseLessonRepository
 from app.repositories.course_progress_repo import CourseProgressRepository
 from app.repositories.course_attempt_repo import CourseAttemptRepository
+from app.services.course_tutor_service import CourseTutorService
 
 
 COURSE_STEP_ORDER = [
@@ -26,6 +28,18 @@ class CourseEngineService:
         self.lesson_repo = CourseLessonRepository(session)
         self.progress_repo = CourseProgressRepository(session)
         self.attempt_repo = CourseAttemptRepository(session)
+        self.tutor = CourseTutorService()
+
+    def _allowed_level_candidates(self, level: str | None) -> tuple[str, ...]:
+        normalized = (level or "").strip().lower()
+        fallback_map = {
+            "beginner": ("hsk1",),
+            "hsk1": ("hsk1",),
+            "hsk2": ("hsk2", "hsk1"),
+            "hsk3": ("hsk3", "hsk2", "hsk1"),
+            "hsk4": ("hsk4", "hsk3", "hsk2", "hsk1"),
+        }
+        return fallback_map.get(normalized, ("hsk1",))
 
     async def get_or_create_progress(self, telegram_id: int):
         user = await self.user_repo.get_by_telegram_id(telegram_id)
@@ -73,6 +87,7 @@ class CourseEngineService:
         current_step = getattr(progress, "current_step", None) or "intro"
 
         if waiting_for in {
+            "satisfaction_answer",
             "satisfaction_reason",
             "homework_submission",
             "next_study_time",
@@ -81,8 +96,6 @@ class CourseEngineService:
             return user, progress, lesson, ""
 
         if current_step == "completed" and homework_status == "completed":
-            await self.progress_repo.set_waiting_for(progress, "review_choice")
-            await self.session.commit()
             return user, progress, lesson, ""
 
         return user, progress, lesson, ""
@@ -95,6 +108,13 @@ class CourseEngineService:
         lesson = await self.lesson_repo.get_by_id(lesson_id)
         if not lesson:
             return user, progress, None, "course_no_lesson_found"
+
+        if lesson.level not in self._allowed_level_candidates(user.level):
+            return user, progress, None, "course_lesson_not_unlocked"
+
+        unlocked_order = max(1, (getattr(progress, "completed_lessons_count", 0) or 0) + 1)
+        if lesson.lesson_order > unlocked_order:
+            return user, progress, None, "course_lesson_not_unlocked"
 
         await self.progress_repo.set_current_lesson_and_step(
             progress=progress,
@@ -182,7 +202,7 @@ class CourseEngineService:
             progress=progress,
             lesson_id=lesson.id,
             step="homework",
-            waiting_for="review_choice",
+            waiting_for="homework_submission",
         )
         await self.progress_repo.set_homework_status(progress, "assigned")
         await self.session.commit()
@@ -227,41 +247,26 @@ class CourseEngineService:
         passed = evaluation.get("passed", False)
         feedback_text = evaluation.get("feedback_text", "")
 
-        last_attempt = await self.attempt_repo.get_last_attempt(
-            user_id=user.id,
-            lesson_id=lesson.id,
-            attempt_type="homework",
-        )
-        attempt_no = (last_attempt.attempt_no + 1) if last_attempt else 1
-
         await self.attempt_repo.create(
             user_id=user.id,
             lesson_id=lesson.id,
-            attempt_no=attempt_no,
             attempt_type="homework",
             step_name="homework",
             score=score,
             passed=passed,
-            answers_json={"submission_text": submission_text},
+            answers_json=json.dumps({"submission_text": submission_text}, ensure_ascii=False),
             ai_feedback=feedback_text,
         )
 
         await self.progress_repo.set_homework_status(progress, "completed")
-
-        reminder_time = getattr(progress, "reminder_time", None)
-        if reminder_time:
-            await self.progress_repo.set_waiting_for(progress, "review_choice")
-            ask_next_study_time = False
-        else:
-            await self.progress_repo.set_waiting_for(progress, "next_study_time")
-            ask_next_study_time = True
+        await self.progress_repo.set_waiting_for(progress, "next_study_time")
 
         await self.session.commit()
 
         return {
             "error_key": None,
             "feedback_text": feedback_text,
-            "ask_next_study_time": ask_next_study_time,
+            "ask_next_study_time": True,
             "score": score,
             "passed": passed,
         }
@@ -271,8 +276,18 @@ class CourseEngineService:
         if error_key:
             return None, None, None, error_key
 
+        next_lesson = await self.lesson_repo.get_next_lesson(
+            level=lesson.level,
+            lesson_order=lesson.lesson_order,
+        )
+
         await self.progress_repo.set_next_study_at(progress, next_study_at)
-        await self.progress_repo.set_waiting_for(progress, "none")
+        await self.progress_repo.set_current_lesson_and_step(
+            progress=progress,
+            lesson_id=lesson.id,
+            step="completed",
+            waiting_for="review_choice" if next_lesson else "none",
+        )
         await self.session.commit()
 
         return user, progress, lesson, ""
@@ -296,7 +311,7 @@ class CourseEngineService:
             step="intro",
             waiting_for="none",
         )
-        await self.progress_repo.set_homework_status(progress, "completed")
+        await self.progress_repo.set_homework_status(progress, "none")
         await self.session.commit()
 
         return user, progress, next_lesson, ""
@@ -327,20 +342,16 @@ class CourseEngineService:
 
         await self.progress_repo.mark_lesson_completed(progress)
 
-        # Muhim:
-        # review_choice oldingi dars contextida qoladi.
-        # Shuning uchun current_lesson_id ni hozircha almashtirmaymiz.
         await self.progress_repo.set_current_lesson_and_step(
             progress=progress,
-            lesson_id=progress.current_lesson_id,
-            step="completed",
-            waiting_for="review_choice" if next_lesson else "none",
+            lesson_id=next_lesson.id if next_lesson else progress.current_lesson_id,
+            step="intro" if next_lesson else "completed",
+            waiting_for="none",
         )
 
         if next_lesson:
-            await self.progress_repo.set_homework_status(progress, "completed")
+            await self.progress_repo.set_homework_status(progress, "none")
 
         await self.session.commit()
 
         return user, progress, lesson, next_lesson, ""
-

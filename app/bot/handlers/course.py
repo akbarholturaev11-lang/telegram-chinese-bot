@@ -77,6 +77,25 @@ async def _resolve_lessons_for_user_level(engine: CourseEngineService, level: st
     return [], candidates[0]
 
 
+def filter_unlocked_lessons(lessons: list, progress) -> list:
+    unlocked_order = max(1, (getattr(progress, "completed_lessons_count", 0) or 0) + 1)
+    return [lesson for lesson in lessons if lesson.lesson_order <= unlocked_order]
+
+
+async def send_course_completion_prompt(*, respond, engine: CourseEngineService, lesson, lang: str) -> None:
+    next_lesson = await engine.lesson_repo.get_next_lesson(
+        level=lesson.level,
+        lesson_order=lesson.lesson_order,
+    )
+    if next_lesson:
+        await respond(
+            t("course_next_lesson_unlocked", lang),
+            reply_markup=course_next_lesson_keyboard(lang),
+        )
+    else:
+        await respond(t("course_completed_title", lang))
+
+
 def _format_homework_text(lang: str, homework_raw) -> str:
     title = t("course_homework_title", lang)
 
@@ -149,7 +168,9 @@ async def course_lessons_page_handler(callback: CallbackQuery, session):
     except Exception:
         page = 0
 
+    progress = await engine.progress_repo.get_by_user_id(user.id)
     lessons, _ = await _resolve_lessons_for_user_level(engine, user.level)
+    lessons = filter_unlocked_lessons(lessons, progress)
 
     await callback.answer()
     await callback.message.edit_reply_markup(
@@ -174,8 +195,11 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
 
     _, _, _, error_key = await engine.pick_lesson(callback.from_user.id, lesson_id)
     if error_key:
-        await callback.answer()
-        await callback.message.answer(t(error_key, lang))
+        if error_key == "course_lesson_not_unlocked":
+            await callback.answer(t(error_key, lang), show_alert=True)
+        else:
+            await callback.answer()
+            await callback.message.answer(t(error_key, lang))
         return
 
     await callback.answer()
@@ -273,6 +297,7 @@ async def run_course_entry_flow(
 
     if not progress.current_lesson_id:
         lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
+        lessons = filter_unlocked_lessons(lessons, progress)
 
         if not lessons:
             await respond(t("course_no_lessons_available", lang))
@@ -285,11 +310,32 @@ async def run_course_entry_flow(
         )
         return
 
-    if getattr(progress, "waiting_for", None) in {"review_choice", "next_study_time"} and getattr(progress, "homework_status", None) == "assigned":
+    if getattr(progress, "waiting_for", None) == "next_study_time":
+        await respond(t("course_next_study_time_optional", lang))
+        return
+
+    if (
+        getattr(progress, "current_step", None) == "completed"
+        and getattr(progress, "homework_status", None) == "completed"
+        and getattr(progress, "waiting_for", None) == "review_choice"
+    ):
         await respond(
             t("course_review_choice", lang),
             reply_markup=review_choice_keyboard(lang),
         )
+        return
+
+    if getattr(progress, "current_step", None) == "completed" and getattr(progress, "homework_status", None) == "completed":
+        lesson = await engine.lesson_repo.get_by_id(progress.current_lesson_id)
+        if lesson:
+            await send_course_completion_prompt(
+                respond=respond,
+                engine=engine,
+                lesson=lesson,
+                lang=lang,
+            )
+        else:
+            await respond(t("course_completed_title", lang))
         return
 
     user, progress, lesson, error_key = await engine.continue_course(telegram_id)
@@ -305,8 +351,19 @@ async def run_course_entry_flow(
         "grammar":  lambda: format_grammar(lesson, lang),
         "exercise": lambda: format_exercise(lesson, lang),
     }
+    step_keyboards = {
+        "intro":    lambda: course_intro_keyboard(lang),
+        "vocab":    lambda: course_vocab_keyboard(lang),
+        "dialogue": lambda: course_dialogue_keyboard(lang),
+        "grammar":  lambda: course_grammar_keyboard(lang),
+        "exercise": lambda: course_exercise_keyboard(lang),
+    }
     if step in formatter_map:
         text = formatter_map[step]()
+        keyboard = step_keyboards.get(step, lambda: None)()
+    elif step == "homework":
+        text = _format_homework_text(lang, lesson.homework_json)
+        keyboard = None
     else:
         text = await tutor.generate_step_response(
             user_language=user.language,
@@ -315,14 +372,7 @@ async def run_course_entry_flow(
             step=step,
             user_message="",
         )
-    step_keyboards = {
-        "intro":    lambda: course_intro_keyboard(lang),
-        "vocab":    lambda: course_vocab_keyboard(lang),
-        "dialogue": lambda: course_dialogue_keyboard(lang),
-        "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: course_exercise_keyboard(lang),
-    }
-    keyboard = step_keyboards.get(step, lambda: None)()
+        keyboard = get_course_keyboard_for_step(lang, step)
     await respond(text, reply_markup=keyboard, parse_mode="HTML")
 
 @router.message(F.text == "/course")
@@ -409,7 +459,7 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
 
     lang = user.language if user.language else "ru"
     progress = await engine.progress_repo.get_by_user_id(user.id)
-    if not progress or progress.waiting_for not in {"review_choice", "next_study_time"}:
+    if not progress or progress.waiting_for != "review_choice":
         await callback.answer()
         return
 
@@ -419,9 +469,6 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
-    await engine.progress_repo.set_waiting_for(progress, "homework_submission")
-    await session.commit()
-
     review_text = await tutor.generate_step_response(
         user_language=user.language,
         user_level=user.level,
@@ -429,6 +476,24 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
         step="review",
         user_message="",
     )
+
+    if getattr(progress, "homework_status", None) == "completed":
+        await engine.progress_repo.set_waiting_for(progress, "none")
+        await session.commit()
+
+        await callback.answer()
+        await callback.message.answer(t("course_review", lang))
+        await callback.message.answer(review_text)
+        await send_course_completion_prompt(
+            respond=callback.message.answer,
+            engine=engine,
+            lesson=lesson,
+            lang=lang,
+        )
+        return
+
+    await engine.progress_repo.set_waiting_for(progress, "homework_submission")
+    await session.commit()
 
     if lesson.homework_json:
         homework_text = _format_homework_text(lang, lesson.homework_json)
@@ -463,17 +528,37 @@ async def course_review_no_handler(callback: CallbackQuery, session):
 
     lang = user.language if user.language else "ru"
 
-    user, progress, next_lesson, error_key = await engine.activate_next_lesson(callback.from_user.id)
+    user, progress, lesson, current_error_key = await engine.get_current_lesson(callback.from_user.id)
+    if current_error_key:
+        await callback.answer()
+        await callback.message.answer(t(current_error_key, lang))
+        return
+
+    if getattr(progress, "homework_status", None) != "completed":
+        await callback.answer()
+        await callback.message.answer(t("course_complete_homework_first", lang))
+        return
+
+    user, progress, lesson, next_lesson, error_key = await engine.complete_lesson_and_unlock_next(callback.from_user.id)
     if error_key:
         await callback.answer()
         await callback.message.answer(t(error_key, lang))
+        return
+
+    if not next_lesson:
+        await callback.answer()
+        await callback.message.answer(t("course_completed_title", lang))
         return
 
     text = format_intro(next_lesson, lang)
 
     await callback.answer()
     await callback.message.answer(t("course_skip_review_next_lesson", lang))
-    await callback.message.answer(text)
+    await callback.message.answer(
+        text,
+        reply_markup=course_intro_keyboard(lang),
+        parse_mode="HTML",
+    )
 
 
 @router.callback_query(F.data == "course:progress")
@@ -620,7 +705,12 @@ async def course_retry_test_handler(callback: CallbackQuery, session):
         user_message=t("course_start_quiz", lang),
     )
 
-    await callback.message.answer(text)
+    await callback.answer()
+    await callback.message.answer(
+        text,
+        reply_markup=get_course_keyboard_for_step(lang, "quiz"),
+        parse_mode="HTML",
+    )
 
 
 @router.callback_query(F.data == "course:satisfied_yes")
@@ -645,10 +735,23 @@ async def course_satisfied_yes_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
+    await engine.progress_repo.set_waiting_for(progress, "homework_submission")
+    await session.commit()
+
+    if lesson.homework_json:
+        homework_text = _format_homework_text(lang, lesson.homework_json)
+    else:
+        homework_text = await CourseTutorService().generate_step_response(
+            user_language=user.language,
+            user_level=user.level,
+            lesson=lesson,
+            step="homework",
+            user_message="",
+        )
+
     await callback.answer()
-    await callback.message.answer(
-        t("course_lesson_homework_intro", lang)
-    )
+    await callback.message.answer(t("course_lesson_homework_intro", lang))
+    await callback.message.answer(homework_text)
 
 
 @router.callback_query(F.data == "course:satisfied_no")
@@ -712,6 +815,10 @@ async def course_show_homework_handler(callback: CallbackQuery, session):
             user_message="",
         )
 
+    if progress.current_step == "homework" and progress.homework_status != "completed":
+        await engine.progress_repo.set_waiting_for(progress, "homework_submission")
+        await session.commit()
+
     await callback.answer()
     await callback.message.answer(homework_text)
 
@@ -754,10 +861,12 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
         await callback.message.answer(t("course_completed_title", lang))
         return
 
-    text = format_intro(next_lesson, lang)
-
     await callback.answer()
-    await callback.message.answer(text)
+    await run_course_entry_flow(
+        session=session,
+        telegram_id=callback.from_user.id,
+        respond=callback.message.answer,
+    )
 
 
 async def _go_to_step(callback, session, step: str):
@@ -799,8 +908,6 @@ async def _go_to_step(callback, session, step: str):
         "grammar":  lambda: format_grammar(lesson, lang),
         "exercise": lambda: format_exercise(lesson, lang),
     }
-    text = formatter_map[step]() if step in formatter_map else ""
-
     step_keyboards = {
         "intro":    lambda: course_intro_keyboard(lang),
         "vocab":    lambda: course_vocab_keyboard(lang),
@@ -808,8 +915,19 @@ async def _go_to_step(callback, session, step: str):
         "grammar":  lambda: course_grammar_keyboard(lang),
         "exercise": lambda: course_exercise_keyboard(lang),
     }
-
-    keyboard = step_keyboards.get(step, lambda: None)()
+    if step in formatter_map:
+        text = formatter_map[step]()
+        keyboard = step_keyboards.get(step, lambda: None)()
+    else:
+        tutor = CourseTutorService()
+        text = await tutor.generate_step_response(
+            user_language=user.language,
+            user_level=user.level,
+            lesson=lesson,
+            step=step,
+            user_message="",
+        )
+        keyboard = get_course_keyboard_for_step(lang, step)
 
     await callback.answer()
     await callback.message.answer(text, reply_markup=keyboard, parse_mode="HTML")
@@ -834,6 +952,43 @@ async def course_go_exercise(callback: CallbackQuery, session):
 @router.callback_query(F.data == "course:go_quiz")
 async def course_go_quiz(callback: CallbackQuery, session):
     await _go_to_step(callback, session, "quiz")
+
+
+@router.callback_query(F.data == "course:finish_quiz")
+async def course_finish_quiz(callback: CallbackQuery, session):
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+    tutor = CourseTutorService()
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+    user, progress, lesson, error_key = await engine.mark_quiz_passed_and_go_to_satisfaction(callback.from_user.id)
+    if error_key:
+        await callback.answer()
+        await callback.message.answer(t(error_key, lang))
+        return
+
+    text = await tutor.generate_step_response(
+        user_language=user.language,
+        user_level=user.level,
+        lesson=lesson,
+        step="satisfaction_check",
+        user_message="",
+    )
+
+    await callback.answer()
+    await callback.message.answer(
+        text,
+        reply_markup=course_satisfaction_keyboard(lang),
+        parse_mode="HTML",
+    )
 
 @router.callback_query(F.data == "course:repeat_step")
 async def course_repeat_step(callback: CallbackQuery, session):

@@ -139,7 +139,12 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             continue
 
         g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
-        rule = g.get(f"rule_{lang}") or g.get("rule_uz") or ""
+        rule = (
+            g.get(f"rule_{lang}") or
+            g.get("rule_uz") or
+            g.get("explanation") or
+            g.get("rule") or ""
+        )
 
         lines.append("━━━━━━━━━━━━━━")
         lines.append(f"📌 {i}. {g_title}")
@@ -156,7 +161,7 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             for ex in examples:
                 zh = ex.get("zh", "")
                 pinyin = ex.get("pinyin", "")
-                meaning = ex.get(lang) or ex.get("uz") or ""
+                meaning = ex.get(lang) or ex.get("uz") or ex.get("meaning") or ""
                 lines.append(f"   • {zh} ({pinyin}) — {meaning}")
         lines.append("")
 

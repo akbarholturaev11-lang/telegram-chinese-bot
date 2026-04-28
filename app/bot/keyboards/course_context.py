@@ -9,8 +9,8 @@ _STEP_NEXT_CALLBACK = {
     "vocab":    "course:go_dialogue",
     "dialogue": "course:go_grammar",
     "grammar":  "course:go_exercise",
-    "exercise": "course:show_homework",
-    "quiz":     "course:show_homework",
+    "exercise": "course:go_quiz",
+    "quiz":     "course:finish_quiz",
 }
 
 _UNDERSTOOD_LABELS = {

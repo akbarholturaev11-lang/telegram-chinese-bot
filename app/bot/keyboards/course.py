@@ -57,12 +57,12 @@ def course_grammar_keyboard(lang: str) -> InlineKeyboardMarkup:
 
 def course_exercise_keyboard(lang: str) -> InlineKeyboardMarkup:
     labels = {
-        "uz": "🏁 Darsni yakunlaymiz",
-        "tj": "🏁 Дарсро хулосабандӣ мекунем",
-        "ru": "🏁 Завершаем урок",
+        "uz": "📝 Quizga o‘tamiz",
+        "tj": "📝 Ба quiz мегузарем",
+        "ru": "📝 Переходим к quiz",
     }
     return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:show_homework")
+        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:go_quiz")
     ]])
 
 
@@ -73,7 +73,7 @@ def course_homework_keyboard(lang: str) -> InlineKeyboardMarkup:
         "ru": "✅ Урок завершён — К следующему уроку",
     }
     return InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:next_lesson")
+        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:start_next_lesson")
     ]])
 
 

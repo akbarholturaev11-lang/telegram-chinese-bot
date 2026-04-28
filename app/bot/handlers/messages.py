@@ -5,8 +5,14 @@ from aiogram import F, Router
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 
 from app.bot.utils.response_effect import ResponseEffect
-from app.bot.handlers.course import get_course_keyboard_for_step, run_course_entry_flow, _resolve_lessons_for_user_level
-from app.bot.keyboards.course import lesson_selection_keyboard
+from app.bot.handlers.course import (
+    get_course_keyboard_for_step,
+    run_course_entry_flow,
+    _resolve_lessons_for_user_level,
+    filter_unlocked_lessons,
+    send_course_completion_prompt,
+)
+from app.bot.keyboards.course import lesson_selection_keyboard, review_choice_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
 from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
@@ -96,7 +102,9 @@ async def handle_text_message(message: Message, session):
 
         if msg_text == t("course_settings_button", user_lang):
             settings_engine = CourseEngineService(session)
+            progress = await settings_engine.progress_repo.get_by_user_id(user.id)
             lessons, resolved_level = await _resolve_lessons_for_user_level(settings_engine, user.level)
+            lessons = filter_unlocked_lessons(lessons, progress)
             if not lessons:
                 await message.answer(t("course_no_lessons_available", user_lang))
                 return
@@ -130,6 +138,29 @@ async def handle_text_message(message: Message, session):
         current_user, progress, lesson, error_key = await engine.get_current_lesson(message.from_user.id)
         if error_key:
             await message.answer(t(error_key, user_lang))
+            return
+
+        if progress.waiting_for == "satisfaction_answer":
+            await message.answer(
+                t("course_wait_for_answer", user_lang),
+                reply_markup=get_course_keyboard_for_step(user_lang, progress.current_step),
+            )
+            return
+
+        if progress.current_step == "completed" and progress.homework_status == "completed":
+            if progress.waiting_for == "review_choice":
+                await message.answer(
+                    t("course_review_choice", user_lang),
+                    reply_markup=review_choice_keyboard(user_lang),
+                )
+                return
+
+            await send_course_completion_prompt(
+                respond=message.answer,
+                engine=engine,
+                lesson=lesson,
+                lang=user_lang,
+            )
             return
 
         if progress.waiting_for == "satisfaction_reason":
@@ -188,6 +219,21 @@ async def handle_text_message(message: Message, session):
             if (message.text or "").strip() == skip_map.get(user_lang, "Пропустить"):
                 await engine.set_next_study_at(message.from_user.id, None)
                 await message.answer(t("course_next_study_time_skipped", user_lang))
+                _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
+                if refreshed_error:
+                    return
+                if refreshed_progress.waiting_for == "review_choice":
+                    await message.answer(
+                        t("course_review_choice", user_lang),
+                        reply_markup=review_choice_keyboard(user_lang),
+                    )
+                else:
+                    await send_course_completion_prompt(
+                        respond=message.answer,
+                        engine=engine,
+                        lesson=refreshed_lesson,
+                        lang=user_lang,
+                    )
                 return
 
             next_study_at = _parse_next_study_at(message.text or "")
@@ -200,6 +246,21 @@ async def handle_text_message(message: Message, session):
 
             await engine.set_next_study_at(message.from_user.id, next_study_at)
             await message.answer(t("course_next_study_time_saved", user_lang))
+            _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
+            if refreshed_error:
+                return
+            if refreshed_progress.waiting_for == "review_choice":
+                await message.answer(
+                    t("course_review_choice", user_lang),
+                    reply_markup=review_choice_keyboard(user_lang),
+                )
+            else:
+                await send_course_completion_prompt(
+                    respond=message.answer,
+                    engine=engine,
+                    lesson=refreshed_lesson,
+                    lang=user_lang,
+                )
             return
 
         message_repo = MessageRepository(session)
