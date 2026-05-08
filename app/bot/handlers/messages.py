@@ -263,6 +263,58 @@ async def handle_text_message(message: Message, session):
                 )
             return
 
+        if progress.waiting_for == "exercise_answer":
+            _emojis_ex = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
+            _anim_msg_ex = await message.answer(_emojis_ex[0])
+
+            async def _animate_ex():
+                for _i in range(1, 30):
+                    await asyncio.sleep(1)
+                    try:
+                        await _anim_msg_ex.edit_text(_emojis_ex[_i % len(_emojis_ex)])
+                    except Exception:
+                        break
+
+            _anim_task_ex = asyncio.create_task(_animate_ex())
+
+            eval_text = await tutor.generate_step_response(
+                user_language=current_user.language,
+                user_level=current_user.level,
+                lesson=lesson,
+                step="exercise",
+                user_message=message.text or "",
+            )
+
+            _anim_task_ex.cancel()
+            try:
+                await _anim_msg_ex.delete()
+            except Exception:
+                pass
+
+            await engine.progress_repo.set_current_lesson_and_step(
+                progress=progress,
+                lesson_id=progress.current_lesson_id,
+                step="quiz",
+                waiting_for="none",
+            )
+            await session.commit()
+
+            quiz_text = await tutor.generate_step_response(
+                user_language=current_user.language,
+                user_level=current_user.level,
+                lesson=lesson,
+                step="quiz",
+                user_message="",
+            )
+
+            await message.answer(eval_text, parse_mode="HTML")
+            await message.answer(
+                quiz_text,
+                reply_markup=get_course_keyboard_for_step(user_lang, "quiz"),
+                parse_mode="HTML",
+            )
+            return
+
         message_repo = MessageRepository(session)
         recent = await message_repo.get_recent_by_user(
             user_id=current_user.id,

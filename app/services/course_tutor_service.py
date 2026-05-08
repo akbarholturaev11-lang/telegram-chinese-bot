@@ -5,7 +5,7 @@ from app.services.ai_service import AIService
 COURSE_MODEL = "gpt-4.1"
 
 # Steps that have the "I understood" advance button — append hint to AI response
-_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise", "quiz"}
+_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "quiz"}
 
 _PRESS_BUTTON_HINT = {
     "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",
@@ -154,7 +154,7 @@ RULES:
             "allowed_grammar": grammar[:3],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Give short practice exercises.
+        prompt = f"""You are a friendly HSK Chinese tutor. Evaluate the student's exercise answers.
 
 EXERCISE DATA:
 {json.dumps(data, ensure_ascii=False, indent=2)}
@@ -162,11 +162,11 @@ EXERCISE DATA:
 RULES:
 - Reply ONLY in {user_language}, {user_level} level
 - Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- Create 2-3 exercises using ONLY allowed_vocabulary and allowed_grammar
-- Mix formats: fill-in-the-blank AND translate a sentence
-- When checking: ✅ correct answer or ❌ + correct answer with a short tip
+- If student answer is provided: evaluate it — mark each item ✅ or ❌, give correct answer for mistakes, be encouraging
+- If no student answer yet: show 2-3 exercises using ONLY allowed_vocabulary and allowed_grammar (fill-in-the-blank + translation)
 - Be encouraging: "Well done! 👏" or "Almost! Here's a tip..."
-- Max 10 lines total"""
+- Max 10 lines total
+- Do NOT mention moving to the next section — the system handles that automatically"""
 
         return prompt, data
 
