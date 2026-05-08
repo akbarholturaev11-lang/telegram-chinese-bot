@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 9,
     "lesson_code": "HSK1-L09",
     "title": "你儿子在哪儿工作",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Joylashuv va ish joyi haqida so'rash, fe'l va predlog'i",
         "tj": "Пурсидан дар бораи макон ва ҷои кор, феъл ва пешванди 在",
         "ru": "В вопросе о местонахождении и рабочем месте используется глагол и предлог在."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "To'qqizinchi darsda siz birovning qayerdaligini, qayerda ishlayotganimizni va l ning ikkita ishlatilishini so'rashni o'rganasiz. 14 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси нӯҳум шумо пурсиданро меомӯзед, ки касе дар куҷост, мо дар куҷо кор мекунем ва ду истифодаи 在. 14 калимаи нав, 3 муколама.",
         "ru": "На девятом уроке вы научитесь спрашивать, где кто-то находится, где мы работаем, а также два варианта использования 在. 14 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

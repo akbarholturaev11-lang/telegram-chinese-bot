@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 12,
     "lesson_code": "HSK1-L12",
     "title": "明天天气怎么样",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Ob-havo haqida gapirganda, so'roq so'zi chíníní va h...",
         "tj": "Сухан дар бораи обу ҳаво, калимаи саволии 怎么样 ва сохтмони 太...了",
         "ru": "Говоря о погоде, вопросительном слове 怎么样 и конструкции 太...了."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'n ikkinchi darsda siz ob-havo haqida qanday gapirishni o'rganasiz, shàngín bilan shtatlar haqida so'rashni va hài...yín konstruktsiyasidan foydalanishni o'rganasiz. 13 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси дувоздаҳ шумо мефаҳмед, ки чӣ тавр дар бораи обу ҳаво сӯҳбат кунед, дар бораи иёлатҳо бо 怎么样 пурсед ва сохти 太...了-ро истифода баред. 13 калимаи нав, 3 муколама.",
         "ru": "На двенадцатом уроке вы научитесь говорить о погоде, спрашивать о штатах с помощью 怎么样 и использовать конструкцию 太...了. 13 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 5,
     "lesson_code": "HSK1-L05",
     "title": "她女儿今年二十岁",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Yosh va oila a'zolari haqida gapiring va 100 gacha raqamlarni o'rganing",
         "tj": "Дар бораи синну сол ва аъзоёни оила сӯҳбат кунед ва рақамҳои то 100-ро омӯзед",
         "ru": "Поговорите о возрасте и членах семьи и выучите числа до 100."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Beshinchi darsda siz birovning yoshini so'rash va aytishni, oila a'zolarining soni haqida gapirishni va 100 tagacha raqamlarni o'rganishni o'rganasiz. 10 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси панчум шумо чи тавр пурсидан ва гуфтани синну соли касеро меомузед, дар бораи шумораи аъзоёни оила гап мезанед, шуморахои то 100-ро меомузед. 10 калимаи нав, 3 муколама.",
         "ru": "На пятом уроке вы научитесь спрашивать и называть чей-то возраст, говорить о количестве членов семьи, а также выучите числа до 100. 10 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

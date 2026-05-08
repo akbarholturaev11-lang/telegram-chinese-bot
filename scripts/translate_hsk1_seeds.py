@@ -307,7 +307,12 @@ def generate_file(lesson: dict) -> str:
     for key in ("goal", "intro_text"):
         if key not in lesson:
             continue
-        lines.append(f'    "{key}": {_fmt_val(lesson[key])},')
+        val = lesson[key]
+        if isinstance(val, dict):
+            inner = json.dumps(val, ensure_ascii=False, indent=8)
+            lines.append(f'    "{key}": json.dumps({inner}, ensure_ascii=False),')
+        else:
+            lines.append(f'    "{key}": {_fmt_val(val)},')
 
     for field in JSON_FIELDS:
         if field not in lesson:

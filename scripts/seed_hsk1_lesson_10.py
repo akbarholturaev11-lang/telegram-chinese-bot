@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 10,
     "lesson_code": "HSK1-L10",
     "title": "我能坐这儿吗",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Joyni ifodalovchi, mí-jumlalar, modal fe'l va bog'lovchilar",
         "tj": "Ифодаи ҷойгиршавӣ, 有-ҷумла, феъли модалӣ 能 ва пайвандаки 和",
         "ru": "Выражение местоположения, 有-предложения, модальный глагол 能 и союз 和"
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'ninchi darsda siz narsalarning qayerdaligini aytishni, mavjudlikni mài bilan ifodalashni, modal fe'l va bog'lovchini ishlatishni o'rganasiz. 12 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси даҳум шумо гуфтанро меомӯзед, ки чизҳо дар куҷо ҳастанд, мавҷудиятро бо 有 ифода кунед, феъли модалии 能 ва пайвандаки 和-ро истифода баред. 12 калимаи нав, 3 муколама.",
         "ru": "На десятом уроке вы научитесь говорить, где находятся вещи, выражать существование с помощью 有, использовать модальный глагол 能 и союз 和. 12 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

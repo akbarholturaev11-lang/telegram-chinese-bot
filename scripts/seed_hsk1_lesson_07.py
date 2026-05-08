@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 7,
     "lesson_code": "HSK1-L07",
     "title": "今天几号",
-    "goal": {
+    "goal": json.dumps({
         "uz": "O'rganish sanalari, hafta kunlari va ketma-ket fe'l jumlalari",
         "tj": "Санаҳои омӯзиш, рӯзҳои ҳафта ва ҷумлаҳои феълии силсилавӣ",
         "ru": "Изучаем даты, дни недели и предложения с последовательными глаголами."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Ettinchi darsda siz bugungi sanani, haftaning kunlarini va j+joy+harakat qurilishini aytishni o'rganasiz. 12 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси ҳафтум шумо гуфтани санаи имрӯза, рӯзҳои ҳафта ва сохтани 去+ҷои+амалро меомӯзед. 12 калимаи нав, 3 муколама.",
         "ru": "На седьмом уроке вы научитесь произносить сегодняшнее число, дни недели и конструкцию 去+место+действие. 12 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

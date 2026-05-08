@@ -1,3 +1,4 @@
+import ast
 import json
 from typing import Any
 
@@ -11,6 +12,36 @@ def _parse(value: Any, default: Any = None):
         return json.loads(value)
     except Exception:
         return default
+
+
+def _ml(value: Any, lang: str, fallback_lang: str = "uz") -> str:
+    """Extract a language string from either a plain string or a multilingual dict."""
+    if isinstance(value, dict):
+        return value.get(lang) or value.get(fallback_lang) or next(iter(value.values()), "") or ""
+    return value or ""
+
+
+def _ml_rule(value: Any, lang: str) -> str:
+    """Extract grammar rule from either a plain string or a {rule_uz, rule_tj, rule_ru} dict."""
+    if isinstance(value, dict):
+        return value.get(f"rule_{lang}") or value.get("rule_uz") or next(iter(value.values()), "") or ""
+    return value or ""
+
+
+def _parse_text_field(raw: Any) -> Any:
+    """Parse a DB text field that may be JSON, Python repr dict, or plain string."""
+    if isinstance(raw, dict):
+        return raw
+    if isinstance(raw, str):
+        try:
+            return json.loads(raw)
+        except Exception:
+            pass
+        try:
+            return ast.literal_eval(raw)
+        except Exception:
+            pass
+    return raw
 
 
 def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
@@ -35,10 +66,10 @@ def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             continue
         zh = word.get("zh", "")
         pinyin = word.get("pinyin", "")
-        meaning = word.get(lang) or word.get("meaning") or ""
+        meaning = _ml(word.get("meaning") or word.get(lang), lang)
         example_zh = word.get("example_zh", "")
         example_pinyin = word.get("example_pinyin", "")
-        example_lang = word.get(f"example_{lang}") or word.get("example") or ""
+        example_lang = _ml(word.get("example") or word.get(f"example_{lang}"), lang)
 
         num = nums[i] if i < len(nums) else f"{i+1}."
 
@@ -74,11 +105,9 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
         # section label (课文 1, 课文 2 ...)
         section = block.get("section_label", "")
-        scene = (
-            block.get(f"scene_{lang}")
-            or block.get("scene_uz")
-            or block.get("scene_label_zh")
-            or ""
+        scene = _ml(
+            block.get("scene_label_zh") or block.get(f"scene_{lang}") or block.get("scene_uz"),
+            lang,
         )
 
         header = " · ".join(filter(None, [section, scene]))
@@ -97,11 +126,9 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             zh = line.get("zh", "")
             pinyin = line.get("pinyin", "")
             # actual key is "translation", fallback to lang key
-            translation = (
-                line.get("translation")
-                or line.get(lang)
-                or line.get("uz")
-                or ""
+            translation = _ml(
+                line.get("translation") or line.get(lang) or line.get("uz"),
+                lang,
             )
 
             icon = "👤" if speaker == "A" else "👥"
@@ -139,11 +166,9 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             continue
 
         g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
-        rule = (
-            g.get(f"rule_{lang}") or
-            g.get("rule_uz") or
-            g.get("explanation") or
-            g.get("rule") or ""
+        rule = _ml_rule(
+            g.get("explanation") or g.get(f"rule_{lang}") or g.get("rule_uz") or g.get("rule"),
+            lang,
         )
 
         lines.append("━━━━━━━━━━━━━━")
@@ -161,7 +186,7 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             for ex in examples:
                 zh = ex.get("zh", "")
                 pinyin = ex.get("pinyin", "")
-                meaning = ex.get(lang) or ex.get("uz") or ex.get("meaning") or ""
+                meaning = _ml(ex.get("meaning") or ex.get(lang) or ex.get("uz"), lang)
                 lines.append(f"   • {zh} ({pinyin}) — {meaning}")
         lines.append("")
 
@@ -194,7 +219,7 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         if not isinstance(ex, dict):
             continue
 
-        instruction = ex.get("instruction", "")
+        instruction = _ml(ex.get("instruction", ""), lang)
         items = ex.get("items", [])
 
         lines.append("━━━━━━━━━━━━━━")
@@ -205,7 +230,7 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         for i, item in enumerate(items, 1):
             if not isinstance(item, dict):
                 continue
-            prompt = item.get("prompt", "")
+            prompt = _ml(item.get("prompt", ""), lang)
             if prompt:
                 lines.append(f"  {i}. {prompt}")
 
@@ -221,11 +246,11 @@ def format_intro(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     title = lesson.title or ""
     intro_raw = lesson.intro_text or ""
 
-    try:
-        intro_data = json.loads(intro_raw) if isinstance(intro_raw, str) else intro_raw
-        intro = intro_data.get(lang) or intro_data.get("uz") or str(intro_data)
-    except Exception:
-        intro = intro_raw
+    intro_data = _parse_text_field(intro_raw)
+    if isinstance(intro_data, dict):
+        intro = intro_data.get(lang) or intro_data.get("uz") or next(iter(intro_data.values()), "") or ""
+    else:
+        intro = str(intro_data) if intro_data else ""
 
     step_label = {"uz": "Darsga xush kelibsiz! 🎉", "tj": "Хуш омадед ба дарс! 🎉", "ru": "Добро пожаловать на урок! 🎉"}
     lines = [

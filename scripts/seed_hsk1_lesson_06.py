@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 6,
     "lesson_code": "HSK1-L06",
     "title": "我会说汉语",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Qobiliyat va malakalar haqida so‘zlash, modal fe’l shn",
         "tj": "Гап дар бораи кобилият ва махорат, феъли модали 会",
         "ru": "Говоря о способностях и навыках, модальный глагол 会"
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Oltinchi darsda siz modal fe'l mín, sifatdosh predikativ jumlalar va so'roq so'zlaridan foydalanib qobiliyatlarni ifodalashni o'rganasiz. 12 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси шашум шумо ифодаи қобилиятҳоро бо истифода аз феъли модалии 会, ҷумлаҳои предикати сифатӣ ва калимаи саволии 怎么 меомӯзед. 12 калимаи нав, 3 муколама.",
         "ru": "На шестом уроке вы научитесь выражать способности с помощью модального глагола 会, прилагательных-сказуемых и вопросительного слова 怎么. 12 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

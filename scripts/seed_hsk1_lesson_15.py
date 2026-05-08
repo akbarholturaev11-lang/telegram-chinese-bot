@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 15,
     "lesson_code": "HSK1-L15",
     "title": "我是坐飞机来的",
-    "goal": {
+    "goal": json.dumps({
         "uz": "mí……y konstruksiya - vaqt, joy va uslubni ta'kidlaydi",
         "tj": "Сохтмони 是……的 - вақт, ҷой ва услубро таъкид мекунад",
         "ru": "Конструкция 是……的 — подчеркивает время, место и манеру поведения."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'n beshinchi darsda - yakuniy darsda siz biror narsa qachon, qayerda va qanday amalga oshirilganligini ta'kidlash uchun i…… y konstruktsiyasidan foydalanishni o'rganasiz. 9 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси понздаҳ - дарси ниҳоӣ - шумо истифодаи конструксияи 是……的-ро меомӯзед, то кай, дар куҷо ва чӣ гуна кореро таъкид кунед. 9 калимаи нав, 3 диалог.",
         "ru": "На пятнадцатом уроке — последнем уроке — вы научитесь использовать конструкцию 是……的, чтобы подчеркнуть, когда, где и как что-то было сделано. 9 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

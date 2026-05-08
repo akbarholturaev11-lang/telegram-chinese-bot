@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 14,
     "lesson_code": "HSK1-L14",
     "title": "她买了不少衣服",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Tugallangan harakatlar uchun zarracha z, vaqt belgisi sifatida z va qo‘shimchasi",
         "tj": "Зарра 了 барои амалҳои анҷомшуда, 后 ҳамчун аломати вақт ва зарфи 都",
         "ru": "Частица 了 обозначает завершенные действия, 后 как маркер времени и наречие 都."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'n to'rtinchi darsda siz tugallangan harakatni shn bilan, kelajak vaqtni xi bilan ifodalashni o'rganasiz va hun qo'shimchasidan foydalanasiz. 16 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси чордаҳум шумо ифода кардани амалҳои анҷомшударо бо 了, вақти ояндаро бо 后 меомӯзед ва зарфи 都ро истифода баред. 16 калимаи нав, 3 муколама.",
         "ru": "На четырнадцатом уроке вы научитесь выражать завершенные действия с помощью 了, будущее время с помощью 后 и использовать наречие 都. 16 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

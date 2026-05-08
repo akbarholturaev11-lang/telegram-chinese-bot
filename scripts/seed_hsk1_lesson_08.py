@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 8,
     "lesson_code": "HSK1-L08",
     "title": "我想喝茶",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Istaklarni ifodalash, narxlarni so'rash va so'zlarni o'lchashni o'rganish",
         "tj": "Изҳори хоҳишҳо, пурсидани нархҳо ва омӯхтани калимаҳо",
         "ru": "Выражение желаний, запрос цен и изучение мерных слов."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Sakkizinchi darsda siz màn modal fe'li yordamida istaklarni ifodalashni, narxlarni so'rashni (kínìnín?) va o'lchov so'zlaridan foydalanishni o'rganasiz. 15 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси ҳаштум шумо бо истифода аз феъли модалии 想 баён кардани хоҳишҳо, пурсидани нархҳо (多少钱?) ва калимаҳои андозагирии 个/口ро меомӯзед. 15 калимаи нав, 3 муколама.",
         "ru": "На восьмом уроке вы научитесь выражать пожелания с помощью модального глагола 想, спрашивать цену (多少钱?) и использовать измерительные слова 个/口. 15 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 13,
     "lesson_code": "HSK1-L13",
     "title": "他在学做中国菜呢",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Davom etilayotgan harakatlarni ifodalash (k...kì), telefon raqamlari va zarrachalar",
         "tj": "Ифодаи амалҳои ҷорӣ (在...呢), рақамҳои телефон ва заррача 吧",
         "ru": "Выражает текущие действия (在...呢), номера телефонов и частицу 吧."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'n uchinchi darsda siz hozir sodir bo'layotgan harakatlarni qanday ifodalashni o'rganasiz. 10 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси сездаҳум шумо тарзи ифода кардани амалҳои ҳозира рӯйдодаро меомӯзед, сохтани 在...呢 ва заррачаи 吧-ро истифода баред. 10 калимаи нав, 3 муколама.",
         "ru": "На тринадцатом уроке вы научитесь выражать действия, происходящие прямо сейчас, используя конструкцию 在...呢 и частицу 吧. 10 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

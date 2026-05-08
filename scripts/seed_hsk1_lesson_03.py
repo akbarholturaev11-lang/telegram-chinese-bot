@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 3,
     "lesson_code": "HSK1-L03",
     "title": "你叫什么名字",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Xitoy tilida ismingizni, millatingizni va kasbingizni aytishni o'rganing",
         "tj": "Ба забони чинӣ ном, миллат ва шуғли худро омӯзед",
         "ru": "Научитесь произносить свое имя, национальность и род занятий на китайском языке."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Uchinchi darsda siz xitoy tilida ismingizni, millatingizni va kasbingizni qanday aytishni o'rganasiz. 9 ta yangi soʻz, 3 ta dialog va hí-jumlalar uchun grammatika.",
         "tj": "Дар дарси сеюм шумо мефаҳмед, ки чӣ гуна ном, миллат ва шуғли худро бо забони чинӣ гуфтан мумкин аст. 9 калимаи нав, 3 муколама ва грамматика барои 是-ҷумла.",
         "ru": "На третьем уроке вы научитесь произносить свое имя, национальность и род занятий на китайском языке. 9 новых слов, 3 диалога и грамматика 是-предложений."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

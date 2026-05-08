@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 4,
     "lesson_code": "HSK1-L04",
     "title": "她是我的汉语老师",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Uchinchi shaxslar haqida gapiring, ii bilan egalik qiling va so'roq so'zlaridan foydalaning.",
         "tj": "Дар бораи шахсони сеюм сӯҳбат кунед, бо 的 соҳибӣ кунед ва калимаҳои 谁/哪 саволро истифода баред",
         "ru": "Говорите о третьих лицах, выражайте владение с помощью 的 и используйте вопросительные слова 谁/哪."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "To'rtinchi darsda siz uchinchi shaxslar (u/u) haqida gapirishni, zán zarrachasi yordamida egalikni ifodalashni va so'roq so'zlaridan foydalanishni o'rganasiz. 10 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси чорум шумо мефаҳмед, ки чӣ тавр дар бораи шахсони сеюм (ӯ) сӯҳбат кардан, соҳибиятро бо истифода аз заррачаи 的 ифода кардан ва калимаҳои саволии 谁/哪 истифода бурданро меомӯзед. 10 калимаи нав, 3 муколама.",
         "ru": "На четвертом уроке вы научитесь говорить о третьем лице (он/она), выражать принадлежность с помощью частицы 的 и использовать вопросительные слова 谁/哪. 10 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

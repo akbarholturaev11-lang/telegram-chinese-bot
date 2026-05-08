@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 11,
     "lesson_code": "HSK1-L11",
     "title": "现在几点",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Vaqt, zamon qo‘shimchalari va sn so‘zini aytish va so‘rash",
         "tj": "Гуфтан ва пурсидани вақт, сифатҳои замон ва калимаи 前",
         "ru": "Рассказывать и спрашивать время, наречия времени и слово 前."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "O'n birinchi darsda siz vaqtni aytishni, vaqt qo'shimchalarini qo'llashni va vaqtni ján so'zi bilan ifodalashni o'rganasiz. 11 ta yangi so'z, 3 ta dialog.",
         "tj": "Дар дарси ёздаҳум шумо мефаҳмед, ки чӣ гуна вақтро гуфтан, истифода бурдани сифатҳои вақт ва ифодаи вақтро бо калимаи 前. 11 калимаи нав, 3 муколама.",
         "ru": "На одиннадцатом уроке вы научитесь определять время, использовать наречия времени и выражать время с помощью слова前. 11 новых слов, 3 диалога."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 2,
     "lesson_code": "HSK1-L02",
     "title": "谢谢你",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Xitoy tilida minnatdorchilik bildirish va xayrlashishni o'rganing",
         "tj": "Бо забони чинӣ чӣ гуна изҳори миннатдорӣ кардан ва хайрухуш карданро омӯзед",
         "ru": "Научитесь выражать благодарность и прощаться на китайском языке."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Ikkinchi darsda siz xitoy tilida minnatdorchilik bildirishni va xayrlashishni o'rganasiz. 4 ta yangi so'z, 3 ta dialog va neytral ohang qoidalari.",
         "tj": "Дар дарси дуюм шумо тарзи изҳори миннатдорӣ ва хайрбод бо забони чиниро меомӯзед. 4 калимаи нав, 3 муколама ва қоидаҳои оҳанги бетараф.",
         "ru": "На втором уроке вы научитесь выражать благодарность и прощаться на китайском языке. 4 новых слова, 3 диалога и правила нейтрального тона."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {

@@ -12,16 +12,16 @@ LESSON = {
     "lesson_order": 1,
     "lesson_code": "HSK1-L01",
     "title": "你好",
-    "goal": {
+    "goal": json.dumps({
         "uz": "Xitoy tilida salomlashish va kechirim so‘rashni o‘rganing",
         "tj": "Омӯзед, ки чӣ тавр ба одамон салом додан ва узр пурсиданро бо забони чинӣ",
         "ru": "Научитесь приветствовать людей и извиняться на китайском языке."
-    },
-    "intro_text": {
+}, ensure_ascii=False),
+    "intro_text": json.dumps({
         "uz": "Birinchi darsda siz xitoycha salomlashishni o'rganasiz. Ushbu dars 6 ta yangi so'z, 3 ta dialog va asosiy talaffuz qoidalarini o'z ichiga oladi.",
         "tj": "Дар дарси аввал шумо саломҳои чиниро меомӯзед. Ин дарс 6 калимаи нав, 3 муколама ва қоидаҳои асосии талаффузро дар бар мегирад.",
         "ru": "На первом уроке вы выучите китайские приветствия. Этот урок включает в себя 6 новых слов, 3 диалога и основные правила произношения."
-    },
+}, ensure_ascii=False),
 
     "vocabulary_json": json.dumps([
         {
