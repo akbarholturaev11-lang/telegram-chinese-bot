@@ -311,7 +311,7 @@ async def run_course_entry_flow(
 
     if not progress.current_lesson_id:
         lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
-        lessons = filter_unlocked_lessons(lessons, progress)
+        # Birinchi kirish: filter yo'q — uzer o'zi qayerdan boshlashini tanlaydi
 
         if not lessons:
             await respond(t("course_no_lessons_available", lang))
