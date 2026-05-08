@@ -1,5 +1,6 @@
 import asyncio
-from datetime import datetime
+import json
+from datetime import datetime, timezone, time
 
 from aiogram import F, Router
 from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
@@ -12,11 +13,18 @@ from app.bot.handlers.course import (
     filter_unlocked_lessons,
     send_course_completion_prompt,
 )
-from app.bot.keyboards.course import lesson_selection_keyboard, review_choice_keyboard
+from app.bot.keyboards.course import (
+    lesson_selection_keyboard,
+    review_choice_keyboard,
+    course_reminder_timezone_keyboard,
+    reminder_time_keyboard,
+)
+from app.bot.keyboards.course import course_intro_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
-from app.bot.keyboards.main_menu import main_menu_keyboard
+from app.bot.keyboards.main_menu import main_menu_keyboard, course_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.keyboards.referral import referral_daily_limit_keyboard
+from app.bot.utils.course_formatter import format_intro
 from app.repositories.message_repo import MessageRepository
 from app.repositories.user_repo import UserRepository
 from app.services.access_service import AccessService
@@ -50,6 +58,19 @@ def _next_study_time_keyboard(user_lang: str) -> ReplyKeyboardMarkup:
         one_time_keyboard=True,
     )
 
+
+
+def _parse_reminder_time(text: str):
+    text = (text or "").strip()
+    try:
+        parts = text.split(":")
+        if len(parts) == 2:
+            h, m = int(parts[0].strip()), int(parts[1].strip())
+            if 0 <= h < 24 and 0 <= m < 60:
+                return time(h, m)
+    except (ValueError, AttributeError):
+        pass
+    return None
 
 
 def _parse_next_study_at(raw_text: str):
@@ -119,12 +140,32 @@ async def handle_text_message(message: Message, session):
             if error_key:
                 await message.answer(t(error_key, user_lang))
                 return
-            current_lesson = lesson.title if lesson else "-"
+            current_lesson_title = lesson.title if lesson else "—"
             completed_count = getattr(progress, "completed_lessons_count", 0) or 0
+            vocab_count = 0
+            if completed_count > 0:
+                all_lessons = await engine.lesson_repo.list_by_level(user.level)
+                for les in all_lessons:
+                    if les.lesson_order <= completed_count and les.vocabulary_json:
+                        try:
+                            vdata = json.loads(les.vocabulary_json) if isinstance(les.vocabulary_json, str) else les.vocabulary_json
+                            if isinstance(vdata, list):
+                                vocab_count += len(vdata)
+                        except Exception:
+                            pass
+            days_studying = 1
+            if progress.created_at:
+                created = progress.created_at
+                if not created.tzinfo:
+                    created = created.replace(tzinfo=timezone.utc)
+                days_studying = max(1, (datetime.now(timezone.utc) - created).days)
             await message.answer(
-                f"📊 {t('course_progress', user_lang)}\n\n"
-                f"{t('course_current_lesson', user_lang)}: {current_lesson}\n"
-                f"{t('course_completed_lessons', user_lang)}: {completed_count}"
+                t("course_progress_full_text", user_lang,
+                  lessons=completed_count,
+                  vocab=vocab_count,
+                  days=days_studying,
+                  current=current_lesson_title),
+                parse_mode="HTML",
             )
             return
 
@@ -134,9 +175,71 @@ async def handle_text_message(message: Message, session):
             await message.answer(t("send_first_message", user_lang), reply_markup=main_menu_keyboard(user_lang))
             return
 
+        if msg_text == t("course_reread_button", user_lang):
+            _, progress_rr, lesson_rr, err_rr = await engine.get_current_lesson(message.from_user.id)
+            if err_rr or not lesson_rr:
+                await message.answer(t(err_rr or "course_no_lesson_found", user_lang))
+                return
+            await engine.progress_repo.set_current_lesson_and_step(
+                progress=progress_rr,
+                lesson_id=lesson_rr.id,
+                step="intro",
+                waiting_for="none",
+            )
+            await session.commit()
+            text_rr = format_intro(lesson_rr, user_lang)
+            await message.answer(t("course_reread_start_msg", user_lang))
+            await message.answer(text_rr, reply_markup=course_intro_keyboard(user_lang), parse_mode="HTML")
+            return
+
+        if msg_text == t("course_reminder_set_button", user_lang):
+            progress_rm = await engine.progress_repo.get_by_user_id(user.id)
+            if not progress_rm:
+                return
+            await engine.progress_repo.set_waiting_for(progress_rm, "reminder_setup")
+            await session.commit()
+            await message.answer(
+                t("course_reminder_setup_msg", user_lang),
+                reply_markup=reminder_time_keyboard(user_lang),
+                parse_mode="HTML",
+            )
+            return
+
         current_user, progress, lesson, error_key = await engine.get_current_lesson(message.from_user.id)
         if error_key:
             await message.answer(t(error_key, user_lang))
+            return
+
+        if progress.waiting_for == "reminder_setup":
+            cancel_map = {"uz": "❌ Bekor qilish", "ru": "❌ Отмена", "tj": "❌ Бекор кардан"}
+            if msg_text == cancel_map.get(user_lang, "❌ Отмена"):
+                await engine.progress_repo.set_waiting_for(progress, "none")
+                await session.commit()
+                await message.answer(
+                    t("course_reminder_cancelled", user_lang),
+                    reply_markup=course_menu_keyboard(user_lang),
+                )
+                return
+            parsed_reminder = _parse_reminder_time(msg_text)
+            if not parsed_reminder:
+                await message.answer(
+                    t("course_invalid_time_format", user_lang),
+                    reply_markup=reminder_time_keyboard(user_lang),
+                )
+                return
+            await engine.progress_repo.set_reminder(progress, enabled=True, reminder_time=parsed_reminder)
+            await engine.progress_repo.set_waiting_for(progress, "none")
+            await session.commit()
+            time_str = parsed_reminder.strftime("%H:%M")
+            await message.answer(
+                t("course_reminder_saved_msg", user_lang, time=time_str),
+                reply_markup=course_menu_keyboard(user_lang),
+                parse_mode="HTML",
+            )
+            await message.answer(
+                t("course_reminder_tz_title", user_lang),
+                reply_markup=course_reminder_timezone_keyboard(),
+            )
             return
 
         if progress.waiting_for == "satisfaction_answer":

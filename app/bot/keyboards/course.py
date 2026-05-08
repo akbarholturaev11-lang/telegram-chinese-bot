@@ -1,4 +1,5 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 
 # ─── STEP KEYBOARDS (inline) ────────────────────────────────────────────────
@@ -134,3 +135,29 @@ def lesson_selection_keyboard(
         buttons.append(nav)
 
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+
+def course_reminder_timezone_keyboard() -> InlineKeyboardMarkup:
+    builder = InlineKeyboardBuilder()
+    builder.button(text="UTC+3 🇷🇺 Москва", callback_data="course:set_tz:3")
+    builder.button(text="UTC+5 🇺🇿 Ташкент", callback_data="course:set_tz:5")
+    builder.button(text="UTC+6 Алматы", callback_data="course:set_tz:6")
+    builder.button(text="UTC+8 🇨🇳 Пекин", callback_data="course:set_tz:8")
+    builder.adjust(2)
+    return builder.as_markup()
+
+
+def reminder_time_keyboard(lang: str) -> ReplyKeyboardMarkup:
+    cancel_map = {
+        "uz": "❌ Bekor qilish",
+        "ru": "❌ Отмена",
+        "tj": "❌ Бекор кардан",
+    }
+    return ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="08:00"), KeyboardButton(text="14:00"), KeyboardButton(text="20:00")],
+            [KeyboardButton(text=cancel_map.get(lang, "❌ Отмена"))],
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=True,
+    )
