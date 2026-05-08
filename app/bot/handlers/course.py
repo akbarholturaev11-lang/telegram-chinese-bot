@@ -182,9 +182,7 @@ async def course_lessons_page_handler(callback: CallbackQuery, session):
     except Exception:
         page = 0
 
-    progress = await engine.progress_repo.get_by_user_id(user.id)
     lessons, _ = await _resolve_lessons_for_user_level(engine, user.level)
-    lessons = filter_unlocked_lessons(lessons, progress)
 
     await callback.answer()
     await callback.message.edit_reply_markup(
@@ -260,6 +258,7 @@ async def course_mode_open_handler(callback: CallbackQuery, session):
         session=session,
         telegram_id=callback.from_user.id,
         respond=callback.message.answer,
+        show_menu=True,
     )
 
 
@@ -270,6 +269,7 @@ async def run_course_entry_flow(
     session,
     telegram_id: int,
     respond,
+    show_menu: bool = False,
 ):
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
@@ -290,14 +290,8 @@ async def run_course_entry_flow(
         )
         return
 
-    was_in_course = user.learning_mode == "course"
     user.learning_mode = "course"
     await session.commit()
-
-    if not was_in_course:
-        await respond(t("course_menu_title", lang), reply_markup=course_menu_keyboard(lang))
-    else:
-        await respond("📚", reply_markup=course_menu_keyboard(lang))
 
     progress = await engine.progress_repo.get_by_user_id(user.id)
     if not progress:
@@ -311,7 +305,6 @@ async def run_course_entry_flow(
 
     if not progress.current_lesson_id:
         lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
-        # Birinchi kirish: filter yo'q — uzer o'zi qayerdan boshlashini tanlaydi
 
         if not lessons:
             await respond(t("course_no_lessons_available", lang))
@@ -323,6 +316,10 @@ async def run_course_entry_flow(
             reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang),
         )
         return
+
+    # Faqat menu tugmasi bosilganda menuni ko'rsat
+    if show_menu:
+        await respond("📚", reply_markup=course_menu_keyboard(lang))
 
     if getattr(progress, "waiting_for", None) == "next_study_time":
         await respond(t("course_next_study_time_optional", lang))

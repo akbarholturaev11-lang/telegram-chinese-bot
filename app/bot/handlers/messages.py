@@ -104,7 +104,6 @@ async def handle_text_message(message: Message, session):
             settings_engine = CourseEngineService(session)
             progress = await settings_engine.progress_repo.get_by_user_id(user.id)
             lessons, resolved_level = await _resolve_lessons_for_user_level(settings_engine, user.level)
-            lessons = filter_unlocked_lessons(lessons, progress)
             if not lessons:
                 await message.answer(t("course_no_lessons_available", user_lang))
                 return

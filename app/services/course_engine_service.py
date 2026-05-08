@@ -112,10 +112,6 @@ class CourseEngineService:
         if lesson.level not in self._allowed_level_candidates(user.level):
             return user, progress, None, "course_lesson_not_unlocked"
 
-        unlocked_order = max(1, (getattr(progress, "completed_lessons_count", 0) or 0) + 1)
-        if lesson.lesson_order > unlocked_order:
-            return user, progress, None, "course_lesson_not_unlocked"
-
         await self.progress_repo.set_current_lesson_and_step(
             progress=progress,
             lesson_id=lesson.id,
