@@ -19,9 +19,13 @@ def main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
 def course_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text=t("course_settings_button", lang))],
             [
+                KeyboardButton(text=t("course_settings_button", lang)),
                 KeyboardButton(text=t("course_progress", lang)),
+            ],
+            [KeyboardButton(text=t("course_reread_button", lang))],
+            [
+                KeyboardButton(text=t("course_reminder_set_button", lang)),
                 KeyboardButton(text=t("course_back_to_qa_button", lang)),
             ],
         ],

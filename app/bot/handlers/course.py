@@ -27,6 +27,9 @@ from app.bot.utils.course_formatter import (
     format_grammar, format_exercise,
 )
 from app.bot.keyboards.main_menu import course_menu_keyboard, main_menu_keyboard
+from app.bot.keyboards.course import course_reminder_timezone_keyboard
+import json
+from datetime import datetime, timezone
 
 
 
@@ -603,17 +606,37 @@ async def course_progress_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
-    current_lesson = lesson.title if lesson else "-"
+    current_lesson_title = lesson.title if lesson else "—"
     completed_count = getattr(progress, "completed_lessons_count", 0) or 0
 
-    text = (
-        f"📊 {t('course_progress', lang)}\n\n"
-        f"{t('course_current_lesson', lang)}: {current_lesson}\n"
-        f"{t('course_completed_lessons', lang)}: {completed_count}"
-    )
+    vocab_count = 0
+    if completed_count > 0:
+        all_lessons = await engine.lesson_repo.list_by_level(user.level)
+        for les in all_lessons:
+            if les.lesson_order <= completed_count and les.vocabulary_json:
+                try:
+                    vdata = json.loads(les.vocabulary_json) if isinstance(les.vocabulary_json, str) else les.vocabulary_json
+                    if isinstance(vdata, list):
+                        vocab_count += len(vdata)
+                except Exception:
+                    pass
+
+    days_studying = 1
+    if progress.created_at:
+        created = progress.created_at
+        if not created.tzinfo:
+            created = created.replace(tzinfo=timezone.utc)
+        days_studying = max(1, (datetime.now(timezone.utc) - created).days)
 
     await callback.answer()
-    await callback.message.answer(text)
+    await callback.message.answer(
+        t("course_progress_full_text", lang,
+          lessons=completed_count,
+          vocab=vocab_count,
+          days=days_studying,
+          current=current_lesson_title),
+        parse_mode="HTML",
+    )
 
 
 
@@ -1069,3 +1092,46 @@ async def course_skip_next_study_time_handler(callback: CallbackQuery, session):
     await callback.message.answer(
         t("course_next_study_time_skipped", lang)
     )
+
+
+@router.callback_query(F.data.startswith("course:set_tz:"))
+async def course_set_timezone_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+
+    try:
+        tz_offset = int(callback.data.split(":")[-1])
+    except (ValueError, IndexError):
+        await callback.answer()
+        return
+
+    progress = await engine.progress_repo.get_by_user_id(user.id)
+    if not progress or not progress.reminder_enabled or not progress.reminder_time:
+        await callback.answer()
+        return
+
+    progress.reminder_tz_offset = tz_offset
+    await session.commit()
+
+    tz_labels = {3: "UTC+3 🇷🇺", 5: "UTC+5 🇺🇿", 6: "UTC+6", 8: "UTC+8 🇨🇳"}
+    tz_label = tz_labels.get(tz_offset, f"UTC+{tz_offset}")
+    time_str = progress.reminder_time.strftime("%H:%M")
+
+    await callback.answer()
+    try:
+        await callback.message.edit_text(
+            t("course_reminder_tz_saved", lang, time=time_str, tz=tz_label),
+            parse_mode="HTML",
+        )
+    except Exception:
+        await callback.message.answer(
+            t("course_reminder_tz_saved", lang, time=time_str, tz=tz_label),
+            parse_mode="HTML",
+        )

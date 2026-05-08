@@ -43,6 +43,8 @@ class CourseProgress(Base):
 
     reminder_enabled: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     reminder_time: Mapped[Optional[time]] = mapped_column(Time, nullable=True)
+    reminder_tz_offset: Mapped[int] = mapped_column(Integer, nullable=False, default=5)
+    last_reminder_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     next_study_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
