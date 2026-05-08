@@ -13,6 +13,7 @@ from app.bot.handlers.course import (
     send_course_completion_prompt,
 )
 from app.bot.keyboards.course import lesson_selection_keyboard, review_choice_keyboard
+from app.bot.keyboards.course_context import course_satisfaction_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
 from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
@@ -182,6 +183,55 @@ async def handle_text_message(message: Message, session):
             await message.answer(
                 tutor_text,
                 reply_markup=get_course_keyboard_for_step(user_lang, refreshed_progress.current_step),
+                parse_mode="HTML",
+            )
+            return
+
+        if progress.waiting_for == "quiz_answer":
+            import asyncio as _asyncio2
+            _emojis2 = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
+            _anim_msg2 = await message.answer(_emojis2[0])
+
+            async def _animate2():
+                for _i2 in range(1, 30):
+                    await _asyncio2.sleep(1)
+                    try:
+                        await _anim_msg2.edit_text(_emojis2[_i2 % len(_emojis2)])
+                    except Exception:
+                        break
+
+            _anim_task2 = _asyncio2.create_task(_animate2())
+
+            quiz_feedback = await tutor.generate_step_response(
+                user_language=current_user.language,
+                user_level=current_user.level,
+                lesson=lesson,
+                step="quiz",
+                user_message=message.text or "",
+                history=course_history,
+            )
+
+            _anim_task2.cancel()
+            try:
+                await _anim_msg2.delete()
+            except Exception:
+                pass
+
+            await message.answer(quiz_feedback, parse_mode="HTML")
+
+            await engine.mark_quiz_passed_and_go_to_satisfaction(message.from_user.id)
+            _, _, refreshed_lesson, _ = await engine.get_current_lesson(message.from_user.id)
+
+            satisfaction_text = await tutor.generate_step_response(
+                user_language=current_user.language,
+                user_level=current_user.level,
+                lesson=refreshed_lesson or lesson,
+                step="satisfaction_check",
+                user_message="",
+            )
+            await message.answer(
+                satisfaction_text,
+                reply_markup=course_satisfaction_keyboard(user_lang),
                 parse_mode="HTML",
             )
             return

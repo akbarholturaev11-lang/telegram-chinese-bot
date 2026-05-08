@@ -5,7 +5,7 @@ from app.services.ai_service import AIService
 COURSE_MODEL = "gpt-4.1"
 
 # Steps that have the "I understood" advance button — append hint to AI response
-_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise", "quiz"}
+_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise"}
 
 _PRESS_BUTTON_HINT = {
     "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",

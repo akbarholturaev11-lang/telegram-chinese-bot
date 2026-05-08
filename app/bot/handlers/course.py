@@ -137,6 +137,8 @@ def get_course_keyboard_for_step(lang: str, step: str):
         return _ctx_homework_keyboard(lang)
     if step == "completed":
         return course_next_lesson_keyboard(lang)
+    if step == "quiz":
+        return None
     return course_understood_keyboard(lang, step)
 
 @router.callback_query(F.data.startswith("course:lessons_page:"))
@@ -374,6 +376,9 @@ async def run_course_entry_flow(
         )
         keyboard = get_course_keyboard_for_step(lang, step)
     await respond(text, reply_markup=keyboard, parse_mode="HTML")
+    if step == "quiz":
+        await engine.progress_repo.set_waiting_for(progress, "quiz_answer")
+        await session.commit()
 
 @router.message(F.text == "/course")
 async def course_command_handler(message: Message, session):
@@ -706,11 +711,9 @@ async def course_retry_test_handler(callback: CallbackQuery, session):
     )
 
     await callback.answer()
-    await callback.message.answer(
-        text,
-        reply_markup=get_course_keyboard_for_step(lang, "quiz"),
-        parse_mode="HTML",
-    )
+    await callback.message.answer(text, parse_mode="HTML")
+    await engine.progress_repo.set_waiting_for(progress, "quiz_answer")
+    await session.commit()
 
 
 @router.callback_query(F.data == "course:satisfied_yes")
@@ -931,6 +934,9 @@ async def _go_to_step(callback, session, step: str):
 
     await callback.answer()
     await callback.message.answer(text, reply_markup=keyboard, parse_mode="HTML")
+    if step == "quiz":
+        await engine.progress_repo.set_waiting_for(progress, "quiz_answer")
+        await session.commit()
 
 
 @router.callback_query(F.data == "course:go_vocab")
