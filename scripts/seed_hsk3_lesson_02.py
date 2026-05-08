@@ -12,8 +12,8 @@ LESSON = {
     "lesson_order": 2,
     "lesson_code": "HSK3-L02",
     "title": "他什么时候回来",
-    "goal": "expressing returning and sequential actions",
-    "intro_text": "This lesson is dedicated to expressing returning and sequential actions. It uses 5 key vocabulary words and covers core grammar patterns such as simple directional complements and two actions occurring in succession.",
+    "goal": json.dumps({"uz": "qaytish va ketma-ket harakatlarni ifodalash", "ru": "выражение возвращения и последовательных действий", "tj": "ифодаи баргаштан ва амалҳои пайдарпай"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu dars qaytish va ketma-ket harakatlarni ifodalashga bag'ishlangan. Unda 5 ta asosiy so'z o'rganiladi va oddiy yo'nalish to'ldiruvchilari hamda ikki harakatning ketma-ket sodir bo'lishi kabi grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён выражению возвращения и последовательных действий. В нём изучаются 5 ключевых слов и рассматриваются грамматические темы: простые направленные дополнения и два действия, следующие одно за другим.", "tj": "Ин дарс ба ифодаи баргаштан ва амалҳои пайдарпай бахшида шудааст. Дар он 5 калимаи асосӣ омӯхта мешавад ва мавзӯҳои грамматикии иловаҳои самтнок ва ду амали пайдарпай баррасӣ мегарданд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -21,35 +21,45 @@ LESSON = {
                         "zh": "回来",
                         "pinyin": "huílai",
                         "pos": "v.",
-                        "meaning": "to come back"
+                        "uz": "qaytib kelmoq",
+                        "ru": "вернуться, прийти обратно",
+                        "tj": "баргаштан, бозгаштан"
                 },
                 {
                         "no": 2,
                         "zh": "办公室",
                         "pinyin": "bàngōngshì",
                         "pos": "n.",
-                        "meaning": "office"
+                        "uz": "idora, ofis",
+                        "ru": "офис, кабинет",
+                        "tj": "идора, кабинет"
                 },
                 {
                         "no": 3,
                         "zh": "拿",
                         "pinyin": "ná",
                         "pos": "v.",
-                        "meaning": "to take, to get"
+                        "uz": "olmoq, ko'tarmoq",
+                        "ru": "брать, взять",
+                        "tj": "гирифтан, бардоштан"
                 },
                 {
                         "no": 4,
                         "zh": "伞",
                         "pinyin": "sǎn",
                         "pos": "n.",
-                        "meaning": "umbrella"
+                        "uz": "soyabon",
+                        "ru": "зонт",
+                        "tj": "чатр"
                 },
                 {
                         "no": 5,
                         "zh": "腿",
                         "pinyin": "tuǐ",
                         "pos": "n.",
-                        "meaning": "leg"
+                        "uz": "oyoq (son)",
+                        "ru": "нога (бедро/голень)",
+                        "tj": "по, ронак"
                 }
         ],
         ensure_ascii=False,
@@ -59,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "Waiting in the office",
+                        "scene_uz": "Idorada kutish",
+                        "scene_ru": "Ожидание в офисе",
+                        "scene_tj": "Интизор шудан дар идора",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "他什么时候回来？",
                                         "pinyin": "",
-                                        "translation": "When will he come back?"
+                                        "uz": "U qachon qaytib keladi?",
+                                        "ru": "Когда он вернётся?",
+                                        "tj": "Вай кай бармегардад?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "他先去办公室拿文件，马上就回来。",
                                         "pinyin": "",
-                                        "translation": "He went to the office to get some documents first, he'll be back shortly."
+                                        "uz": "U avval idoraga hujjat olishga ketdi, hozir qaytadi.",
+                                        "ru": "Он сначала пошёл в офис за документами, сейчас вернётся.",
+                                        "tj": "Вай аввал ба идора барои ҳуҷҷат рафт, ҳозир бармегардад."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "On a rainy day",
+                        "scene_uz": "Yomg'irli kunda",
+                        "scene_ru": "В дождливый день",
+                        "scene_tj": "Дар рӯзи борондор",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "外边下雨了，你把伞拿回来了吗？",
                                         "pinyin": "",
-                                        "translation": "It's raining outside, did you bring the umbrella back?"
+                                        "uz": "Tashqarida yomg'ir yog'yapti, soyabonni olib keldingizmi?",
+                                        "ru": "На улице дождь, ты принёс зонт обратно?",
+                                        "tj": "Берун борон меборад, чатрро баргардондӣ?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "拿回来了，不过我的腿还有点儿疼。",
                                         "pinyin": "",
-                                        "translation": "I brought it back, but my leg still hurts a little."
+                                        "uz": "Olib keldim, lekin oyog'im hali biroz og'riydi.",
+                                        "ru": "Принёс, но моя нога ещё немного болит.",
+                                        "tj": "Оvardам, аммо пои ман ҳанӯз каме дард мекунад."
                                 }
                         ]
                 }
@@ -102,34 +124,52 @@ LESSON = {
                 {
                         "no": 1,
                         "title_zh": "简单趋向补语",
-                        "explanation": "This topic shows the direction of movement of an action, or where the subject ends up as a result.",
+                        "title_uz": "Oddiy yo'nalish to'ldiruvchisi",
+                        "title_ru": "Простое направленное дополнение",
+                        "title_tj": "Иловаи самтноки содда",
+                        "rule_uz": "Bu mavzu harakatning yo'nalishini yoki sub'ekt harakatdan keyin qayerda ekanligini ko'rsatadi.",
+                        "rule_ru": "Эта тема показывает направление движения действия или где субъект оказывается в результате.",
+                        "rule_tj": "Ин мавзӯ самти ҳаракати амал ё ҷойеро, ки субъект дар натиҷа қарор мегирад, нишон медиҳад.",
                         "examples": [
                                 {
                                         "zh": "他什么时候回来。",
                                         "pinyin": "",
-                                        "meaning": "The main pattern from the lesson title."
+                                        "uz": "Darsning asosiy qolipi.",
+                                        "ru": "Основная конструкция урока.",
+                                        "tj": "Қолаби асосии дарс."
                                 },
                                 {
                                         "zh": "这个句子里有回来和办公室。",
                                         "pinyin": "",
-                                        "meaning": "This sentence uses 回来 and 办公室."
+                                        "uz": "Bu gapda 回来 va 办公室 so'zlari bor.",
+                                        "ru": "В этом предложении используются слова 回来 и 办公室.",
+                                        "tj": "Дар ин ҷумла калимаҳои 回来 ва 办公室 истифода шудаанд."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "两个动作连续发生",
-                        "explanation": "This grammar topic helps to practice the core sentence patterns of the lesson in context.",
+                        "title_uz": "Ikki harakatning ketma-ket sodir bo'lishi",
+                        "title_ru": "Два действия, следующие одно за другим",
+                        "title_tj": "Ду амали пайдарпай",
+                        "rule_uz": "Bu grammatik mavzu dars asosiy gap qoliplarini mashq qilishga yordam beradi.",
+                        "rule_ru": "Эта грамматическая тема помогает отработать основные конструкции урока.",
+                        "rule_tj": "Ин мавзӯи грамматикӣ ба машқ кардани қолабҳои асосии дарс кӯмак мекунад.",
                         "examples": [
                                 {
                                         "zh": "他什么时候回来。",
                                         "pinyin": "",
-                                        "meaning": "The main pattern from the lesson title."
+                                        "uz": "Darsning asosiy qolipi.",
+                                        "ru": "Основная конструкция урока.",
+                                        "tj": "Қолаби асосии дарс."
                                 },
                                 {
                                         "zh": "这个句子里有回来和办公室。",
                                         "pinyin": "",
-                                        "meaning": "This sentence uses 回来 and 办公室."
+                                        "uz": "Bu gapda 回来 va 办公室 so'zlari bor.",
+                                        "ru": "В этом предложении используются слова 回来 и 办公室.",
+                                        "tj": "Дар ин ҷумла калимаҳои 回来 ва 办公室 истифода шудаанд."
                                 }
                         ]
                 }
@@ -141,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarning xitoychasini yozing:",
+                        "instruction_ru": "Запишите по-китайски следующие слова:",
+                        "instruction_tj": "Калимаҳои зеринро бо хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "to come back",
+                                        "prompt_uz": "qaytib kelmoq",
+                                        "prompt_ru": "вернуться",
+                                        "prompt_tj": "баргаштан",
                                         "answer": "回来",
                                         "pinyin": "huílai"
                                 },
                                 {
-                                        "prompt": "office",
+                                        "prompt_uz": "idora, ofis",
+                                        "prompt_ru": "офис",
+                                        "prompt_tj": "идора",
                                         "answer": "办公室",
                                         "pinyin": "bàngōngshì"
                                 },
                                 {
-                                        "prompt": "to take, to get",
+                                        "prompt_uz": "olmoq, ko'tarmoq",
+                                        "prompt_ru": "брать",
+                                        "prompt_tj": "гирифтан",
                                         "answer": "拿",
                                         "pinyin": "ná"
                                 },
                                 {
-                                        "prompt": "umbrella",
+                                        "prompt_uz": "soyabon",
+                                        "prompt_ru": "зонт",
+                                        "prompt_tj": "чатр",
                                         "answer": "伞",
                                         "pinyin": "sǎn"
                                 }
@@ -168,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi so'zlarning ma'nosini yozing:",
+                        "instruction_ru": "Запишите значение следующих слов:",
+                        "instruction_tj": "Маънои калимаҳои зеринро нависед:",
                         "items": [
                                 {
-                                        "prompt": "回来",
-                                        "answer": "to come back",
+                                        "prompt_uz": "回来",
+                                        "prompt_ru": "回来",
+                                        "prompt_tj": "回来",
+                                        "answer": "回来",
                                         "pinyin": "huílai"
                                 },
                                 {
-                                        "prompt": "办公室",
-                                        "answer": "office",
+                                        "prompt_uz": "办公室",
+                                        "prompt_ru": "办公室",
+                                        "prompt_tj": "办公室",
+                                        "answer": "办公室",
                                         "pinyin": "bàngōngshì"
                                 },
                                 {
-                                        "prompt": "拿",
-                                        "answer": "to take, to get",
+                                        "prompt_uz": "拿",
+                                        "prompt_ru": "拿",
+                                        "prompt_tj": "拿",
+                                        "answer": "拿",
                                         "pinyin": "ná"
                                 },
                                 {
-                                        "prompt": "伞",
-                                        "answer": "umbrella",
+                                        "prompt_uz": "伞",
+                                        "prompt_ru": "伞",
+                                        "prompt_tj": "伞",
+                                        "answer": "伞",
                                         "pinyin": "sǎn"
                                 }
                         ]
@@ -209,10 +269,10 @@ LESSON = {
                 {
                         "no": 2,
                         "answers": [
-                                "to come back",
-                                "office",
-                                "to take, to get",
-                                "umbrella"
+                                "回来",
+                                "办公室",
+                                "拿",
+                                "伞"
                         ]
                 }
         ],
@@ -222,18 +282,26 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Make 3 sentences using the following words:",
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла тартиб диҳед:",
                         "words": [
                                 "回来",
                                 "办公室",
                                 "拿"
                         ],
-                        "example": "回来 和 办公室 可以出现在同一个句子里。"
+                        "topic_uz": "回来 va 办公室 so'zlarini bir gapda ishlatish mumkin.",
+                        "topic_ru": "Слова 回来 и 办公室 можно использовать в одном предложении.",
+                        "topic_tj": "Калимаҳои 回来 ва 办公室 метавонанд дар як ҷумла истифода шаванд."
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short paragraph of 4-5 sentences about the lesson topic:",
-                        "topic": "他什么时候回来"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий абзац из 4-5 предложений по теме урока:",
+                        "instruction_tj": "Дар мавзӯи дарс матни кӯтоҳи 4-5 ҷумлагӣ нависед:",
+                        "topic_uz": "他什么时候回来",
+                        "topic_ru": "他什么时候回来",
+                        "topic_tj": "他什么时候回来"
                 }
         ],
         ensure_ascii=False,
@@ -251,19 +319,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))

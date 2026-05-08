@@ -32,6 +32,7 @@ class CourseSeedService:
 
         seed_paths.extend(sorted(scripts_dir.glob("seed_hsk2_lesson_*.py")))
         seed_paths.extend(sorted(scripts_dir.glob("seed_hsk3_lesson_*.py")))
+        seed_paths.extend(sorted(scripts_dir.glob("seed_hsk4_lesson_*.py")))
         return seed_paths
 
     def _load_seed_callable(self, seed_path: Path):

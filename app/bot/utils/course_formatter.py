@@ -194,7 +194,11 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         if not isinstance(ex, dict):
             continue
 
-        instruction = ex.get("instruction", "")
+        instruction = (
+            ex.get(f"instruction_{lang}")
+            or ex.get("instruction_uz")
+            or ex.get("instruction", "")
+        )
         items = ex.get("items", [])
 
         lines.append("━━━━━━━━━━━━━━")
@@ -205,7 +209,11 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         for i, item in enumerate(items, 1):
             if not isinstance(item, dict):
                 continue
-            prompt = item.get("prompt", "")
+            prompt = (
+                item.get(f"prompt_{lang}")
+                or item.get("prompt_uz")
+                or item.get("prompt", "")
+            )
             if prompt:
                 lines.append(f"  {i}. {prompt}")
 

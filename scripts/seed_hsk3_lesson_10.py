@@ -12,8 +12,8 @@ LESSON = {
     "lesson_order": 10,
     "lesson_code": "HSK3-L10",
     "title": "数学比历史难多了",
-    "goal": "expressing comparison and difference in degree",
-    "intro_text": "This lesson is dedicated to expressing comparison and difference in degree. It introduces 5 key vocabulary words and covers core grammar patterns such as 比较句 2：A 比 B + Adj + 一点儿/一些/得多/多了 and 概数的表达 1.",
+    "goal": json.dumps({"uz": "taqqoslash va darajadagi farqni ifodalash", "ru": "выражение сравнения и различия по степени", "tj": "ифода кардани муқоиса ва фарқ дар дараҷа"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda taqqoslash va darajadagi farqni ifodalash o'rgatiladi. 5 ta asosiy so'z va 比较句 2：A 比 B + Adj + 一点儿/一些/得多/多了 hamda 概数的表达 1 grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён выражению сравнения и различия по степени. Вводятся 5 ключевых слов и грамматические конструкции 比较句 2：A 比 B + Adj + 一点儿/一些/得多/多了 и 概数的表达 1.", "tj": "Ин дарс ба ифода кардани муқоиса ва фарқ дар дараҷа бахшида шудааст. 5 калимаи асосӣ ва намунаҳои грамматикии 比较句 2：A 比 B + Adj + 一点儿/一些/得多/多了 ва 概数的表达 1 омӯхта мешаванд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -21,35 +21,45 @@ LESSON = {
                         "zh": "数学",
                         "pinyin": "shùxué",
                         "pos": "n.",
-                        "meaning": "mathematics"
+                        "uz": "matematika",
+                        "ru": "математика",
+                        "tj": "математика"
                 },
                 {
                         "no": 2,
                         "zh": "历史",
                         "pinyin": "lìshǐ",
                         "pos": "n.",
-                        "meaning": "history"
+                        "uz": "tarix",
+                        "ru": "история",
+                        "tj": "таърих"
                 },
                 {
                         "no": 3,
                         "zh": "体育",
                         "pinyin": "tǐyù",
                         "pos": "n.",
-                        "meaning": "physical education / sports"
+                        "uz": "jismoniy tarbiya; sport",
+                        "ru": "физкультура; спорт",
+                        "tj": "тарбияи ҷисмонӣ; варзиш"
                 },
                 {
                         "no": 4,
                         "zh": "自行车",
                         "pinyin": "zìxíngchē",
                         "pos": "n.",
-                        "meaning": "bicycle"
+                        "uz": "velosiped",
+                        "ru": "велосипед",
+                        "tj": "велосипед"
                 },
                 {
                         "no": 5,
                         "zh": "附近",
                         "pinyin": "fùjìn",
                         "pos": "n.",
-                        "meaning": "nearby; in the vicinity"
+                        "uz": "yaqin atrofda; yaqinida",
+                        "ru": "рядом; поблизости",
+                        "tj": "дар наздикӣ; дар атроф"
                 }
         ],
         ensure_ascii=False,
@@ -59,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "About subjects",
+                        "scene_uz": "Fanlar haqida",
+                        "scene_ru": "О предметах",
+                        "scene_tj": "Дар бораи фанҳо",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "数学比历史难多了。",
-                                        "pinyin": "",
-                                        "translation": "Math is much harder than history."
+                                        "pinyin": "Shùxué bǐ lìshǐ nán duō le.",
+                                        "uz": "Matematika tarixdan ancha qiyin.",
+                                        "ru": "Математика намного сложнее истории.",
+                                        "tj": "Математика нисбат ба таърих хеле душвортар аст."
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "我觉得体育比数学轻松一些。",
-                                        "pinyin": "",
-                                        "translation": "I think PE is a bit more relaxed than math."
+                                        "pinyin": "Wǒ juéde tǐyù bǐ shùxué qīngsōng yīxiē.",
+                                        "uz": "Menimcha, jismoniy tarbiya matematikadan biroz osonroq.",
+                                        "ru": "Мне кажется, физкультура немного легче математики.",
+                                        "tj": "Ба назарам тарбияи ҷисмонӣ аз математика каме осонтар аст."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "On the way",
+                        "scene_uz": "Yo'lda",
+                        "scene_ru": "В дороге",
+                        "scene_tj": "Дар роҳ",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "学校离你家远吗？",
-                                        "pinyin": "",
-                                        "translation": "Is the school far from your home?"
+                                        "pinyin": "Xuéxiào lí nǐ jiā yuǎn ma?",
+                                        "uz": "Maktab uyingizdan uzoqmi?",
+                                        "ru": "Школа далеко от твоего дома?",
+                                        "tj": "Мактаб аз хонаи шумо дур аст?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "不太远，骑自行车二十分钟左右。",
-                                        "pinyin": "",
-                                        "translation": "Not too far — about twenty minutes by bicycle."
+                                        "pinyin": "Bú tài yuǎn, qí zìxíngchē èrshí fēnzhōng zuǒyòu.",
+                                        "uz": "Unchalik emas, velosipedda taxminan yigirma daqiqa.",
+                                        "ru": "Не очень — примерно двадцать минут на велосипеде.",
+                                        "tj": "Не он қадар дур, тақрибан бист дақиқа бо велосипед."
                                 }
                         ]
                 }
@@ -102,34 +124,52 @@ LESSON = {
                 {
                         "no": 1,
                         "title_zh": "比较句 2：A 比 B + Adj + 一点儿/一些/得多/多了",
-                        "explanation": "This pattern is used to compare two things or people in terms of degree.",
+                        "title_uz": "Taqqoslash 2: A, B dan + sifat + biroz/ancha",
+                        "title_ru": "Сравнение 2: A + Прил + немного/намного + чем B",
+                        "title_tj": "Муқоиса 2: A аз B + сифат + каме/хеле",
+                        "rule_uz": "Bu shakl ikki narsa yoki shaxsni darajasi bo'yicha taqqoslashda, farqini ifodalashda ishlatiladi.",
+                        "rule_ru": "Эта конструкция используется для сравнения двух предметов или людей по степени признака с указанием разницы.",
+                        "rule_tj": "Ин намуна барои муқоисаи ду чиз ё шахс аз рӯи дараҷа ва нишон додани фарқ истифода мешавад.",
                         "examples": [
                                 {
                                         "zh": "数学比历史难多了。",
-                                        "pinyin": "",
-                                        "meaning": "A comparison example from the lesson title."
+                                        "pinyin": "Shùxué bǐ lìshǐ nán duō le.",
+                                        "uz": "Matematika tarixdan ancha qiyin.",
+                                        "ru": "Математика намного сложнее истории.",
+                                        "tj": "Математика нисбат ба таърих хеле душвортар аст."
                                 },
                                 {
-                                        "zh": "数学比历史更重要。",
-                                        "pinyin": "",
-                                        "meaning": "数学 is even more important than 历史."
+                                        "zh": "今天比昨天冷一点儿。",
+                                        "pinyin": "Jīntiān bǐ zuótiān lěng yīdiǎnr.",
+                                        "uz": "Bugun kechagidan biroz sovuqroq.",
+                                        "ru": "Сегодня немного холоднее, чем вчера.",
+                                        "tj": "Имрӯз аз дирӯз каме сардтар аст."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "概数的表达 1",
-                        "explanation": "This topic helps express approximate numbers or time in a soft, flexible way.",
+                        "title_uz": "Taxminiy sonlar ifodalash 1",
+                        "title_ru": "Выражение приблизительных чисел 1",
+                        "title_tj": "Ифода кардани рақамҳои тахминӣ 1",
+                        "rule_uz": "Bu mavzu taxminiy raqam yoki vaqtni ifodalashda ishlatiladi.",
+                        "rule_ru": "Эта тема помогает выражать приблизительные числа или время.",
+                        "rule_tj": "Ин мавзӯ барои ифода кардани рақамҳо ё вақти тахминӣ кӯмак мекунад.",
                         "examples": [
                                 {
-                                        "zh": "数学比历史难多了。",
-                                        "pinyin": "",
-                                        "meaning": "The key pattern from the lesson title."
+                                        "zh": "骑自行车二十分钟左右。",
+                                        "pinyin": "Qí zìxíngchē èrshí fēnzhōng zuǒyòu.",
+                                        "uz": "Velosipedda taxminan yigirma daqiqa.",
+                                        "ru": "Примерно двадцать минут на велосипеде.",
+                                        "tj": "Тақрибан бист дақиқа бо велосипед."
                                 },
                                 {
-                                        "zh": "这个句子里有数学和历史。",
-                                        "pinyin": "",
-                                        "meaning": "This sentence uses 数学 and 历史."
+                                        "zh": "他有三四个朋友。",
+                                        "pinyin": "Tā yǒu sān sì gè péngyou.",
+                                        "uz": "Uning uch-to'rtta do'sti bor.",
+                                        "ru": "У него три-четыре друга.",
+                                        "tj": "Вай се-чор дӯст дорад."
                                 }
                         ]
                 }
@@ -141,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarni xitoycha yozing:",
+                        "instruction_ru": "Напишите китайский для следующих слов:",
+                        "instruction_tj": "Калимаҳои зеринро ба хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "mathematics",
+                                        "prompt_uz": "matematika",
+                                        "prompt_ru": "математика",
+                                        "prompt_tj": "математика",
                                         "answer": "数学",
                                         "pinyin": "shùxué"
                                 },
                                 {
-                                        "prompt": "history",
+                                        "prompt_uz": "tarix",
+                                        "prompt_ru": "история",
+                                        "prompt_tj": "таърих",
                                         "answer": "历史",
                                         "pinyin": "lìshǐ"
                                 },
                                 {
-                                        "prompt": "physical education / sports",
+                                        "prompt_uz": "jismoniy tarbiya; sport",
+                                        "prompt_ru": "физкультура; спорт",
+                                        "prompt_tj": "тарбияи ҷисмонӣ; варзиш",
                                         "answer": "体育",
                                         "pinyin": "tǐyù"
                                 },
                                 {
-                                        "prompt": "bicycle",
+                                        "prompt_uz": "velosiped",
+                                        "prompt_ru": "велосипед",
+                                        "prompt_tj": "велосипед",
                                         "answer": "自行车",
                                         "pinyin": "zìxíngchē"
                                 }
@@ -168,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi xitoycha so'zlarni tarjima qiling:",
+                        "instruction_ru": "Переведите следующие китайские слова:",
+                        "instruction_tj": "Калимаҳои зерини хитоиро тарҷума кунед:",
                         "items": [
                                 {
-                                        "prompt": "数学",
-                                        "answer": "mathematics",
+                                        "prompt_uz": "数学",
+                                        "prompt_ru": "数学",
+                                        "prompt_tj": "数学",
+                                        "answer": "matematika / математика / математика",
                                         "pinyin": "shùxué"
                                 },
                                 {
-                                        "prompt": "历史",
-                                        "answer": "history",
+                                        "prompt_uz": "历史",
+                                        "prompt_ru": "历史",
+                                        "prompt_tj": "历史",
+                                        "answer": "tarix / история / таърих",
                                         "pinyin": "lìshǐ"
                                 },
                                 {
-                                        "prompt": "体育",
-                                        "answer": "physical education / sports",
+                                        "prompt_uz": "体育",
+                                        "prompt_ru": "体育",
+                                        "prompt_tj": "体育",
+                                        "answer": "jismoniy tarbiya / физкультура / тарбияи ҷисмонӣ",
                                         "pinyin": "tǐyù"
                                 },
                                 {
-                                        "prompt": "自行车",
-                                        "answer": "bicycle",
+                                        "prompt_uz": "自行车",
+                                        "prompt_ru": "自行车",
+                                        "prompt_tj": "自行车",
+                                        "answer": "velosiped / велосипед / велосипед",
                                         "pinyin": "zìxíngchē"
                                 }
                         ]
@@ -199,20 +259,15 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "answers": [
-                                "数学",
-                                "历史",
-                                "体育",
-                                "自行车"
-                        ]
+                        "answers": ["数学", "历史", "体育", "自行车"]
                 },
                 {
                         "no": 2,
                         "answers": [
-                                "mathematics",
-                                "history",
-                                "physical education / sports",
-                                "bicycle"
+                                "matematika / математика / математика",
+                                "tarix / история / таърих",
+                                "jismoniy tarbiya / физкультура / тарбияи ҷисмонӣ",
+                                "velosiped / велосипед / велосипед"
                         ]
                 }
         ],
@@ -222,18 +277,20 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Write 3 sentences using the following words:",
-                        "words": [
-                                "数学",
-                                "历史",
-                                "体育"
-                        ],
-                        "example": "数学 和 历史 可以出现在同一个句子里。"
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла созед:",
+                        "words": ["数学", "历史", "体育"],
+                        "example": "数学比历史难多了，但体育很轻松。"
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short passage of 4–5 sentences about the lesson topic:",
-                        "topic": "数学比历史难多了"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 ta gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий текст из 4–5 предложений по теме урока:",
+                        "instruction_tj": "Дар бораи мавзӯи дарс матни кӯтоҳ аз 4-5 ҷумла нависед:",
+                        "topic_uz": "Matematika tarixdan ancha qiyin",
+                        "topic_ru": "Математика намного сложнее истории",
+                        "topic_tj": "Математика нисбат ба таърих хеле душвортар аст"
                 }
         ],
         ensure_ascii=False,
@@ -251,19 +308,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))

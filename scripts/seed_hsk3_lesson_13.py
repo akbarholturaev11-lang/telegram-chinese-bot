@@ -12,8 +12,8 @@ LESSON = {
     "lesson_order": 13,
     "lesson_code": "HSK3-L13",
     "title": "我是走回来的",
-    "goal": "expressing direction of movement and simultaneous actions",
-    "intro_text": "This lesson is dedicated to expressing direction of movement and simultaneous actions. It uses 5 key vocabulary words and covers core grammar patterns such as 复合趋向补语 and 一边……一边……",
+    "goal": json.dumps({"uz": "harakat yo'nalishi va bir vaqtda bajarilayotgan harakatlarni ifodalash", "ru": "выражение направления движения и одновременных действий", "tj": "ифода кардани самти ҳаракат ва амалҳои ҳамзамон"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda harakat yo'nalishi va bir vaqtda bajarilayotgan harakatlarni ifodalash o'rgatiladi. 5 ta asosiy so'z va 复合趋向补语 hamda 一边……一边…… grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён выражению направления движения и одновременных действий. Вводятся 5 ключевых слов и грамматические конструкции 复合趋向补语 и 一边……一边……", "tj": "Ин дарс ба ифода кардани самти ҳаракат ва амалҳои ҳамзамон бахшида шудааст. 5 калимаи асосӣ ва намунаҳои грамматикии 复合趋向补语 ва 一边……一边…… омӯхта мешаванд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -21,35 +21,45 @@ LESSON = {
                         "zh": "礼物",
                         "pinyin": "lǐwù",
                         "pos": "n.",
-                        "meaning": "gift, present"
+                        "uz": "sovg'a; hadya",
+                        "ru": "подарок",
+                        "tj": "тӯҳфа; ҳадя"
                 },
                 {
                         "no": 2,
                         "zh": "奶奶",
                         "pinyin": "nǎinai",
                         "pos": "n.",
-                        "meaning": "grandmother (paternal)"
+                        "uz": "buvi (ota tomonidan)",
+                        "ru": "бабушка (по отцу)",
+                        "tj": "момо (аз тарафи падар)"
                 },
                 {
                         "no": 3,
                         "zh": "遇到",
                         "pinyin": "yùdào",
                         "pos": "v.",
-                        "meaning": "to run into, to meet"
+                        "uz": "uchramoq; ro'para kelmoq",
+                        "ru": "встретить; натолкнуться",
+                        "tj": "вохӯрдан; рӯ ба рӯ шудан"
                 },
                 {
                         "no": 4,
                         "zh": "一边",
                         "pinyin": "yìbiān",
                         "pos": "adv.",
-                        "meaning": "at the same time, while"
+                        "uz": "bir vaqtda; bir paytda",
+                        "ru": "одновременно; в то же время",
+                        "tj": "ҳамзамон; дар як вақт"
                 },
                 {
                         "no": 5,
                         "zh": "愿意",
                         "pinyin": "yuànyì",
                         "pos": "v.",
-                        "meaning": "to be willing to, to agree"
+                        "uz": "rozi bo'lmoq; tayyorligini bildirmoq",
+                        "ru": "быть готовым; соглашаться",
+                        "tj": "розӣ будан; омодагӣ доштан"
                 }
         ],
         ensure_ascii=False,
@@ -59,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "Walking back",
+                        "scene_uz": "Piyoda qaytib kelish",
+                        "scene_ru": "Возвращение пешком",
+                        "scene_tj": "Баргаштан бо пой",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "你怎么回来的？",
-                                        "pinyin": "",
-                                        "translation": "How did you come back?"
+                                        "pinyin": "Nǐ zěnme huí lái de?",
+                                        "uz": "Qanday qaytib keldingiz?",
+                                        "ru": "Как ты вернулся?",
+                                        "tj": "Чӣ тавр баргаштед?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "我是走回来的。",
-                                        "pinyin": "",
-                                        "translation": "I came back on foot."
+                                        "pinyin": "Wǒ shì zǒu huí lái de.",
+                                        "uz": "Men piyoda qaytib keldim.",
+                                        "ru": "Я вернулся пешком.",
+                                        "tj": "Ман бо пой баргаштам."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "On the way",
+                        "scene_uz": "Yo'lda",
+                        "scene_ru": "В дороге",
+                        "scene_tj": "Дар роҳ",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "路上你遇到谁了？",
-                                        "pinyin": "",
-                                        "translation": "Who did you run into on the way?"
+                                        "pinyin": "Lù shang nǐ yùdào shéi le?",
+                                        "uz": "Yo'lda kimni uchratdingiz?",
+                                        "ru": "Кого ты встретил по дороге?",
+                                        "tj": "Дар роҳ бо кӣ вохӯрдед?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "我一边走一边给奶奶买礼物。",
-                                        "pinyin": "",
-                                        "translation": "I walked back while buying a gift for my grandmother at the same time."
+                                        "pinyin": "Wǒ yìbiān zǒu yìbiān gěi nǎinai mǎi lǐwù.",
+                                        "uz": "Men yura-yura buvimdga sovg'a sotib oldim.",
+                                        "ru": "Я шёл и одновременно купил подарок бабушке.",
+                                        "tj": "Ман рафта-рафта барои момо тӯҳфа харидам."
                                 }
                         ]
                 }
@@ -102,34 +124,52 @@ LESSON = {
                 {
                         "no": 1,
                         "title_zh": "复合趋向补语",
-                        "explanation": "This topic shows the direction of movement of an action, or where the subject ends up as a result.",
+                        "title_uz": "Murakkab yo'nalish to'ldiruvchisi",
+                        "title_ru": "Сложное направительное дополнение",
+                        "title_tj": "Иловаи самти мураккаб",
+                        "rule_uz": "Bu mavzu harakatning yo'nalishini yoki sub'ektning natijada qayerga tushganini bildiradi.",
+                        "rule_ru": "Эта тема показывает направление действия или конечное положение субъекта как результат действия.",
+                        "rule_tj": "Ин мавзӯ самти амал ё мавқеи ниҳоии субъектро дар натиҷаи амал нишон медиҳад.",
                         "examples": [
                                 {
                                         "zh": "我是走回来的。",
-                                        "pinyin": "",
-                                        "meaning": "The main pattern from the lesson title."
+                                        "pinyin": "Wǒ shì zǒu huí lái de.",
+                                        "uz": "Men piyoda qaytib keldim.",
+                                        "ru": "Я вернулся пешком.",
+                                        "tj": "Ман бо пой баргаштам."
                                 },
                                 {
-                                        "zh": "这个句子里有礼物和奶奶。",
-                                        "pinyin": "",
-                                        "meaning": "This sentence uses 礼物 and 奶奶."
+                                        "zh": "他跑进来了。",
+                                        "pinyin": "Tā pǎo jìn lái le.",
+                                        "uz": "U yugura-yugura kirdi.",
+                                        "ru": "Он вбежал.",
+                                        "tj": "Вай давон-давон даромад."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "一边……一边……",
-                        "explanation": "This pattern indicates that two actions are happening simultaneously.",
+                        "title_uz": "一边……一边…… (bir vaqtda ikki harakat)",
+                        "title_ru": "一边……一边…… (два действия одновременно)",
+                        "title_tj": "一边……一边…… (ду амали ҳамзамон)",
+                        "rule_uz": "Bu shakl ikki harakatning bir vaqtda bajarilishini bildiradi.",
+                        "rule_ru": "Эта конструкция указывает на то, что два действия выполняются одновременно.",
+                        "rule_tj": "Ин намуна нишон медиҳад, ки ду амал дар як вақт иҷро мешаванд.",
                         "examples": [
                                 {
                                         "zh": "我一边走一边听音乐。",
-                                        "pinyin": "",
-                                        "meaning": "I listen to music while walking."
+                                        "pinyin": "Wǒ yìbiān zǒu yìbiān tīng yīnyuè.",
+                                        "uz": "Men yura-yura musiqa tinglayapman.",
+                                        "ru": "Я иду и одновременно слушаю музыку.",
+                                        "tj": "Ман рафта-рафта мусиқа мегӯшам."
                                 },
                                 {
                                         "zh": "她一边做饭一边说话。",
-                                        "pinyin": "",
-                                        "meaning": "She talks while cooking."
+                                        "pinyin": "Tā yìbiān zuòfàn yìbiān shuōhuà.",
+                                        "uz": "U ovqat pishira-pishira gaplashmoqda.",
+                                        "ru": "Она готовит еду и одновременно разговаривает.",
+                                        "tj": "Вай хӯрок пухта-пухта гап мезанад."
                                 }
                         ]
                 }
@@ -141,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarni xitoycha yozing:",
+                        "instruction_ru": "Напишите китайский для следующих слов:",
+                        "instruction_tj": "Калимаҳои зеринро ба хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "gift, present",
+                                        "prompt_uz": "sovg'a; hadya",
+                                        "prompt_ru": "подарок",
+                                        "prompt_tj": "тӯҳфа; ҳадя",
                                         "answer": "礼物",
                                         "pinyin": "lǐwù"
                                 },
                                 {
-                                        "prompt": "grandmother (paternal)",
+                                        "prompt_uz": "buvi (ota tomonidan)",
+                                        "prompt_ru": "бабушка (по отцу)",
+                                        "prompt_tj": "момо (аз тарафи падар)",
                                         "answer": "奶奶",
                                         "pinyin": "nǎinai"
                                 },
                                 {
-                                        "prompt": "to run into, to meet",
+                                        "prompt_uz": "uchramoq; ro'para kelmoq",
+                                        "prompt_ru": "встретить; натолкнуться",
+                                        "prompt_tj": "вохӯрдан; рӯ ба рӯ шудан",
                                         "answer": "遇到",
                                         "pinyin": "yùdào"
                                 },
                                 {
-                                        "prompt": "at the same time, while",
+                                        "prompt_uz": "bir vaqtda; bir paytda",
+                                        "prompt_ru": "одновременно; в то же время",
+                                        "prompt_tj": "ҳамзамон; дар як вақт",
                                         "answer": "一边",
                                         "pinyin": "yìbiān"
                                 }
@@ -168,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi xitoycha so'zlarni tarjima qiling:",
+                        "instruction_ru": "Переведите следующие китайские слова:",
+                        "instruction_tj": "Калимаҳои зерини хитоиро тарҷума кунед:",
                         "items": [
                                 {
-                                        "prompt": "礼物",
-                                        "answer": "gift, present",
+                                        "prompt_uz": "礼物",
+                                        "prompt_ru": "礼物",
+                                        "prompt_tj": "礼物",
+                                        "answer": "sovg'a / подарок / тӯҳфа",
                                         "pinyin": "lǐwù"
                                 },
                                 {
-                                        "prompt": "奶奶",
-                                        "answer": "grandmother (paternal)",
+                                        "prompt_uz": "奶奶",
+                                        "prompt_ru": "奶奶",
+                                        "prompt_tj": "奶奶",
+                                        "answer": "buvi / бабушка / момо",
                                         "pinyin": "nǎinai"
                                 },
                                 {
-                                        "prompt": "遇到",
-                                        "answer": "to run into, to meet",
+                                        "prompt_uz": "遇到",
+                                        "prompt_ru": "遇到",
+                                        "prompt_tj": "遇到",
+                                        "answer": "uchramoq / встретить / вохӯрдан",
                                         "pinyin": "yùdào"
                                 },
                                 {
-                                        "prompt": "一边",
-                                        "answer": "at the same time, while",
+                                        "prompt_uz": "一边",
+                                        "prompt_ru": "一边",
+                                        "prompt_tj": "一边",
+                                        "answer": "bir vaqtda / одновременно / ҳамзамон",
                                         "pinyin": "yìbiān"
                                 }
                         ]
@@ -199,20 +259,15 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "answers": [
-                                "礼物",
-                                "奶奶",
-                                "遇到",
-                                "一边"
-                        ]
+                        "answers": ["礼物", "奶奶", "遇到", "一边"]
                 },
                 {
                         "no": 2,
                         "answers": [
-                                "gift, present",
-                                "grandmother (paternal)",
-                                "to run into, to meet",
-                                "at the same time, while"
+                                "sovg'a / подарок / тӯҳфа",
+                                "buvi / бабушка / момо",
+                                "uchramoq / встретить / вохӯрдан",
+                                "bir vaqtda / одновременно / ҳамзамон"
                         ]
                 }
         ],
@@ -222,18 +277,20 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Make 3 sentences using the following words:",
-                        "words": [
-                                "礼物",
-                                "奶奶",
-                                "遇到"
-                        ],
-                        "example": "礼物 和 奶奶 可以出现在同一个句子里。"
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла созед:",
+                        "words": ["礼物", "奶奶", "遇到"],
+                        "example": "我回来的路上遇到了朋友，还给奶奶买了礼物。"
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short paragraph of 4-5 sentences about the lesson topic:",
-                        "topic": "我是走回来的"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 ta gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий текст из 4–5 предложений по теме урока:",
+                        "instruction_tj": "Дар бораи мавзӯи дарс матни кӯтоҳ аз 4-5 ҷумла нависед:",
+                        "topic_uz": "Men piyoda qaytib keldim",
+                        "topic_ru": "Я вернулся пешком",
+                        "topic_tj": "Ман бо пой баргаштам"
                 }
         ],
         ensure_ascii=False,
@@ -251,19 +308,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))

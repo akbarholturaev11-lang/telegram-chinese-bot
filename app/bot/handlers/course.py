@@ -107,24 +107,38 @@ def _format_homework_text(lang: str, homework_raw) -> str:
     except Exception:
         return f"{title}\n\n{homework_raw}"
 
-    if isinstance(data, list):
-        lines = [title, ""]
-        for i, item in enumerate(data, 1):
+    if not isinstance(data, list):
+        return f"{title}\n\n{data}"
+
+    lines = [title, ""]
+    for i, item in enumerate(data, 1):
+        if not isinstance(item, dict):
             lines.append(f"{i}. {item}")
-        return "\n".join(lines)
+            continue
 
-    if isinstance(data, dict):
-        lines = [title, ""]
-        for key, value in data.items():
-            if isinstance(value, list):
-                lines.append(f"{key}:")
-                for i, item in enumerate(value, 1):
-                    lines.append(f"{i}. {item}")
-            else:
-                lines.append(f"{key}: {value}")
-        return "\n".join(lines)
+        instruction = (
+            item.get(f"instruction_{lang}")
+            or item.get("instruction_uz")
+            or item.get("instruction", "")
+        )
+        words = item.get("words", [])
+        example = item.get("example", "")
+        topic = (
+            item.get(f"topic_{lang}")
+            or item.get("topic_uz")
+            or item.get("topic", "")
+        )
 
-    return f"{title}\n\n{data}"
+        lines.append(f"{i}. {instruction}")
+        if words:
+            lines.append(f"   📌 {' · '.join(words)}")
+        if example:
+            lines.append(f"   💬 {example}")
+        if topic:
+            lines.append(f"   🎯 {topic}")
+        lines.append("")
+
+    return "\n".join(lines).rstrip()
 
 
 

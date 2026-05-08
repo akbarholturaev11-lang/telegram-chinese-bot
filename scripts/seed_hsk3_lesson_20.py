@@ -12,9 +12,8 @@ LESSON = {
     "lesson_order": 20,
     "lesson_code": "HSK3-L20",
     "title": "我被他影响了",
-    "goal": "using passive voice and restrictive conditions",
-    "intro_text": 'This lesson is dedicated to using passive voice and restrictive conditions. It uses 5 key vocabulary words and covers core grammar patterns such as "被"字句 and 只有……才……',
-
+    "goal": json.dumps({"uz": "passiv nisbat va cheklovchi shartlardan foydalanish", "ru": "использование страдательного залога и ограничительных условий", "tj": "истифодаи садои маҷҳул ва шартҳои маҳдудкунанда"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda passiv nisbat va cheklovchi shartlardan foydalanish o'rgatiladi. 5 ta asosiy so'z va «被»字句 hamda 只有……才…… grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён использованию страдательного залога и ограничительных условий. Вводятся 5 ключевых слов и грамматические конструкции «被»字句 и 只有……才……", "tj": "Ин дарс ба истифодаи садои маҷҳул ва шартҳои маҳдудкунанда бахшида шудааст. 5 калимаи асосӣ ва намунаҳои грамматикии «被»字句 ва 只有……才…… омӯхта мешаванд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -22,35 +21,45 @@ LESSON = {
                         "zh": "被",
                         "pinyin": "bèi",
                         "pos": "prep.",
-                        "meaning": "by (passive marker)"
+                        "uz": "tomonidan (passiv belgisi)",
+                        "ru": "(маркер пассивного залога)",
+                        "tj": "аз тарафи (нишонаи садои маҷҳул)"
                 },
                 {
                         "no": 2,
                         "zh": "影响",
                         "pinyin": "yǐngxiǎng",
                         "pos": "v./n.",
-                        "meaning": "to influence, influence"
+                        "uz": "ta'sir qilmoq; ta'sir",
+                        "ru": "влиять; влияние",
+                        "tj": "таъсир расонидан; таъсир"
                 },
                 {
                         "no": 3,
                         "zh": "解决",
                         "pinyin": "jiějué",
                         "pos": "v.",
-                        "meaning": "to solve, to resolve"
+                        "uz": "hal qilmoq; yechmoq",
+                        "ru": "решать; разрешать",
+                        "tj": "ҳал кардан; бартараф кардан"
                 },
                 {
                         "no": 4,
                         "zh": "关心",
                         "pinyin": "guānxīn",
                         "pos": "v.",
-                        "meaning": "to care about, to show concern"
+                        "uz": "g'amxo'rlik qilmoq; e'tibor bermoq",
+                        "ru": "заботиться; проявлять внимание",
+                        "tj": "ғамхорӣ кардан; диққат зоҳир кардан"
                 },
                 {
                         "no": 5,
                         "zh": "照相机",
                         "pinyin": "zhàoxiàngjī",
                         "pos": "n.",
-                        "meaning": "camera"
+                        "uz": "fotoaparat",
+                        "ru": "фотоаппарат",
+                        "tj": "фотоаппарат"
                 }
         ],
         ensure_ascii=False,
@@ -60,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "Talking about influence",
+                        "scene_uz": "Ta'sir haqida gaplashish",
+                        "scene_ru": "Разговор о влиянии",
+                        "scene_tj": "Гуфтугӯ дар бораи таъсир",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "你怎么开始认真学习了？",
-                                        "pinyin": "",
-                                        "translation": "Why did you start studying seriously?"
+                                        "pinyin": "Nǐ zěnme kāishǐ rènzhēn xuéxí le?",
+                                        "uz": "Siz qanday qilib jiddiy o'qishni boshladingiz?",
+                                        "ru": "Как ты начал серьёзно учиться?",
+                                        "tj": "Шумо чӣ тавр ба ҷиддӣ хондан шурӯъ кардед?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "我被他影响了。",
-                                        "pinyin": "",
-                                        "translation": "I was influenced by him."
+                                        "pinyin": "Wǒ bèi tā yǐngxiǎng le.",
+                                        "uz": "U meni ta'sir ostiga oldi.",
+                                        "ru": "На меня повлиял он.",
+                                        "tj": "Вай ба ман таъсир расонд."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "Solving a problem",
+                        "scene_uz": "Muammoni hal qilish",
+                        "scene_ru": "Решение проблемы",
+                        "scene_tj": "Ҳал кардани мушкилот",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "这个问题怎么解决？",
-                                        "pinyin": "",
-                                        "translation": "How do we solve this problem?"
+                                        "pinyin": "Zhège wèntí zěnme jiějué?",
+                                        "uz": "Bu muammoni qanday hal qilish kerak?",
+                                        "ru": "Как решить эту проблему?",
+                                        "tj": "Ин мушкилотро чӣ тавр ҳал кунем?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "只有大家一起努力，才会解决。",
-                                        "pinyin": "",
-                                        "translation": "Only if everyone works together will it be solved."
+                                        "pinyin": "Zhǐyǒu dàjiā yìqǐ nǔlì, cái huì jiějué.",
+                                        "uz": "Faqat hamma birgalikda harakat qilsagina hal bo'ladi.",
+                                        "ru": "Только если все будут стараться вместе — решится.",
+                                        "tj": "Танҳо агар ҳама якҷоя кӯшиш кунанд, ҳал мешавад."
                                 }
                         ]
                 }
@@ -102,36 +123,53 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": '"被"字句',
-
-                        "explanation": "This structure expresses a passive meaning and shows who or what is affected by the action.",
+                        "title_zh": "«被»字句",
+                        "title_uz": "«被» li passiv gap",
+                        "title_ru": "Конструкция страдательного залога с «被»",
+                        "title_tj": "Ҷумлаи маҷҳули бо «被»",
+                        "rule_uz": "Bu tuzilma passiv ma'noni ifodalaydi va harakatdan ta'sirlangan shaxs yoki narsani ko'rsatadi.",
+                        "rule_ru": "Эта конструкция выражает пассивное значение и показывает, кто или что подвергается действию.",
+                        "rule_tj": "Ин сохтор маъноии маҷҳулро ифода мекунад ва нишон медиҳад, ки кӣ ё чӣ дар натиҷаи амал таъсир мебинад.",
                         "examples": [
                                 {
                                         "zh": "我被他影响了。",
-                                        "pinyin": "",
-                                        "meaning": "I was influenced by him."
+                                        "pinyin": "Wǒ bèi tā yǐngxiǎng le.",
+                                        "uz": "U meni ta'sir ostiga oldi.",
+                                        "ru": "На меня повлиял он.",
+                                        "tj": "Вай ба ман таъсир расонд."
                                 },
                                 {
                                         "zh": "他被老师表扬了。",
-                                        "pinyin": "",
-                                        "meaning": "He was praised by the teacher."
+                                        "pinyin": "Tā bèi lǎoshī biǎoyáng le.",
+                                        "uz": "Uni o'qituvchi maqtadi.",
+                                        "ru": "Его похвалил учитель.",
+                                        "tj": "Муаллим вайро таъриф кард."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "只有……才……",
-                        "explanation": "This pattern emphasises the one and only necessary condition.",
+                        "title_uz": "Faqat…… bo'lgandagina, ……",
+                        "title_ru": "Только……, тогда/лишь тогда……",
+                        "title_tj": "Танҳо……, он вақт……",
+                        "rule_uz": "Bu shakl yagona zaruriy shartni ta'kidlaydi.",
+                        "rule_ru": "Эта конструкция подчёркивает единственное необходимое условие.",
+                        "rule_tj": "Ин намуна шарти ягонаи зарурӣро таъкид мекунад.",
                         "examples": [
                                 {
                                         "zh": "只有认真学习，才会成功。",
-                                        "pinyin": "",
-                                        "meaning": "Only by studying seriously will you succeed."
+                                        "pinyin": "Zhǐyǒu rènzhēn xuéxí, cái huì chénggōng.",
+                                        "uz": "Faqat jiddiy o'qiganingizda muvaffaqiyat qo'lga kiradi.",
+                                        "ru": "Только учась серьёзно — добьёшься успеха.",
+                                        "tj": "Танҳо бо ҷиддият хондан муваффақият меояд."
                                 },
                                 {
                                         "zh": "只有解决问题，大家才放心。",
-                                        "pinyin": "",
-                                        "meaning": "Only when the problem is solved will everyone be at ease."
+                                        "pinyin": "Zhǐyǒu jiějué wèntí, dàjiā cái fàngxīn.",
+                                        "uz": "Faqat muammo hal bo'lgandagina hammasi tinchlanadi.",
+                                        "ru": "Только когда проблема будет решена — все успокоятся.",
+                                        "tj": "Танҳо вақте ки мушкилот ҳал шавад, ҳама оромӣ меёбанд."
                                 }
                         ]
                 }
@@ -143,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarni xitoycha yozing:",
+                        "instruction_ru": "Напишите китайский для следующих слов:",
+                        "instruction_tj": "Калимаҳои зеринро ба хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "by (passive marker)",
+                                        "prompt_uz": "tomonidan (passiv belgisi)",
+                                        "prompt_ru": "маркер пассивного залога",
+                                        "prompt_tj": "нишонаи садои маҷҳул",
                                         "answer": "被",
                                         "pinyin": "bèi"
                                 },
                                 {
-                                        "prompt": "to influence, influence",
+                                        "prompt_uz": "ta'sir qilmoq; ta'sir",
+                                        "prompt_ru": "влиять; влияние",
+                                        "prompt_tj": "таъсир расонидан; таъсир",
                                         "answer": "影响",
                                         "pinyin": "yǐngxiǎng"
                                 },
                                 {
-                                        "prompt": "to solve, to resolve",
+                                        "prompt_uz": "hal qilmoq; yechmoq",
+                                        "prompt_ru": "решать; разрешать",
+                                        "prompt_tj": "ҳал кардан; бартараф кардан",
                                         "answer": "解决",
                                         "pinyin": "jiějué"
                                 },
                                 {
-                                        "prompt": "to care about, to show concern",
+                                        "prompt_uz": "g'amxo'rlik qilmoq; e'tibor bermoq",
+                                        "prompt_ru": "заботиться; проявлять внимание",
+                                        "prompt_tj": "ғамхорӣ кардан; диққат зоҳир кардан",
                                         "answer": "关心",
                                         "pinyin": "guānxīn"
                                 }
@@ -170,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi xitoycha so'zlarni tarjima qiling:",
+                        "instruction_ru": "Переведите следующие китайские слова:",
+                        "instruction_tj": "Калимаҳои зерини хитоиро тарҷума кунед:",
                         "items": [
                                 {
-                                        "prompt": "被",
-                                        "answer": "by (passive marker)",
+                                        "prompt_uz": "被",
+                                        "prompt_ru": "被",
+                                        "prompt_tj": "被",
+                                        "answer": "tomonidan (passiv) / маркер пассива / нишонаи маҷҳул",
                                         "pinyin": "bèi"
                                 },
                                 {
-                                        "prompt": "影响",
-                                        "answer": "to influence, influence",
+                                        "prompt_uz": "影响",
+                                        "prompt_ru": "影响",
+                                        "prompt_tj": "影响",
+                                        "answer": "ta'sir qilmoq / влиять / таъсир расонидан",
                                         "pinyin": "yǐngxiǎng"
                                 },
                                 {
-                                        "prompt": "解决",
-                                        "answer": "to solve, to resolve",
+                                        "prompt_uz": "解决",
+                                        "prompt_ru": "解决",
+                                        "prompt_tj": "解决",
+                                        "answer": "hal qilmoq / решать / ҳал кардан",
                                         "pinyin": "jiějué"
                                 },
                                 {
-                                        "prompt": "关心",
-                                        "answer": "to care about, to show concern",
+                                        "prompt_uz": "关心",
+                                        "prompt_ru": "关心",
+                                        "prompt_tj": "关心",
+                                        "answer": "g'amxo'rlik qilmoq / заботиться / ғамхорӣ кардан",
                                         "pinyin": "guānxīn"
                                 }
                         ]
@@ -201,20 +259,15 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "answers": [
-                                "被",
-                                "影响",
-                                "解决",
-                                "关心"
-                        ]
+                        "answers": ["被", "影响", "解决", "关心"]
                 },
                 {
                         "no": 2,
                         "answers": [
-                                "by (passive marker)",
-                                "to influence, influence",
-                                "to solve, to resolve",
-                                "to care about, to show concern"
+                                "tomonidan (passiv) / маркер пассива / нишонаи маҷҳул",
+                                "ta'sir qilmoq / влиять / таъсир расонидан",
+                                "hal qilmoq / решать / ҳал кардан",
+                                "g'amxo'rlik qilmoq / заботиться / ғамхорӣ кардан"
                         ]
                 }
         ],
@@ -224,18 +277,20 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Make 3 sentences using the following words:",
-                        "words": [
-                                "被",
-                                "影响",
-                                "解决"
-                        ],
-                        "example": "被 和 影响 可以出现在同一个句子里。"
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла созед:",
+                        "words": ["被", "影响", "解决"],
+                        "example": "只有大家一起努力，这个问题才能被解决。"
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short paragraph of 4-5 sentences about the lesson topic:",
-                        "topic": "我被他影响了"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 ta gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий текст из 4–5 предложений по теме урока:",
+                        "instruction_tj": "Дар бораи мавзӯи дарс матни кӯтоҳ аз 4-5 ҷумла нависед:",
+                        "topic_uz": "U meni ta'sir ostiga oldi",
+                        "topic_ru": "На меня повлиял он",
+                        "topic_tj": "Вай ба ман таъсир расонд"
                 }
         ],
         ensure_ascii=False,
@@ -253,19 +308,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))

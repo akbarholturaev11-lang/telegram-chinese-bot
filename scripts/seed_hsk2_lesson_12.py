@@ -3,7 +3,7 @@ import json
 
 from sqlalchemy import select
 
-from app.db.session import SessionLocal
+from app.db.session import async_session_maker as SessionLocal
 from app.db.models.course_lessons import CourseLesson
 
 
@@ -12,117 +12,160 @@ LESSON = {
     "lesson_order": 12,
     "lesson_code": "HSK2-L12",
     "title": "你穿得太少了",
-    "goal": "",
-    "intro_text": "",
+    "goal": json.dumps({"uz": "Holat to'ldiruvchisi ('de' yuklamasi bilan) va 'bǐ' qiyoslash gapining kengaytirilgan shaklini o'rganish.", "ru": "Изучение дополнения состояния (с частицей 'de') и расширенной формы конструкции сравнения 'bǐ'.", "tj": "Омӯзиши илова ба ҳолат (бо зарраи 'de') ва шакли васеъшудаи конструксияи муқоисавии 'bǐ'."}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda kundalik hayotdagi harakatlarni qanday bajarilganligini tasvirlashni o'rganamiz. 'De' yuklamasi yordamida holat to'ldiruvchisi hosil qilib, uyqu, ovqatlanish, kiyinish kabi harakatlarni baholashni mashq qilamiz. Shuningdek, 'bǐ' qiyoslovini fe'l birikmalariga tatbiq qilishni o'rganamiz.", "ru": "На этом уроке мы учимся описывать, как выполняются действия в повседневной жизни. Отрабатываем образование дополнения состояния с помощью частицы 'de' для оценки таких действий, как сон, еда, одевание. Также учимся применять сравнение 'bǐ' к глагольным конструкциям.", "tj": "Дар ин дарс ёд мегирем тавсиф кунем амалҳои ҳаррӯзаро чӣ тавр иҷро мешаванд. Бо ёрии зарраи 'de' иловаи ҳолат сохта, амалҳои хобидан, хӯрдан ва пӯшидан ро баҳо медиҳем. Инчунин истифодаи 'bǐ'-ро барои сохторҳои феълӣ меомӯзем."}, ensure_ascii=False),
     "vocabulary_json": json.dumps([
-        {"no": 1, "zh": "得", "pinyin": "de", "pos": "part."},
-        {"no": 2, "zh": "妻子", "pinyin": "qīzi", "pos": "n."},
-        {"no": 3, "zh": "雪", "pinyin": "xuě", "pos": "n."},
-        {"no": 4, "zh": "零", "pinyin": "líng", "pos": "num."},
-        {"no": 5, "zh": "度", "pinyin": "dù", "pos": "n./m."},
-        {"no": 6, "zh": "穿", "pinyin": "chuān", "pos": "v."},
-        {"no": 7, "zh": "进", "pinyin": "jìn", "pos": "v."},
-        {"no": 8, "zh": "弟弟", "pinyin": "dìdi", "pos": "n."},
-        {"no": 9, "zh": "近", "pinyin": "jìn", "pos": "adj."}
+        {"no": 1, "zh": "得", "pinyin": "de", "pos": "part.", "uz": "holat to'ldiruvchisi yuklamasi (fe'ldan keyin)", "ru": "частица дополнения состояния (после глагола)", "tj": "зарраи иловаи ҳолат (баъд аз феъл)"},
+        {"no": 2, "zh": "妻子", "pinyin": "qīzi", "pos": "n.", "uz": "xotin, turmush o'rtoq (ayol)", "ru": "жена, супруга", "tj": "зан, ҳамсар (зан)"},
+        {"no": 3, "zh": "雪", "pinyin": "xuě", "pos": "n.", "uz": "qor", "ru": "снег", "tj": "барф"},
+        {"no": 4, "zh": "零", "pinyin": "líng", "pos": "num.", "uz": "nol", "ru": "ноль", "tj": "сифр"},
+        {"no": 5, "zh": "度", "pinyin": "dù", "pos": "n./m.", "uz": "daraja (harorat o'lchovi)", "ru": "градус (единица температуры)", "tj": "дараҷа (воҳиди ҳарорат)"},
+        {"no": 6, "zh": "穿", "pinyin": "chuān", "pos": "v.", "uz": "kiymoq (kiyim-bosh)", "ru": "надевать, носить (одежду)", "tj": "пӯшидан (либос)"},
+        {"no": 7, "zh": "进", "pinyin": "jìn", "pos": "v.", "uz": "kirmoq", "ru": "войти, заходить", "tj": "даромадан"},
+        {"no": 8, "zh": "弟弟", "pinyin": "dìdi", "pos": "n.", "uz": "uka", "ru": "младший брат", "tj": "бародари хурдӣ"},
+        {"no": 9, "zh": "近", "pinyin": "jìn", "pos": "adj.", "uz": "yaqin", "ru": "близкий, недалёкий", "tj": "наздик"}
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
             "block_no": 1,
             "section_label": "课文 1",
-            "scene_label_zh": "在教室",
+            "scene_uz": "Sinfxonada",
+            "scene_ru": "В классе",
+            "scene_tj": "Дар синфхона",
             "dialogue": [
-                {"speaker": "A", "zh": "你每天早上几点起床？", "pinyin": "Nǐ měitiān zǎoshang jǐ diǎn qǐchuáng?"},
-                {"speaker": "B", "zh": "六点多。", "pinyin": "Liù diǎn duō."},
-                {"speaker": "A", "zh": "你比我早起一个小时。", "pinyin": "Nǐ bǐ wǒ zǎo qǐ yí ge xiǎoshí."},
-                {"speaker": "B", "zh": "我睡得也早，我每天晚上十点就睡觉。早睡早起对身体好。", "pinyin": "Wǒ shuì de yě zǎo, wǒ měitiān wǎnshang shí diǎn jiù shuìjiào. Zǎo shuì zǎo qǐ duì shēntǐ hǎo."}
+                {"speaker": "A", "zh": "你每天早上几点起床？", "pinyin": "Nǐ měitiān zǎoshang jǐ diǎn qǐchuáng?", "uz": "Siz har kuni ertalab soat nechada turasiz?", "ru": "В котором часу ты встаёшь каждое утро?", "tj": "Ҳар рӯз субҳ шумо соати чанд бармехезед?"},
+                {"speaker": "B", "zh": "六点多。", "pinyin": "Liù diǎn duō.", "uz": "Oltidan o'tganda.", "ru": "Чуть больше шести.", "tj": "Каме аз соати шаш гузашта."},
+                {"speaker": "A", "zh": "你比我早起一个小时。", "pinyin": "Nǐ bǐ wǒ zǎo qǐ yí ge xiǎoshí.", "uz": "Siz mendan bir soat oldin turasiz.", "ru": "Ты встаёшь на час раньше меня.", "tj": "Шумо аз ман як соат зудтар бармехезед."},
+                {"speaker": "B", "zh": "我睡得也早，我每天晚上十点就睡觉。早睡早起对身体好。", "pinyin": "Wǒ shuì de yě zǎo, wǒ měitiān wǎnshang shí diǎn jiù shuìjiào. Zǎo shuì zǎo qǐ duì shēntǐ hǎo.", "uz": "Men ham erta yotaman, har kuni kechqurun o'n da yotaman. Erta yotib erta turish sog'liq uchun foydali.", "ru": "Я тоже ложусь рано, каждый вечер в десять. Рано ложиться и рано вставать полезно для здоровья.", "tj": "Ман ҳам барвақт мехобам, ҳар шаб соати даҳ мехобам. Барвақт хобидан ва барвақт бархестан барои саломатӣ муфид аст."}
             ]
         },
         {
             "block_no": 2,
-            "section_label": "在朋友家 2",
-            "scene_label_zh": "在朋友家",
+            "section_label": "课文 2",
+            "scene_uz": "Do'st uyida",
+            "scene_ru": "В доме друга",
+            "scene_tj": "Дар хонаи дӯст",
             "dialogue": [
-                {"speaker": "A", "zh": "再来点儿米饭吧，你吃得太少了。", "pinyin": "Zài lái diǎnr mǐfàn ba, nǐ chī de tài shǎo le."},
-                {"speaker": "B", "zh": "不心了，今天吃得很好，太谢谢你了。", "pinyin": "Bù xīn le, jīntiān chī de hěn hǎo, tài xièxie nǐ le."},
-                {"speaker": "A", "zh": "你饭做得怎么样？", "pinyin": "Nǐ fàn zuò de zěnmeyàng?"},
-                {"speaker": "B", "zh": "不怎么样，我妻子比我饭做得好。", "pinyin": "Bù zěnmeyàng, wǒ qīzi bǐ wǒ zuò fàn zuò de hǎo."}
+                {"speaker": "A", "zh": "再来点儿米饭吧，你吃得太少了。", "pinyin": "Zài lái diǎnr mǐfàn ba, nǐ chī de tài shǎo le.", "uz": "Yana biroz guruch oling, siz juda oz yedingiz.", "ru": "Возьми ещё немного риса, ты съел(а) слишком мало.", "tj": "Боз каме биринҷ гиред, шумо хеле кам хӯрдед."},
+                {"speaker": "B", "zh": "不心了，今天吃得很好，太谢谢你了。", "pinyin": "Bù xīn le, jīntiān chī de hěn hǎo, tài xièxie nǐ le.", "uz": "Kerak emas, bugun juda yaxshi yedim, katta rahmat sizga.", "ru": "Не надо, сегодня я поел(а) очень хорошо, большое тебе спасибо.", "tj": "Даркор нест, имрӯз хеле хуб хӯрдам, ташаккури зиёд."},
+                {"speaker": "A", "zh": "你饭做得怎么样？", "pinyin": "Nǐ fàn zuò de zěnmeyàng?", "uz": "Siz ovqat qanday pishirasiz?", "ru": "Как ты готовишь еду?", "tj": "Шумо хӯрок чӣ хел мепазед?"},
+                {"speaker": "B", "zh": "不怎么样，我妻子比我饭做得好。", "pinyin": "Bù zěnmeyàng, wǒ qīzi bǐ wǒ zuò fàn zuò de hǎo.", "uz": "Unchalik emas, xotinim mendan yaxshiroq ovqat pishiradi.", "ru": "Не очень, моя жена готовит лучше меня.", "tj": "Чандон не, занам аз ман беҳтар хӯрок мепазад."}
             ]
         },
         {
             "block_no": 3,
-            "section_label": "在家门口 3",
-            "scene_label_zh": "在家门口",
+            "section_label": "课文 3",
+            "scene_uz": "Uy eshigi oldida",
+            "scene_ru": "У двери дома",
+            "scene_tj": "Дар пеши дари хона",
             "dialogue": [
-                {"speaker": "A", "zh": "下雪了，今天真冷。", "pinyin": "Xià xuě le, jīntiān zhēn lěng."},
-                {"speaker": "B", "zh": "有零下10度吧？", "pinyin": "Yǒu líng xià shí dù ba?"},
-                {"speaker": "A", "zh": "是啊，你穿得太少了，我们进房间吧。", "pinyin": "Shì a, nǐ chuān de tài shǎo le, wǒmen jìn fángjiān ba."},
-                {"speaker": "B", "zh": "好吧。", "pinyin": "Hǎo ba."}
+                {"speaker": "A", "zh": "下雪了，今天真冷。", "pinyin": "Xià xuě le, jīntiān zhēn lěng.", "uz": "Qor yog'yapti, bugun juda sovuq.", "ru": "Пошёл снег, сегодня очень холодно.", "tj": "Барф борид, имрӯз хеле сард аст."},
+                {"speaker": "B", "zh": "有零下10度吧？", "pinyin": "Yǒu líng xià shí dù ba?", "uz": "Minus o'n daraja bo'lsa kerak?", "ru": "Наверное, минус десять градусов?", "tj": "Эҳтимол даҳ дараҷа зер аз сифр бошад?"},
+                {"speaker": "A", "zh": "是啊，你穿得太少了，我们进房间吧。", "pinyin": "Shì a, nǐ chuān de tài shǎo le, wǒmen jìn fángjiān ba.", "uz": "Ha, siz juda kam kiyingiz, xonaga kiraylik.", "ru": "Да, ты слишком мало надел(а), давай зайдём в комнату.", "tj": "Бале, шумо хеле кам пӯшидед, биёед ба хона дарем."},
+                {"speaker": "B", "zh": "好吧。", "pinyin": "Hǎo ba.", "uz": "Xo'p bo'lmasa.", "ru": "Ладно.", "tj": "Хуб."}
             ]
         },
         {
             "block_no": 4,
-            "section_label": "在家里 4",
-            "scene_label_zh": "在家里",
+            "section_label": "课文 4",
+            "scene_uz": "Uyda",
+            "scene_ru": "Дома",
+            "scene_tj": "Дар хона",
             "dialogue": [
-                {"speaker": "A", "zh": "你在忙什么呢？", "pinyin": "Nǐ zài máng shénme ne?"},
-                {"speaker": "B", "zh": "我弟弟让我帮他找个房子，现在他离公司有点儿远。", "pinyin": "Wǒ dìdi ràng wǒ bāng tā zhǎo ge fángzi, xiànzài tā lí gōngsī yǒudiǎnr yuǎn."},
-                {"speaker": "A", "zh": "住得远真的很累！", "pinyin": "Zhù de yuǎn zhēn de hěn lèi!"},
-                {"speaker": "B", "zh": "是啊，他也希望能住得近一点儿。", "pinyin": "Shì a, tā yě xīwàng néng zhù de jìn yìdiǎnr."}
+                {"speaker": "A", "zh": "你在忙什么呢？", "pinyin": "Nǐ zài máng shénme ne?", "uz": "Siz nima bilan bandsiniz?", "ru": "Чем ты сейчас занят(а)?", "tj": "Шумо ба чӣ машғул ҳастед?"},
+                {"speaker": "B", "zh": "我弟弟让我帮他找个房子，现在他离公司有点儿远。", "pinyin": "Wǒ dìdi ràng wǒ bāng tā zhǎo ge fángzi, xiànzài tā lí gōngsī yǒudiǎnr yuǎn.", "uz": "Ukam menga unga uy topishda yordam berishimni so'radi, hozir u kompaniyadan biroz uzoqda turadi.", "ru": "Мой младший брат попросил помочь найти ему жильё, сейчас он живёт немного далеко от компании.", "tj": "Бародари хурдиам хоҳиш кард ба ӯ хона ёбам, ҳоло ӯ аз ширкат каме дур зиндагӣ мекунад."},
+                {"speaker": "A", "zh": "住得远真的很累！", "pinyin": "Zhù de yuǎn zhēn de hěn lèi!", "uz": "Uzoqda yashash chindan ham charchatadi!", "ru": "Жить далеко действительно очень утомительно!", "tj": "Дур зиндагӣ кардан воқеан хеле монандакор аст!"},
+                {"speaker": "B", "zh": "是啊，他也希望能住得近一点儿。", "pinyin": "Shì a, tā yě xīwàng néng zhù de jìn yìdiǎnr.", "uz": "Ha, u ham biroz yaqinroqda yashashni xohlaydi.", "ru": "Да, он тоже хочет жить немного ближе.", "tj": "Бале, ӯ ҳам мехоҳад каме наздиктар зиндагӣ кунад."}
             ]
         }
     ], ensure_ascii=False),
     "grammar_json": json.dumps([
-        {"no": 1, "title_zh": "状态补语"},
-        {"no": 2, "title_zh": "“比”字句（2）"}
+        {
+            "no": 1,
+            "title_zh": "状态补语",
+            "title_uz": "Holat to'ldiruvchisi",
+            "title_ru": "Дополнение состояния",
+            "title_tj": "Иловаи ҳолат",
+            "rule_uz": "Holat to'ldiruvchisi fe'ldan keyin '得(de)' yuklamasi qo'shilib, harakatning qanday bajarilganligini yoki natijani bildiradi. Tuzilish: Fe'l + 得 + sifat/holat. Agar fe'lning to'ldiruvchisi bo'lsa, fe'l takrorlanadi: 做饭做得好. Inkor: 得 dan keyin '不' qo'yiladi: 做得不好.",
+            "rule_ru": "Дополнение состояния образуется после глагола с частицей '得(de)' и описывает, как выполняется действие или каков его результат. Структура: Глагол + 得 + прилагательное/состояние. Если у глагола есть дополнение, глагол повторяется: 做饭做得好. Отрицание: после '得' ставится '不': 做得不好.",
+            "rule_tj": "Иловаи ҳолат баъд аз феъл бо зарраи '得(de)' омада, тавсиф мекунад амал чӣ тавр иҷро мешавад ё натиҷааш чист. Сохтор: Феъл + 得 + сифат/ҳолат. Агар феъл иловаи хос дошта бошад, феъл такрор мешавад: 做饭做得好. Инкор: баъд аз '得' '不' гузошта мешавад: 做得不好.",
+            "examples": [
+                {"zh": "你穿得太少了。", "pinyin": "Nǐ chuān de tài shǎo le.", "uz": "Siz juda kam kiyingiz.", "ru": "Ты надел(а) слишком мало.", "tj": "Шумо хеле кам пӯшидед."},
+                {"zh": "她睡得很早。", "pinyin": "Tā shuì de hěn zǎo.", "uz": "U juda erta yotadi.", "ru": "Она ложится спать очень рано.", "tj": "Ӯ хеле барвақт мехобад."}
+            ]
+        },
+        {
+            "no": 2,
+            "title_zh": "“比”字句（2）",
+            "title_uz": "'Bǐ' qiyoslash gapi (2)",
+            "title_ru": "Предложения сравнения с 'bǐ' (2)",
+            "title_tj": "Ҷумлаи муқоисавӣ бо 'bǐ' (2)",
+            "rule_uz": "Fe'l birikmalarini qiyoslashda '比' quyidagicha ishlatiladi: A + 比 + B + fe'l + 得 + sifat. Yoki fe'l takrorlanadi: A + 比 + B + fe'l + fe'l + 得 + sifat. Masalan: 我妻子比我做饭做得好. Miqdor farqini qo'shish mumkin: 比我早起一个小时.",
+            "rule_ru": "При сравнении глагольных конструкций '比' используется так: A + 比 + B + глагол + 得 + прилагательное. Или глагол повторяется: A + 比 + B + глагол + глагол + 得 + прилагательное. Например: 我妻子比我做饭做得好. Можно добавить разницу: 比我早起一个小时.",
+            "rule_tj": "Ҳангоми муқоисаи сохторҳои феълӣ 'bǐ' чунин истифода мешавад: A + 比 + B + феъл + 得 + сифат. Ё феъл такрор мешавад: A + 比 + B + феъл + феъл + 得 + сифат. Масалан: 我妻子比我做饭做得好. Метавон фарқро ҳам зиёд кард: 比我早起一个小时.",
+            "examples": [
+                {"zh": "我妻子比我做饭做得好。", "pinyin": "Wǒ qīzi bǐ wǒ zuò fàn zuò de hǎo.", "uz": "Xotinim mendan yaxshiroq ovqat pishiradi.", "ru": "Моя жена готовит лучше меня.", "tj": "Занам аз ман беҳтар хӯрок мепазад."},
+                {"zh": "你比我早起一个小时。", "pinyin": "Nǐ bǐ wǒ zǎo qǐ yí ge xiǎoshí.", "uz": "Siz mendan bir soat oldin turasiz.", "ru": "Ты встаёшь на час раньше меня.", "tj": "Шумо аз ман як соат зудтар бармехезед."}
+            ]
+        }
     ], ensure_ascii=False),
     "exercise_json": json.dumps([
         {
-            "order": 1,
-            "type": "role_play",
-            "title_zh": "分角色朗读课文",
-            "prompt_zh": "分角色朗读课文。"
-        },
-        {
-            "order": 2,
-            "type": "qa_from_dialog",
-            "title_zh": "根据课文内容回答问题",
-            "questions": [
-                {"no": 1, "zh": "她为什么每天晚上十点就睡觉？", "pinyin": "Tā wèishénme měitiān wǎnshang shí diǎn jiù shuìjiào?"},
-                {"no": 2, "zh": "他们家谁做饭做得好？", "pinyin": "Tāmen jiā shéi zuò fàn zuò de hǎo?"},
-                {"no": 3, "zh": "今天天气怎么样？", "pinyin": "Jīntiān tiānqì zěnmeyàng?"},
-                {"no": 4, "zh": "她这两天在忙什么呢？", "pinyin": "Tā zhè liǎng tiān zài máng shénme ne?"},
-                {"no": 5, "zh": "她弟弟为什么要找新的房子？", "pinyin": "Tā dìdi wèishénme yào zhǎo xīn de fángzi?"}
+            "no": 1,
+            "type": "translate_to_chinese",
+            "instruction_uz": "Quyidagi so'zlarning xitoychasini yozing:",
+            "instruction_ru": "Напишите китайские эквиваленты следующих слов:",
+            "instruction_tj": "Тарҷумаи чинии калимаҳои зеринро нависед:",
+            "items": [
+                {"prompt_uz": "qor", "prompt_ru": "снег", "prompt_tj": "барф", "answer": "雪", "pinyin": "xuě"},
+                {"prompt_uz": "kiymoq", "prompt_ru": "надевать", "prompt_tj": "пӯшидан", "answer": "穿", "pinyin": "chuān"},
+                {"prompt_uz": "uka", "prompt_ru": "младший брат", "prompt_tj": "бародари хурдӣ", "answer": "弟弟", "pinyin": "dìdi"},
+                {"prompt_uz": "xotin", "prompt_ru": "жена", "prompt_tj": "зан", "answer": "妻子", "pinyin": "qīzi"},
+                {"prompt_uz": "yaqin", "prompt_ru": "близкий", "prompt_tj": "наздик", "answer": "近", "pinyin": "jìn"}
             ]
         },
         {
-            "order": 3,
-            "type": "describe_picture",
-            "title_zh": "用本课新学的语言点和词语描述图片",
+            "no": 2,
+            "type": "fill_blank",
+            "instruction_uz": "Bo'sh joyni to'ldiring:",
+            "instruction_ru": "Заполните пропуск:",
+            "instruction_tj": "Ҷойи холиро пур кунед:",
             "items": [
-                {"no": 1, "zh": "她唱得________。", "pinyin": "Tā chàng de ________."},
-                {"no": 2, "zh": "爸爸开车开得________。", "pinyin": "Bàba kāichē kāi de ________."},
-                {"no": 3, "zh": "哥哥比我吃得________。", "pinyin": "Gēge bǐ wǒ chī de ________."},
-                {"no": 4, "zh": "爸爸比妈妈做饭做得________。", "pinyin": "Bàba bǐ māma zuò fàn zuò de ________."}
-            ]
-        },
-        {
-            "order": 4,
-            "type": "pair_work",
-            "title_zh": "用状态补语练习说句子",
-            "items": [
-                {"no": 1, "zh": "他跑得很快。", "pinyin": "Tā pǎo de hěn kuài."},
-                {"no": 2, "zh": "我跑得不快。", "pinyin": "Wǒ pǎo de bù kuài."}
+                {"prompt_uz": "U qo'shiq ayt___ juda yaxshi. (得)", "prompt_ru": "Она поёт очень хорошо. (得)", "prompt_tj": "Ӯ суруд хон___ хеле хуб аст. (得)", "answer": "得", "pinyin": "de"},
+                {"prompt_uz": "Aka mendan ko'p ye___. (得)", "prompt_ru": "Старший брат ест больше меня. (得)", "prompt_tj": "Бародари калон аз ман бештар хӯр___. (得)", "answer": "得", "pinyin": "de"},
+                {"prompt_uz": "Bugun ___ o'n daraja. (零)", "prompt_ru": "Сегодня ___ десять градусов. (零)", "prompt_tj": "Имрӯз ___ даҳ дараҷа. (零)", "answer": "零", "pinyin": "líng"},
+                {"prompt_uz": "U juda uzoqda yasha___. (得)", "prompt_ru": "Он живёт очень далеко. (得)", "prompt_tj": "Ӯ хеле дур зиндагӣ мекун___. (得)", "answer": "得", "pinyin": "de"}
             ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
-        {"no": 1, "zh": "因为早睡早起对身体好。", "pinyin": "Yīnwèi zǎo shuì zǎo qǐ duì shēntǐ hǎo."},
-        {"no": 2, "zh": "他妻子做饭做得好。", "pinyin": "Tā qīzi zuò fàn zuò de hǎo."},
-        {"no": 3, "zh": "今天很冷，下雪了。", "pinyin": "Jīntiān hěn lěng, xià xuě le."},
-        {"no": 4, "zh": "她在帮弟弟找房子。", "pinyin": "Tā zài bāng dìdi zhǎo fángzi."},
-        {"no": 5, "zh": "因为他现在离公司有点儿远。", "pinyin": "Yīnwèi tā xiànzài lí gōngsī yǒudiǎnr yuǎn."}
+        {"no": 1, "answers": ["雪", "穿", "弟弟", "妻子", "近"]},
+        {"no": 2, "answers": ["得", "得", "零", "得"]}
     ], ensure_ascii=False),
-    "homework_json": "[]",
+    "homework_json": json.dumps([
+        {
+            "no": 1,
+            "instruction_uz": "Holat to'ldiruvchisi ('de') ishlatib oila a'zolaringiz yoki do'stlaringizni tasvirlang: ular qanday gapiradi, yuradi, ovqatlanadi va h.k. Kamida 4 jumla yozing.",
+            "instruction_ru": "Используя дополнение состояния ('de'), опишите членов своей семьи или друзей: как они говорят, ходят, едят и т.д. Напишите не менее 4 предложений.",
+            "instruction_tj": "Бо истифодаи иловаи ҳолат ('de') аъзоёни оила ё дӯстонатонро тавсиф кунед: онҳо чӣ хел гап мезананд, мераванд, хӯрок мехӯранд ва ғ. Камаш 4 ҷумла нависед.",
+            "words": ["得", "比……得"],
+            "example": "妈妈做饭做得很好。",
+            "topic_uz": "Oila va do'stlar tavsifi",
+            "topic_ru": "Описание семьи и друзей",
+            "topic_tj": "Тавсифи оила ва дӯстон"
+        },
+        {
+            "no": 2,
+            "instruction_uz": "Kiyinish va ob-havo haqida yozing: bugun qanday kiyindingiz, ob-havo qanday, nega bunday kiyindingiz.",
+            "instruction_ru": "Напишите об одежде и погоде: как вы оделись сегодня, какая погода, почему вы так оделись.",
+            "instruction_tj": "Дар бораи либос ва ҳаво нависед: имрӯз чӣ пӯшидед, ҳаво чӣ хел аст, чаро чунин пӯшидед.",
+            "words": ["穿得", "零下", "度"],
+            "example": "今天天气很冷，我穿得很多。",
+            "topic_uz": "Bugungi kiyim va ob-havo",
+            "topic_ru": "Сегодняшняя одежда и погода",
+            "topic_tj": "Либоси имрӯза ва ҳаво"
+        }
+    ], ensure_ascii=False),
     "review_json": "[]",
     "is_active": True
 }
@@ -134,26 +177,13 @@ async def upsert_lesson():
             select(CourseLesson).where(CourseLesson.lesson_code == LESSON["lesson_code"])
         )
         existing = result.scalar_one_or_none()
-
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))
             print(f"inserted: {LESSON['lesson_code']}")
-
         await session.commit()
 
 

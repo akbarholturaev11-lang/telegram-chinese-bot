@@ -12,9 +12,8 @@ LESSON = {
     "lesson_order": 14,
     "lesson_code": "HSK3-L14",
     "title": "你把水果拿过来",
-    "goal": "expressing commands, sequence, and direction",
-    "intro_text": 'This lesson is dedicated to expressing commands, sequence, and direction. It uses 5 key vocabulary words and covers core grammar patterns such as "把"字句 3：A 把 B + V + 结果补语/趋向补语 and 先……，再/又……，然后……',
-
+    "goal": json.dumps({"uz": "buyruq, ketma-ketlik va yo'nalishni ifodalash", "ru": "выражение команд, последовательности и направления", "tj": "ифода кардани амр, пайдарпайӣ ва самт"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda buyruq, ketma-ketlik va yo'nalishni ifodalash o'rgatiladi. 5 ta asosiy so'z va «把»字句 3：A 把 B + V + 结果补语/趋向补语 hamda 先……，再/又……，然后…… grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён выражению команд, последовательности и направления. Вводятся 5 ключевых слов и грамматические конструкции «把»字句 3：A 把 B + V + 结果补语/趋向补语 и 先……，再/又……，然后……", "tj": "Ин дарс ба ифода кардани амр, пайдарпайӣ ва самт бахшида шудааст. 5 калимаи асосӣ ва намунаҳои грамматикии «把»字句 3：A 把 B + V + 结果补语/趋向补语 ва 先……，再/又……，然后…… омӯхта мешаванд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -22,35 +21,45 @@ LESSON = {
                         "zh": "水果",
                         "pinyin": "shuǐguǒ",
                         "pos": "n.",
-                        "meaning": "fruit"
+                        "uz": "meva",
+                        "ru": "фрукты",
+                        "tj": "мева"
                 },
                 {
                         "no": 2,
                         "zh": "打扫",
                         "pinyin": "dǎsǎo",
                         "pos": "v.",
-                        "meaning": "to clean, to sweep"
+                        "uz": "tozalamoq; supurmoq",
+                        "ru": "убирать; подметать",
+                        "tj": "тоза кардан; рӯфтан"
                 },
                 {
                         "no": 3,
                         "zh": "冰箱",
                         "pinyin": "bīngxiāng",
                         "pos": "n.",
-                        "meaning": "refrigerator"
+                        "uz": "muzlatgich",
+                        "ru": "холодильник",
+                        "tj": "яхдон"
                 },
                 {
                         "no": 4,
                         "zh": "香蕉",
                         "pinyin": "xiāngjiāo",
                         "pos": "n.",
-                        "meaning": "banana"
+                        "uz": "banan",
+                        "ru": "банан",
+                        "tj": "банан"
                 },
                 {
                         "no": 5,
                         "zh": "月亮",
                         "pinyin": "yuèliang",
                         "pos": "n.",
-                        "meaning": "moon"
+                        "uz": "oy",
+                        "ru": "луна",
+                        "tj": "моҳ"
                 }
         ],
         ensure_ascii=False,
@@ -60,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "In the kitchen",
+                        "scene_uz": "Oshxonada",
+                        "scene_ru": "На кухне",
+                        "scene_tj": "Дар ошхона",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "你把水果拿过来。",
-                                        "pinyin": "",
-                                        "translation": "Bring the fruit over here."
+                                        "pinyin": "Nǐ bǎ shuǐguǒ ná guòlai.",
+                                        "uz": "Mevalarni bu yerga olib kel.",
+                                        "ru": "Принеси сюда фрукты.",
+                                        "tj": "Меваҳоро ин ҷо биёр."
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "好，我先从冰箱里拿出来。",
-                                        "pinyin": "",
-                                        "translation": "Sure, I'll take it out of the fridge first."
+                                        "pinyin": "Hǎo, wǒ xiān cóng bīngxiāng lǐ ná chūlái.",
+                                        "uz": "Yaxshi, avval muzlatgichdan olib chiqaman.",
+                                        "ru": "Хорошо, сначала достану из холодильника.",
+                                        "tj": "Хуб, аввал аз яхдон бароварда мегирам."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "Housework order",
+                        "scene_uz": "Uy ishlari tartibi",
+                        "scene_ru": "Порядок домашних дел",
+                        "scene_tj": "Тартиби корҳои хонагӣ",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "你先打扫桌子，然后洗水果。",
-                                        "pinyin": "",
-                                        "translation": "Clean the table first, then wash the fruit."
+                                        "pinyin": "Nǐ xiān dǎsǎo zhuōzi, rán hòu xǐ shuǐguǒ.",
+                                        "uz": "Avval stolni tozala, keyin mevalarni yuv.",
+                                        "ru": "Сначала вытри стол, потом помой фрукты.",
+                                        "tj": "Аввал мизро тоза кун, баъд меваҳоро биш."
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "洗好了以后，我再拿香蕉过来。",
-                                        "pinyin": "",
-                                        "translation": "After washing them, I'll bring the bananas over."
+                                        "pinyin": "Xǐ hǎo le yǐhòu, wǒ zài ná xiāngjiāo guòlai.",
+                                        "uz": "Yuvib bo'lgandan keyin, bananlarni olib kelaman.",
+                                        "ru": "После мытья принесу бананы.",
+                                        "tj": "Пас аз шустан, банонҳоро меорам."
                                 }
                         ]
                 }
@@ -102,36 +123,53 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "title_zh": '"把"字句 3：A 把 B + V + 结果补语/趋向补语',
-
-                        "explanation": "This pattern indicates that an action has been completed successfully or satisfactorily.",
+                        "title_zh": "«把»字句 3：A 把 B + V + 结果补语/趋向补语",
+                        "title_uz": "«把» li gap 3: A 把 B + fe'l + natija/yo'nalish to'ldiruvchisi",
+                        "title_ru": "Конструкция с «把» 3: A 把 B + глагол + результирующее/направительное дополнение",
+                        "title_tj": "Ҷумла бо «把» 3: A 把 B + феъл + иловаи натиҷа/самт",
+                        "rule_uz": "Bu shakl ob'ektga nisbatan bajarilgan harakatning natijasini yoki yo'nalishini ko'rsatadi.",
+                        "rule_ru": "Эта конструкция показывает результат или направление действия, совершённого над объектом.",
+                        "rule_tj": "Ин сохтор натиҷа ё самти амале, ки нисбат ба объект иҷро шудааст, нишон медиҳад.",
                         "examples": [
                                 {
-                                        "zh": "我准备好了。",
-                                        "pinyin": "",
-                                        "meaning": "I'm ready."
+                                        "zh": "你把水果拿过来。",
+                                        "pinyin": "Nǐ bǎ shuǐguǒ ná guòlai.",
+                                        "uz": "Mevalarni bu yerga olib kel.",
+                                        "ru": "Принеси сюда фрукты.",
+                                        "tj": "Меваҳоро ин ҷо биёр."
                                 },
                                 {
-                                        "zh": "电影票买好了。",
-                                        "pinyin": "",
-                                        "meaning": "The movie tickets have been bought."
+                                        "zh": "把书放回书架上。",
+                                        "pinyin": "Bǎ shū fàng huí shūjià shang.",
+                                        "uz": "Kitobni javonga qaytarib qo'y.",
+                                        "ru": "Положи книгу обратно на полку.",
+                                        "tj": "Китобро ба қафасаи китоб баргардон."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "先……，再/又……，然后……",
-                        "explanation": "This grammar topic helps to practise the core sentence patterns of the lesson in context.",
+                        "title_uz": "Avval…, keyin…, so'ngra…",
+                        "title_ru": "Сначала…, затем/снова…, потом…",
+                        "title_tj": "Аввал…, баъд…, сипас…",
+                        "rule_uz": "Bu grammatik shakl ketma-ket bajarilayotgan harakatlarni ifodalaydi.",
+                        "rule_ru": "Эта конструкция выражает последовательность действий.",
+                        "rule_tj": "Ин намуна пайдарпайии амалҳоро ифода мекунад.",
                         "examples": [
                                 {
-                                        "zh": "你把水果拿过来。",
-                                        "pinyin": "",
-                                        "meaning": "The main pattern from the lesson title."
+                                        "zh": "你先打扫桌子，然后洗水果。",
+                                        "pinyin": "Nǐ xiān dǎsǎo zhuōzi, rán hòu xǐ shuǐguǒ.",
+                                        "uz": "Avval stolni tozala, keyin mevalarni yuv.",
+                                        "ru": "Сначала вытри стол, потом помой фрукты.",
+                                        "tj": "Аввал мизро тоза кун, баъд меваҳоро биш."
                                 },
                                 {
-                                        "zh": "这个句子里有水果和打扫。",
-                                        "pinyin": "",
-                                        "meaning": "This sentence uses 水果 and 打扫."
+                                        "zh": "先学习，再玩儿，然后睡觉。",
+                                        "pinyin": "Xiān xuéxí, zài wánr, rán hòu shuìjiào.",
+                                        "uz": "Avval o'qi, keyin o'yna, so'ngra uxla.",
+                                        "ru": "Сначала учись, потом играй, затем ложись спать.",
+                                        "tj": "Аввал дарс хон, баъд бозӣ кун, сипас хоб кун."
                                 }
                         ]
                 }
@@ -143,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarni xitoycha yozing:",
+                        "instruction_ru": "Напишите китайский для следующих слов:",
+                        "instruction_tj": "Калимаҳои зеринро ба хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "fruit",
+                                        "prompt_uz": "meva",
+                                        "prompt_ru": "фрукты",
+                                        "prompt_tj": "мева",
                                         "answer": "水果",
                                         "pinyin": "shuǐguǒ"
                                 },
                                 {
-                                        "prompt": "to clean, to sweep",
+                                        "prompt_uz": "tozalamoq; supurmoq",
+                                        "prompt_ru": "убирать; подметать",
+                                        "prompt_tj": "тоза кардан; рӯфтан",
                                         "answer": "打扫",
                                         "pinyin": "dǎsǎo"
                                 },
                                 {
-                                        "prompt": "refrigerator",
+                                        "prompt_uz": "muzlatgich",
+                                        "prompt_ru": "холодильник",
+                                        "prompt_tj": "яхдон",
                                         "answer": "冰箱",
                                         "pinyin": "bīngxiāng"
                                 },
                                 {
-                                        "prompt": "banana",
+                                        "prompt_uz": "banan",
+                                        "prompt_ru": "банан",
+                                        "prompt_tj": "банан",
                                         "answer": "香蕉",
                                         "pinyin": "xiāngjiāo"
                                 }
@@ -170,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi xitoycha so'zlarni tarjima qiling:",
+                        "instruction_ru": "Переведите следующие китайские слова:",
+                        "instruction_tj": "Калимаҳои зерини хитоиро тарҷума кунед:",
                         "items": [
                                 {
-                                        "prompt": "水果",
-                                        "answer": "fruit",
+                                        "prompt_uz": "水果",
+                                        "prompt_ru": "水果",
+                                        "prompt_tj": "水果",
+                                        "answer": "meva / фрукты / мева",
                                         "pinyin": "shuǐguǒ"
                                 },
                                 {
-                                        "prompt": "打扫",
-                                        "answer": "to clean, to sweep",
+                                        "prompt_uz": "打扫",
+                                        "prompt_ru": "打扫",
+                                        "prompt_tj": "打扫",
+                                        "answer": "tozalamoq / убирать / тоза кардан",
                                         "pinyin": "dǎsǎo"
                                 },
                                 {
-                                        "prompt": "冰箱",
-                                        "answer": "refrigerator",
+                                        "prompt_uz": "冰箱",
+                                        "prompt_ru": "冰箱",
+                                        "prompt_tj": "冰箱",
+                                        "answer": "muzlatgich / холодильник / яхдон",
                                         "pinyin": "bīngxiāng"
                                 },
                                 {
-                                        "prompt": "香蕉",
-                                        "answer": "banana",
+                                        "prompt_uz": "香蕉",
+                                        "prompt_ru": "香蕉",
+                                        "prompt_tj": "香蕉",
+                                        "answer": "banan / банан / банан",
                                         "pinyin": "xiāngjiāo"
                                 }
                         ]
@@ -201,20 +259,15 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "answers": [
-                                "水果",
-                                "打扫",
-                                "冰箱",
-                                "香蕉"
-                        ]
+                        "answers": ["水果", "打扫", "冰箱", "香蕉"]
                 },
                 {
                         "no": 2,
                         "answers": [
-                                "fruit",
-                                "to clean, to sweep",
-                                "refrigerator",
-                                "banana"
+                                "meva / фрукты / мева",
+                                "tozalamoq / убирать / тоза кардан",
+                                "muzlatgich / холодильник / яхдон",
+                                "banan / банан / банан"
                         ]
                 }
         ],
@@ -224,18 +277,20 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Make 3 sentences using the following words:",
-                        "words": [
-                                "水果",
-                                "打扫",
-                                "冰箱"
-                        ],
-                        "example": "水果 和 打扫 可以出现在同一个句子里。"
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла созед:",
+                        "words": ["水果", "打扫", "冰箱"],
+                        "example": "先把桌子打扫干净，然后把冰箱里的水果拿过来。"
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short paragraph of 4-5 sentences about the lesson topic:",
-                        "topic": "你把水果拿过来"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 ta gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий текст из 4–5 предложений по теме урока:",
+                        "instruction_tj": "Дар бораи мавзӯи дарс матни кӯтоҳ аз 4-5 ҷумла нависед:",
+                        "topic_uz": "Mevalarni bu yerga olib kel",
+                        "topic_ru": "Принеси сюда фрукты",
+                        "topic_tj": "Меваҳоро ин ҷо биёр"
                 }
         ],
         ensure_ascii=False,
@@ -253,19 +308,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))

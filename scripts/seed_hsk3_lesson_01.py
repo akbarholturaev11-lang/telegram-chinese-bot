@@ -12,8 +12,8 @@ LESSON = {
     "lesson_order": 1,
     "lesson_code": "HSK3-L01",
     "title": "周末你有什么打算",
-    "goal": "talking about weekend plans",
-    "intro_text": "This lesson is dedicated to talking about weekend plans. It uses 5 key vocabulary words and covers core grammar patterns such as the resultative complement 好 and 一......也/都 + 不/没...... expressing negation.",
+    "goal": json.dumps({"uz": "dam olish kunlari rejalari haqida gapirish", "ru": "говорить о планах на выходные", "tj": "дар бораи нақшаҳои охири ҳафта сӯҳбат кардан"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu dars dam olish kunlari rejalari haqida gaplashishga bag'ishlangan. Unda 5 ta asosiy so'z o'rganiladi va 好 natija to'ldiruvchisi hamda 一......也/都 + 不/没...... inkor qolipi kabi grammatik mavzular ko'rib chiqiladi.", "ru": "Этот урок посвящён разговорам о планах на выходные. В нём изучаются 5 ключевых слов и рассматриваются грамматические темы: результативное дополнение 好 и конструкция 一......也/都 + 不/没...... для выражения отрицания.", "tj": "Ин дарс ба сӯҳбат дар бораи нақшаҳои охири ҳафта бахшида шудааст. Дар он 5 калимаи асосӣ омӯхта мешавад ва мавзӯҳои грамматикии иловаи натиҷавӣ 好 ва қолаби инкорӣ 一......也/都 + 不/没...... баррасӣ мегарданд."}, ensure_ascii=False),
     "vocabulary_json": json.dumps(
         [
                 {
@@ -21,35 +21,45 @@ LESSON = {
                         "zh": "周末",
                         "pinyin": "zhōumò",
                         "pos": "n.",
-                        "meaning": "weekend"
+                        "uz": "dam olish kuni, hafta oxiri",
+                        "ru": "выходные (дни)",
+                        "tj": "охири ҳафта, рӯзҳои истироҳат"
                 },
                 {
                         "no": 2,
                         "zh": "打算",
                         "pinyin": "dǎsuàn",
                         "pos": "v./n.",
-                        "meaning": "to plan, plan"
+                        "uz": "reja qilmoq; reja",
+                        "ru": "планировать; план",
+                        "tj": "нақша кашидан; нақша"
                 },
                 {
                         "no": 3,
                         "zh": "作业",
                         "pinyin": "zuòyè",
                         "pos": "n.",
-                        "meaning": "homework"
+                        "uz": "uy vazifasi",
+                        "ru": "домашнее задание",
+                        "tj": "вазифаи хонагӣ"
                 },
                 {
                         "no": 4,
                         "zh": "着急",
                         "pinyin": "zháojí",
                         "pos": "adj.",
-                        "meaning": "worried, anxious"
+                        "uz": "tashvishlanmoq, xavotir olmoq",
+                        "ru": "беспокоиться, нервничать",
+                        "tj": "ташвиш кашидан, нигарон будан"
                 },
                 {
                         "no": 5,
                         "zh": "地图",
                         "pinyin": "dìtú",
                         "pos": "n.",
-                        "meaning": "map"
+                        "uz": "xarita",
+                        "ru": "карта",
+                        "tj": "харита"
                 }
         ],
         ensure_ascii=False,
@@ -59,38 +69,50 @@ LESSON = {
                 {
                         "block_no": 1,
                         "section_label": "课文 1",
-                        "scene_label_zh": "Weekend plan",
+                        "scene_uz": "Dam olish kuni rejasi",
+                        "scene_ru": "План на выходные",
+                        "scene_tj": "Нақшаи охири ҳафта",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "周末你有什么打算？",
                                         "pinyin": "",
-                                        "translation": "What are your plans for the weekend?"
+                                        "uz": "Dam olish kunlari nima qilmoqchisiz?",
+                                        "ru": "Какие у тебя планы на выходные?",
+                                        "tj": "Охири ҳафта чӣ нақша дорӣ?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "我想先写作业，然后跟朋友出去。",
                                         "pinyin": "",
-                                        "translation": "I want to do my homework first, then go out with a friend."
+                                        "uz": "Avval uy vazifasini qilmoqchiman, keyin do'st bilan chiqmoqchiman.",
+                                        "ru": "Сначала хочу сделать домашнее задание, потом выйти с другом.",
+                                        "tj": "Аввал мехоҳам вазифаи хонагиро анҷом диҳам, сипас бо дӯст берун равам."
                                 }
                         ]
                 },
                 {
                         "block_no": 2,
                         "section_label": "课文 2",
-                        "scene_label_zh": "Preparing things",
+                        "scene_uz": "Narsalarni tayyorlash",
+                        "scene_ru": "Подготовка вещей",
+                        "scene_tj": "Тайёр кардани чизҳо",
                         "dialogue": [
                                 {
                                         "speaker": "A",
                                         "zh": "去公园要不要带地图？",
                                         "pinyin": "",
-                                        "translation": "Do we need to bring a map to the park?"
+                                        "uz": "Parka borishda xarita olib borishimiz kerakmi?",
+                                        "ru": "Нужно ли брать карту в парк?",
+                                        "tj": "Ба бӯстон рафтан хариту лозим аст?"
                                 },
                                 {
                                         "speaker": "B",
                                         "zh": "不用着急，我都准备好了。",
                                         "pinyin": "",
-                                        "translation": "Don't worry, I've got everything ready."
+                                        "uz": "Xavotir olmang, men hamma narsani tayyorladim.",
+                                        "ru": "Не беспокойтесь, я всё уже подготовил.",
+                                        "tj": "Ташвиш накашед, ман ҳама чизро тайёр кардаам."
                                 }
                         ]
                 }
@@ -102,34 +124,52 @@ LESSON = {
                 {
                         "no": 1,
                         "title_zh": "结果补语“好”",
-                        "explanation": "This pattern indicates that an action has been completed successfully or satisfactorily.",
+                        "title_uz": "Natija to'ldiruvchisi “好”",
+                        "title_ru": "Результативное дополнение «好»",
+                        "title_tj": "Иловаи натиҷавӣ «好»",
+                        "rule_uz": "Bu qolip biror harakatning muvaffaqiyatli yoki to'liq bajarilganligini bildiradi.",
+                        "rule_ru": "Эта конструкция указывает на то, что действие выполнено успешно или полностью.",
+                        "rule_tj": "Ин қолаб нишон медиҳад, ки амал бомуваффақият ё пурра иҷро шудааст.",
                         "examples": [
                                 {
                                         "zh": "我准备好了。",
                                         "pinyin": "",
-                                        "meaning": "I'm ready."
+                                        "uz": "Men tayyor bo'ldim.",
+                                        "ru": "Я готов.",
+                                        "tj": "Ман тайёрам."
                                 },
                                 {
                                         "zh": "电影票买好了。",
                                         "pinyin": "",
-                                        "meaning": "The movie tickets have been bought."
+                                        "uz": "Kino chiptasi sotib olindi.",
+                                        "ru": "Билеты в кино куплены.",
+                                        "tj": "Чиптаи кино харидорӣ шуд."
                                 }
                         ]
                 },
                 {
                         "no": 2,
                         "title_zh": "一......也/都 + 不/没......表示否定",
-                        "explanation": "This grammar topic helps to practice the core sentence patterns of the lesson in context.",
+                        "title_uz": "一......也/都 + 不/没...... inkor ifodalash",
+                        "title_ru": "一......也/都 + 不/没...... для выражения отрицания",
+                        "title_tj": "一......也/都 + 不/没...... барои ифодаи инкор",
+                        "rule_uz": "Bu grammatik mavzu dars asosiy gap qoliplarini mashq qilishga yordam beradi.",
+                        "rule_ru": "Эта грамматическая тема помогает отработать основные конструкции урока.",
+                        "rule_tj": "Ин мавзӯи грамматикӣ ба машқ кардани қолабҳои асосии дарс кӯмак мекунад.",
                         "examples": [
                                 {
                                         "zh": "周末你有什么打算。",
                                         "pinyin": "",
-                                        "meaning": "The main pattern from the lesson title."
+                                        "uz": "Darsning asosiy qolipi.",
+                                        "ru": "Основная конструкция урока.",
+                                        "tj": "Қолаби асосии дарс."
                                 },
                                 {
                                         "zh": "这个句子里有周末和打算。",
                                         "pinyin": "",
-                                        "meaning": "This sentence uses 周末 and 打算."
+                                        "uz": "Bu gapda 周末 va 打算 so'zlari bor.",
+                                        "ru": "В этом предложении используются слова 周末 и 打算.",
+                                        "tj": "Дар ин ҷумла калимаҳои 周末 ва 打算 истифода шудаанд."
                                 }
                         ]
                 }
@@ -141,25 +181,35 @@ LESSON = {
                 {
                         "no": 1,
                         "type": "translate_to_chinese",
-                        "instruction": "Write the Chinese for the following meanings:",
+                        "instruction_uz": "Quyidagi so'zlarning xitoychasini yozing:",
+                        "instruction_ru": "Запишите по-китайски следующие слова:",
+                        "instruction_tj": "Калимаҳои зеринро бо хитоӣ нависед:",
                         "items": [
                                 {
-                                        "prompt": "weekend",
+                                        "prompt_uz": "dam olish kuni",
+                                        "prompt_ru": "выходные",
+                                        "prompt_tj": "охири ҳафта",
                                         "answer": "周末",
                                         "pinyin": "zhōumò"
                                 },
                                 {
-                                        "prompt": "to plan, plan",
+                                        "prompt_uz": "reja qilmoq; reja",
+                                        "prompt_ru": "планировать; план",
+                                        "prompt_tj": "нақша кашидан; нақша",
                                         "answer": "打算",
                                         "pinyin": "dǎsuàn"
                                 },
                                 {
-                                        "prompt": "homework",
+                                        "prompt_uz": "uy vazifasi",
+                                        "prompt_ru": "домашнее задание",
+                                        "prompt_tj": "вазифаи хонагӣ",
                                         "answer": "作业",
                                         "pinyin": "zuòyè"
                                 },
                                 {
-                                        "prompt": "worried, anxious",
+                                        "prompt_uz": "tashvishlanmoq",
+                                        "prompt_ru": "беспокоиться",
+                                        "prompt_tj": "ташвиш кашидан",
                                         "answer": "着急",
                                         "pinyin": "zháojí"
                                 }
@@ -168,26 +218,36 @@ LESSON = {
                 {
                         "no": 2,
                         "type": "translate_to_uzbek",
-                        "instruction": "Write the English for the following words:",
+                        "instruction_uz": "Quyidagi so'zlarning ma'nosini yozing:",
+                        "instruction_ru": "Запишите значение следующих слов:",
+                        "instruction_tj": "Маънои калимаҳои зеринро нависед:",
                         "items": [
                                 {
-                                        "prompt": "周末",
-                                        "answer": "weekend",
+                                        "prompt_uz": "周末",
+                                        "prompt_ru": "周末",
+                                        "prompt_tj": "周末",
+                                        "answer": "周末",
                                         "pinyin": "zhōumò"
                                 },
                                 {
-                                        "prompt": "打算",
-                                        "answer": "to plan, plan",
+                                        "prompt_uz": "打算",
+                                        "prompt_ru": "打算",
+                                        "prompt_tj": "打算",
+                                        "answer": "打算",
                                         "pinyin": "dǎsuàn"
                                 },
                                 {
-                                        "prompt": "作业",
-                                        "answer": "homework",
+                                        "prompt_uz": "作业",
+                                        "prompt_ru": "作业",
+                                        "prompt_tj": "作业",
+                                        "answer": "作业",
                                         "pinyin": "zuòyè"
                                 },
                                 {
-                                        "prompt": "着急",
-                                        "answer": "worried, anxious",
+                                        "prompt_uz": "着急",
+                                        "prompt_ru": "着急",
+                                        "prompt_tj": "着急",
+                                        "answer": "着急",
                                         "pinyin": "zháojí"
                                 }
                         ]
@@ -209,10 +269,10 @@ LESSON = {
                 {
                         "no": 2,
                         "answers": [
-                                "weekend",
-                                "to plan, plan",
-                                "homework",
-                                "worried, anxious"
+                                "周末",
+                                "打算",
+                                "作业",
+                                "着急"
                         ]
                 }
         ],
@@ -222,18 +282,26 @@ LESSON = {
         [
                 {
                         "no": 1,
-                        "instruction": "Make 3 sentences using the following words:",
+                        "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta gap tuzing:",
+                        "instruction_ru": "Составьте 3 предложения, используя следующие слова:",
+                        "instruction_tj": "Бо истифода аз калимаҳои зерин 3 ҷумла тартиб диҳед:",
                         "words": [
                                 "周末",
                                 "打算",
                                 "作业"
                         ],
-                        "example": "周末 和 打算 可以出现在同一个句子里。"
+                        "topic_uz": "周末 va 打算 so'zlarini bir gapda ishlatish mumkin.",
+                        "topic_ru": "Слова 周末 и 打算 можно использовать в одном предложении.",
+                        "topic_tj": "Калимаҳои 周末 ва 打算 метавонанд дар як ҷумла истифода шаванд."
                 },
                 {
                         "no": 2,
-                        "instruction": "Write a short paragraph of 4-5 sentences about the lesson topic:",
-                        "topic": "周末你有什么打算"
+                        "instruction_uz": "Dars mavzusi bo'yicha 4-5 gapdan iborat qisqa matn yozing:",
+                        "instruction_ru": "Напишите короткий абзац из 4-5 предложений по теме урока:",
+                        "instruction_tj": "Дар мавзӯи дарс матни кӯтоҳи 4-5 ҷумлагӣ нависед:",
+                        "topic_uz": "周末你有什么打算",
+                        "topic_ru": "周末你有什么打算",
+                        "topic_tj": "周末你有什么打算"
                 }
         ],
         ensure_ascii=False,
@@ -251,19 +319,8 @@ async def upsert_lesson():
         existing = result.scalar_one_or_none()
 
         if existing:
-            existing.level = LESSON["level"]
-            existing.lesson_order = LESSON["lesson_order"]
-            existing.title = LESSON["title"]
-            existing.goal = LESSON["goal"]
-            existing.intro_text = LESSON["intro_text"]
-            existing.vocabulary_json = LESSON["vocabulary_json"]
-            existing.dialogue_json = LESSON["dialogue_json"]
-            existing.grammar_json = LESSON["grammar_json"]
-            existing.exercise_json = LESSON["exercise_json"]
-            existing.answers_json = LESSON["answers_json"]
-            existing.homework_json = LESSON["homework_json"]
-            existing.review_json = LESSON["review_json"]
-            existing.is_active = LESSON["is_active"]
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
             print(f"updated: {LESSON['lesson_code']}")
         else:
             session.add(CourseLesson(**LESSON))
