@@ -28,6 +28,23 @@ def course_understood_keyboard(lang: str, step: str) -> InlineKeyboardMarkup | N
     ]])
 
 
+# Barcha content step lari uchun universal "Tushundim" tugmasi (AI javob ostida)
+_TUSHUNDIM_LABELS = {
+    "uz": "✅ Tushundim",
+    "ru": "✅ Понял(а)",
+    "tj": "✅ Фаҳмидам",
+}
+
+def course_tushundim_keyboard(lang: str) -> InlineKeyboardMarkup:
+    """AI tutor javobidan keyin: 'Tushundim' → keyingi bo'limga o'tish."""
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(
+            text=_TUSHUNDIM_LABELS.get(lang, _TUSHUNDIM_LABELS["ru"]),
+            callback_data="course:go_next_step",
+        )
+    ]])
+
+
 def course_review_offer_keyboard(lang: str) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
