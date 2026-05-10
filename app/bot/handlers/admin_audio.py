@@ -147,6 +147,21 @@ async def admin_audio_entry(message: Message, state: FSMContext):
     )
 
 
+@router.callback_query(F.data == "adm:audio_panel")
+async def admin_audio_from_panel(callback: CallbackQuery, state: FSMContext):
+    """Admin paneldagi '🎵 Audio boshqaruv' tugmasi."""
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+    await state.clear()
+    await callback.answer()
+    await callback.message.edit_text(
+        "🎵 <b>Audio boshqaruv paneli</b>\n\nQaysi HSK darajasi?",
+        reply_markup=_level_keyboard(),
+        parse_mode="HTML",
+    )
+
+
 @router.callback_query(F.data == "adm_audio:back_levels")
 async def back_to_levels(callback: CallbackQuery, state: FSMContext):
     if not _is_admin(callback.from_user.id):

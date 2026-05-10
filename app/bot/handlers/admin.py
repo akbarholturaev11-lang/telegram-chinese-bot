@@ -24,6 +24,7 @@ def admin_menu_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="🗑 Foydalanuvchini o'chirish", callback_data="adm:deleteuser_info")],
         [InlineKeyboardButton(text="📢 Broadcast xabar", callback_data="adm:broadcast_info")],
         [InlineKeyboardButton(text="✅ Obuna berish", callback_data="adm:giveaccess_info")],
+        [InlineKeyboardButton(text="🎵 Audio boshqaruv", callback_data="adm:audio_panel")],
     ])
 
 
@@ -240,36 +241,53 @@ async def admin_audio_list_handler(message: Message, session):
     await message.answer("\n".join(lines), parse_mode="HTML")
 
 
-@router.message(
-    F.voice | F.audio,
-    F.caption.regexp(r"^(hsk\d+)\s+(\d+)\s+(vocab|dialogue_\d+)$"),
-)
+@router.message(F.voice | F.audio | F.document)
 async def admin_upload_audio_handler(message: Message, session):
-    """Audio yuklash: kaptionida  hsk1 3 dialogue_1  yozing.
+    """Audio yuklash — voice, audio yoki mp3/ogg fayl sifatida yuboring.
 
-    Fayl turini bot aniqlab, file_id ni DB ga saqlaydi.
-    Misol caption: hsk1 1 vocab   yoki   hsk2 3 dialogue_2
+    Caption (podpis) ga yozing:  hsk1 1 dialogue_1
+    Format:  {level} {lesson_order} {audio_type}
+    audio_type:  vocab | dialogue_1 | dialogue_2 | dialogue_3 | dialogue_4
+
+    Misol caption:
+      hsk1 1 vocab
+      hsk1 1 dialogue_1
+      hsk2 3 dialogue_2
     """
     if not _is_admin(message.from_user.id):
         return
 
-    caption = (message.caption or "").strip()
-    parts = caption.split()
-    level = parts[0].lower()
-    try:
-        lesson_order = int(parts[1])
-    except (IndexError, ValueError):
-        await message.answer("❌ Caption noto'g'ri format: <code>hsk1 3 dialogue_1</code>", parse_mode="HTML")
+    caption = (message.caption or "").strip().lower()
+    import re
+    m = re.match(r"^(hsk\d+)\s+(\d+)\s+(vocab|dialogue_\d+)$", caption)
+    if not m:
+        # Caption yo'q yoki noto'g'ri — yordam ko'rsat
+        await message.answer(
+            "📎 Fayl qabul qilindi, lekin <b>caption (podpis) noto'g'ri</b>.\n\n"
+            "Faylni qaytadan yuboring, caption qatoriga quyidagi formatda yozing:\n"
+            "<code>hsk1 1 dialogue_1</code>\n\n"
+            "Misollар:\n"
+            "<code>hsk1 1 vocab</code> — 1-dars so'zlar\n"
+            "<code>hsk1 1 dialogue_1</code> — 1-dars 1-dialog\n"
+            "<code>hsk1 1 dialogue_2</code> — 1-dars 2-dialog\n"
+            "<code>hsk2 3 dialogue_1</code> — HSK2 3-dars 1-dialog",
+            parse_mode="HTML",
+        )
         return
-    audio_type = parts[2].lower()
 
-    # file_id olish (voice yoki audio)
+    level = m.group(1)
+    lesson_order = int(m.group(2))
+    audio_type = m.group(3)
+
+    # file_id olish — voice, audio yoki document (mp3 fayl)
     if message.voice:
         file_id = message.voice.file_id
     elif message.audio:
         file_id = message.audio.file_id
+    elif message.document:
+        file_id = message.document.file_id
     else:
-        await message.answer("❌ Audio yoki voice fayl yuboring")
+        await message.answer("❌ Audio, voice yoki fayl yuboring")
         return
 
     repo = CourseAudioRepository(session)
@@ -278,7 +296,7 @@ async def admin_upload_audio_handler(message: Message, session):
     await message.answer(
         f"✅ Saqlandi!\n"
         f"📍 <b>{level}</b> · Dars <b>{lesson_order}</b> · <code>{audio_type}</code>\n"
-        f"🔑 file_id: <code>{file_id[:40]}…</code>",
+        f"🔑 <code>{file_id[:50]}…</code>",
         parse_mode="HTML",
     )
 
