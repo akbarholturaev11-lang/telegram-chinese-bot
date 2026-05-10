@@ -54,7 +54,6 @@ class AIService:
         response = await self.client.chat.completions.create(
             model=model_override or "o4-mini",
             messages=messages,
-            temperature=0.7,
         )
 
         return response.choices[0].message.content or ""
