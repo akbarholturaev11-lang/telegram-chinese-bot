@@ -417,6 +417,60 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
     return "\n".join(lines).rstrip()
 
 
+def format_grammar_v2(lesson, lang: str) -> str:
+    """V2: grammatika — step raqamisiz, toza ko'rinish."""
+    grammar = _parse(lesson.grammar_json, [])
+    if not grammar:
+        return ""
+
+    title = lesson.title or ""
+    hdr = {
+        "uz": "📐 Grammatika",
+        "tj": "📐 Грамматика",
+        "ru": "📐 Грамматика",
+    }
+
+    lines = [
+        f"<b>【{title}】</b>",
+        f"{hdr.get(lang, hdr['ru'])}",
+        "",
+    ]
+
+    for i, g in enumerate(grammar, 1):
+        if not isinstance(g, dict):
+            continue
+
+        g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
+        rule = (
+            g.get(f"rule_{lang}")
+            or g.get("rule_uz")
+            or g.get("explanation")
+            or g.get("rule")
+            or ""
+        )
+
+        lines.append("━━━━━━━━━━━━━━")
+        lines.append(f"<b>📌 {i}. {g_title}</b>")
+        lines.append("")
+        for rule_line in rule.split("\n"):
+            lines.append(f"   {rule_line}")
+        lines.append("")
+
+        examples = g.get("examples", [])
+        if examples:
+            eg_label = {"uz": "💬 Misollar:", "tj": "💬 Мисолҳо:", "ru": "💬 Примеры:"}
+            lines.append(f"   {eg_label.get(lang, eg_label['ru'])}")
+            for ex in examples:
+                zh = ex.get("zh", "")
+                pinyin = ex.get("pinyin", "")
+                meaning = ex.get(lang) or ex.get("uz") or ex.get("meaning") or ""
+                lines.append(f"   • <b>{zh}</b> <i>({pinyin})</i> — {meaning}")
+            lines.append("")
+
+    lines.append("━━━━━━━━━━━━━━")
+    return "\n".join(lines)
+
+
 def format_step(lesson, lang: str, step: str) -> str | None:
     """Universal dispatcher: har qanday step nomi uchun formatlangan matn qaytaradi.
 
@@ -439,7 +493,7 @@ def format_step(lesson, lang: str, step: str) -> str | None:
             n = 1
         return format_dialogue_n(lesson, lang, n)
     if step == "grammar":
-        return format_grammar(lesson, lang)
+        return format_grammar_v2(lesson, lang)
     if step == "exercise":
         return format_exercise(lesson, lang)
     return None  # AI tutor handle qiladi

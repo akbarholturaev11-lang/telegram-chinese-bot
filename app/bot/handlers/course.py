@@ -858,6 +858,9 @@ def _keyboard_for_step(lang: str, step: str, lesson=None):
         except (ValueError, IndexError):
             n = 1
         return course_dialogue_n_keyboard(lang, n)
+    # grammar — V2 da "Davom etamiz", V1 da "Exercisega o'tamiz"
+    if step == "grammar" and v2:
+        return course_next_step_keyboard(lang)
     # V1 steps
     if step == "intro":
         return course_intro_keyboard(lang)

@@ -75,6 +75,11 @@ def get_step_order(lesson) -> list:
     for i in range(1, min(len(dialogues) + 1, 5)):
         steps.append(f"dialogue_{i}")
 
+    # grammar_json bo'sh bo'lmasa — grammar stepini qo'shamiz
+    grammar = _parse_json(getattr(lesson, "grammar_json", None), [])
+    if grammar:
+        steps.append("grammar")
+
     steps += ["exercise", "satisfaction_check", "homework", "completed"]
     return steps
 
