@@ -1,4 +1,3 @@
-import asyncio
 import json
 from datetime import datetime, timezone, time
 
@@ -284,18 +283,7 @@ async def handle_text_message(message: Message, session):
             return
 
         if progress.waiting_for == "exercise_answer":
-            _emojis_ex = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
-            _anim_msg_ex = await message.answer(_emojis_ex[0])
-
-            async def _animate_ex():
-                for _i in range(1, 30):
-                    await asyncio.sleep(1)
-                    try:
-                        await _anim_msg_ex.edit_text(_emojis_ex[_i % len(_emojis_ex)])
-                    except Exception:
-                        break
-
-            _anim_task_ex = asyncio.create_task(_animate_ex())
+            _loading_ex = await message.answer("🔎")
 
             eval_text = await tutor.generate_step_response(
                 user_language=current_user.language,
@@ -305,9 +293,8 @@ async def handle_text_message(message: Message, session):
                 user_message=message.text or "",
             )
 
-            _anim_task_ex.cancel()
             try:
-                await _anim_msg_ex.delete()
+                await _loading_ex.delete()
             except Exception:
                 pass
 
@@ -467,18 +454,22 @@ async def handle_text_message(message: Message, session):
         )
 
         import asyncio as _asyncio
-        _emojis = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
-        _anim_msg = await message.answer(_emojis[0])
+        if current_step == "quiz":
+            _anim_msg = await message.answer("🔎")
+            _anim_task = None
+        else:
+            _emojis = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
+            _anim_msg = await message.answer(_emojis[0])
 
-        async def _animate():
-            for _i in range(1, 30):
-                await _asyncio.sleep(1)
-                try:
-                    await _anim_msg.edit_text(_emojis[_i % len(_emojis)])
-                except Exception:
-                    break
+            async def _animate():
+                for _i in range(1, 30):
+                    await _asyncio.sleep(1)
+                    try:
+                        await _anim_msg.edit_text(_emojis[_i % len(_emojis)])
+                    except Exception:
+                        break
 
-        _anim_task = _asyncio.create_task(_animate())
+            _anim_task = _asyncio.create_task(_animate())
 
         tutor_text = await tutor.generate_step_response(
             user_language=current_user.language,
@@ -489,7 +480,8 @@ async def handle_text_message(message: Message, session):
             history=course_history,
         )
 
-        _anim_task.cancel()
+        if _anim_task:
+            _anim_task.cancel()
         try:
             await _anim_msg.delete()
         except Exception:
