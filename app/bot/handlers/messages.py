@@ -17,7 +17,6 @@ from app.bot.keyboards.course import (
     review_choice_keyboard,
     course_reminder_timezone_keyboard,
     reminder_time_keyboard,
-    next_study_time_inline_keyboard,
 )
 from app.bot.keyboards.course import course_intro_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
@@ -39,27 +38,6 @@ from app.bot.utils.i18n import t
 router = Router()
 
 
-def _next_study_time_keyboard(user_lang: str) -> ReplyKeyboardMarkup:
-    skip_map = {
-        "uz": "O‘tkazib yuborish",
-        "ru": "Пропустить",
-        "tj": "Гузаронидан",
-    }
-
-    skip_text = skip_map.get(user_lang, "Пропустить")
-
-    return ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="09:00"), KeyboardButton(text="14:00")],
-            [KeyboardButton(text="19:00"), KeyboardButton(text="21:00")],
-            [KeyboardButton(text=skip_text)],
-        ],
-        resize_keyboard=True,
-        one_time_keyboard=True,
-    )
-
-
-
 def _parse_reminder_time(text: str):
     text = (text or "").strip()
     try:
@@ -72,29 +50,6 @@ def _parse_reminder_time(text: str):
         pass
     return None
 
-
-def _parse_next_study_at(raw_text: str):
-    raw_text = (raw_text or "").strip()
-    if not raw_text:
-        return None
-
-    formats = [
-        "%Y-%m-%d %H:%M",
-        "%Y-%m-%d %H:%M:%S",
-        "%H:%M",
-    ]
-
-    for fmt in formats:
-        try:
-            parsed = datetime.strptime(raw_text, fmt)
-            if fmt == "%H:%M":
-                now = datetime.now()
-                parsed = parsed.replace(year=now.year, month=now.month, day=now.day)
-            return parsed
-        except ValueError:
-            continue
-
-    return None
 
 
 @router.message(F.text & ~F.text.startswith("/"))
@@ -339,54 +294,30 @@ async def handle_text_message(message: Message, session):
                 await message.answer(t("course_homework_received", user_lang))
 
             if isinstance(result, dict) and result.get("ask_next_study_time"):
-                reminder_already_set = getattr(progress, "reminder_enabled", False)
-                shown_count = getattr(progress, "reminder_prompt_count", 0) or 0
-
-                if not reminder_already_set and shown_count < 2:
-                    # Faqat eslatma o'rnatilmagan va 2 martadan kam ko'rsatilganda chiqar
-                    progress.reminder_prompt_count = shown_count + 1
-                    await session.commit()
-                    await message.answer(
-                        t("course_next_study_time_optional", user_lang),
-                        reply_markup=next_study_time_inline_keyboard(user_lang),
-                    )
-                else:
-                    # Eslatma allaqachon o'rnatilgan yoki 2 marta ko'rsatilgan — o'tkazib yuborish
-                    await engine.set_next_study_at(message.from_user.id, None)
-                    _, rp, rl, re_err = await engine.get_current_lesson(message.from_user.id)
-                    if not re_err:
-                        if rp.waiting_for == "review_choice":
-                            await message.answer(
-                                t("course_review_choice", user_lang),
-                                reply_markup=review_choice_keyboard(user_lang),
-                            )
-                        else:
-                            await send_course_completion_prompt(
-                                respond=message.answer,
-                                engine=engine,
-                                lesson=rl,
-                                lang=user_lang,
-                            )
+                await engine.set_next_study_at(message.from_user.id, None)
+                _, rp, rl, re_err = await engine.get_current_lesson(message.from_user.id)
+                if not re_err:
+                    if rp.waiting_for == "review_choice":
+                        await message.answer(
+                            t("course_review_choice", user_lang),
+                            reply_markup=review_choice_keyboard(user_lang),
+                        )
+                    else:
+                        await send_course_completion_prompt(
+                            respond=message.answer,
+                            engine=engine,
+                            lesson=rl,
+                            lang=user_lang,
+                        )
 
             return
 
         if progress.waiting_for == "next_study_time":
-            skip_map = {
-                "uz": "O‘tkazib yuborish",
-                "ru": "Пропустить",
-                "tj": "Гузаронидан",
-            }
-
-            if (message.text or "").strip() == skip_map.get(user_lang, "Пропустить"):
-                await engine.set_next_study_at(message.from_user.id, None)
-                await message.answer(
-                    t("course_next_study_time_skipped", user_lang),
-                    reply_markup=course_menu_keyboard(user_lang),
-                )
-                _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
-                if refreshed_error:
-                    return
-                if refreshed_progress.waiting_for == "review_choice":
+            # Agar kimdir eski holatda qolib ketgan bo’lsa — avtomatik o’tkazib yuborish
+            await engine.set_next_study_at(message.from_user.id, None)
+            _, rp, rl, re_err = await engine.get_current_lesson(message.from_user.id)
+            if not re_err:
+                if rp.waiting_for == "review_choice":
                     await message.answer(
                         t("course_review_choice", user_lang),
                         reply_markup=review_choice_keyboard(user_lang),
@@ -395,39 +326,9 @@ async def handle_text_message(message: Message, session):
                     await send_course_completion_prompt(
                         respond=message.answer,
                         engine=engine,
-                        lesson=refreshed_lesson,
+                        lesson=rl,
                         lang=user_lang,
                     )
-                return
-
-            next_study_at = _parse_next_study_at(message.text or "")
-            if not next_study_at:
-                await message.answer(
-                    t("course_invalid_time_format", user_lang),
-                    reply_markup=next_study_time_inline_keyboard(user_lang),
-                )
-                return
-
-            await engine.set_next_study_at(message.from_user.id, next_study_at)
-            await message.answer(
-                t("course_next_study_time_saved", user_lang),
-                reply_markup=course_menu_keyboard(user_lang),
-            )
-            _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
-            if refreshed_error:
-                return
-            if refreshed_progress.waiting_for == "review_choice":
-                await message.answer(
-                    t("course_review_choice", user_lang),
-                    reply_markup=review_choice_keyboard(user_lang),
-                )
-            else:
-                await send_course_completion_prompt(
-                    respond=message.answer,
-                    engine=engine,
-                    lesson=refreshed_lesson,
-                    lang=user_lang,
-                )
             return
 
         message_repo = MessageRepository(session)

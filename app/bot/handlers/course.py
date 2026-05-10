@@ -327,10 +327,22 @@ async def run_course_entry_flow(
         return
 
     if getattr(progress, "waiting_for", None) == "next_study_time":
-        await respond(
-            t("course_next_study_time_optional", lang),
-            reply_markup=next_study_time_inline_keyboard(lang),
-        )
+        # Avtomatik o'tkazib yuboramiz — foydalanuvchi xohlasa menyu orqali eslatma qo'yadi
+        await engine.set_next_study_at(telegram_id, None)
+        _, p2, l2, e2 = await engine.get_current_lesson(telegram_id)
+        if not e2:
+            if getattr(p2, "waiting_for", None) == "review_choice":
+                await respond(
+                    t("course_review_choice", lang),
+                    reply_markup=review_choice_keyboard(lang),
+                )
+            else:
+                await send_course_completion_prompt(
+                    respond=respond,
+                    engine=engine,
+                    lesson=l2,
+                    lang=lang,
+                )
         return
 
     if (
