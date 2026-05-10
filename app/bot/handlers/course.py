@@ -1033,11 +1033,11 @@ async def course_skip_next_study_time_handler(callback: CallbackQuery, session):
     )
 
 
-_AUDIO_UNAVAILABLE = (
-    "🔇 Audio hozircha mavjud emas\n"
-    "🔇 Аудио пока недоступно\n"
-    "🔇 Аудио ҳоло дастрас нест"
-)
+_AUDIO_UNAVAILABLE = {
+    "uz": "🔇 Audio hozircha mavjud emas",
+    "ru": "🔇 Аудио пока недоступно",
+    "tj": "🔇 Аудио ҳоло дастрас нест",
+}
 
 # ─── Audio fayl joylash qoidasi ───────────────────────────────────────────────
 # Birinchi navbatda dars-spesifik path qidiriladi, keyin level-wide:
@@ -1050,18 +1050,21 @@ from app.repositories.course_audio_repo import CourseAudioRepository
 
 
 async def _send_audio_file(callback: CallbackQuery, session, audio_type: str):
-    """DB dan file_id topib yuboradi, yo'q bo'lsa xabar ko'rsatadi."""
+    """DB dan file_id topib yuboradi, yo'q bo'lsa foydalanuvchi tilida xabar ko'rsatadi."""
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
 
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    lang = (user.language if user and user.language else "ru")
+    unavailable = _AUDIO_UNAVAILABLE.get(lang, _AUDIO_UNAVAILABLE["ru"])
+
     if not user:
-        await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+        await callback.answer(unavailable, show_alert=True)
         return
 
     user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)
     if error_key or not lesson:
-        await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+        await callback.answer(unavailable, show_alert=True)
         return
 
     level = (lesson.level or "hsk1").lower()
@@ -1078,7 +1081,7 @@ async def _send_audio_file(callback: CallbackQuery, session, audio_type: str):
     if file_id:
         await callback.message.answer_voice(file_id)
     else:
-        await callback.message.answer(_AUDIO_UNAVAILABLE)
+        await callback.message.answer(unavailable)
 
 
 @router.callback_query(F.data == "course:audio_vocab")
