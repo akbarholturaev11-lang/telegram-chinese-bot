@@ -175,18 +175,19 @@ QOIDALAR:
 MASHQ MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-ASOSIY VAZIFA:
-- Foydalanuvchi javob yubormasa: javob kutilmoqda, hech narsa qo'shma
-- Foydalanuvchi javob yuborsa:
-  * Har bir javobni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
-  * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat va qisqa izoh ber
-  * TO'G'RI FORMATNI ko'rsat (masalan: <b>汉字</b> [<code>pinyin</code>])
-  * Xatolarni aniq va qisqa tushuntir
-  * Rag'batlantiruvchi so'zlar ishlatilsin: "Yaxshi! 👏" yoki "Deyarli to'g'ri! Mana maslahat..."
+ASOSIY VAZIFA — JAVOBNI MAZMUN BO'YICHA TEKSHIR (FORMAT BO'YICHA EMAS):
+- Foydalanuvchi xitoy belgilari, pinyin yoki ma'no yozishi mumkin — BARCHASI QABUL QILINADI
+- HTML teglari (<b>, <code>) talab qilinmaydi — foydalanuvchi oddiy matn yozadi
+- Har bir javobni FAQAT MAZMUN bo'yicha tekshir:
+  * ✅ — ma'no/so'z to'g'ri bo'lsa
+  * ❌ — ma'no/so'z noto'g'ri bo'lsa
+- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat (faqat bot o'zi <b>汉字</b> [<code>pinyin</code>] — ma'no formatida yozadi)
+- Xatolarni qisqa tushuntir
+- Rag'batlantiruvchi bo'l: "Yaxshi! 👏" yoki "Deyarli to'g'ri! Mana maslahat..."
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Bot o'z javobida xitoy: <b>...</b>, pinyin: <code>...</code> ishlatadi
 - Jami 10 qatordan oshmasin
 - Keyingi bo'limga o'tish haqida HECH NARSA dema — tizim o'zi o'tkazadi"""
 
@@ -203,7 +204,7 @@ QOIDALAR:
             "test_grammar": grammar[:3],
         }
 
-        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Test savollarini ber va javoblarni tekshir.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Foydalanuvchiga TEST savollarini ber.
 
 TEST MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
@@ -211,17 +212,18 @@ TEST MA'LUMOTI:
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
 - Xitoy: <b>...</b>, pinyin: <code>...</code>
-- Birinchi chaqiruvda: FAQAT 3-4 ta savol ber (ko'p tanlovli yoki bo'sh to'ldirish)
-- FAQAT test_vocabulary va test_grammar dan foydalanilsin — tashqi kontent yo'q
-- Foydalanuvchi javob yuborganda:
-  * Har bir savolni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
+- BIRINCHI CHAQIRUVDA (foydalanuvchi xabari yo'q bo'lsa):
+  * FAQAT 3-4 ta TEST SAVOLI ber — raqamlangan (1, 2, 3, 4)
+  * Savol turlari: ko'p tanlovli (A/B/C/D) YOKI bo'sh to'ldirish
+  * FAQAT test_vocabulary va test_grammar dan — tashqi so'z yo'q
+  * Tushuntirma, izoh, so'z ma'nolari BERMA — faqat savollar
+- FOYDALANUVCHI JAVOB YUBORGANDA:
+  * Har bir javobni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
   * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat
-  * TO'G'RI FORMATNI ko'rsat (masalan: <b>汉字</b> [<code>pinyin</code>])
   * Umumiy ball ber (masalan: 3/4 ✅)
-  * Xatolarni qisqa tushuntir
+  * Xatolarni 1 qatorda qisqa tushuntir
 - Rag'batlantiruvchi bo'l
-- Har bir o'zaro muloqotda 10 qatordan oshmasin
-{_EXPLANATION_RULE}"""
+- Jami 12 qatordan oshmasin"""
 
         return prompt, data
 
