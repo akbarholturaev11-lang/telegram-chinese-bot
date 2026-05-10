@@ -1,6 +1,6 @@
 from typing import Optional
 
-from sqlalchemy import select
+from sqlalchemy import select, func, distinct
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.dialects.postgresql import insert
 
@@ -44,3 +44,21 @@ class CourseAudioRepository:
             ).order_by(CourseAudio.audio_type)
         )
         return list(result.scalars().all())
+
+    async def get_uploaded_lesson_orders(self, level: str) -> set[int]:
+        """Kamida bitta audio yuklangan darslarning lesson_order larini qaytaradi."""
+        result = await self.session.execute(
+            select(distinct(CourseAudio.lesson_order)).where(
+                CourseAudio.level == level,
+            )
+        )
+        return set(result.scalars().all())
+
+    async def count_uploaded_lessons(self, level: str) -> int:
+        """Kamida bitta audio yuklangan darslar soni."""
+        result = await self.session.execute(
+            select(func.count(distinct(CourseAudio.lesson_order))).where(
+                CourseAudio.level == level,
+            )
+        )
+        return result.scalar() or 0

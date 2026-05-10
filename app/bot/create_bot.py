@@ -17,6 +17,7 @@ from app.bot.handlers.admin_broadcast import router as admin_broadcast_router
 from app.bot.handlers.messages import router as messages_router
 from app.bot.handlers.course import router as course_router
 from app.bot.handlers.admin import router as admin_router
+from app.bot.handlers.admin_audio import router as admin_audio_router
 
 
 def create_bot(settings):
@@ -37,6 +38,7 @@ def create_bot(settings):
     dp.include_router(payments_router)
     dp.include_router(admin_payments_router)
     dp.include_router(admin_broadcast_router)
+    dp.include_router(admin_audio_router)   # ← admin audio — messages_router DAN OLDIN
     dp.include_router(course_router)
     dp.include_router(admin_router)
     dp.include_router(messages_router)
