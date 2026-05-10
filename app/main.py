@@ -18,7 +18,7 @@ bot, dp = create_bot(settings)
 
 async def _background_scheduler(bot: Bot) -> None:
     while True:
-        await asyncio.sleep(3600)
+        await asyncio.sleep(60)
         try:
             async with async_session_maker() as session:
                 await DailyResetService(session).send_daily_reset_notifications(bot)

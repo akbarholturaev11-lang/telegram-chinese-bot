@@ -43,8 +43,11 @@ class CourseReminderService:
             tz_offset = getattr(progress, "reminder_tz_offset", 5) or 5
             local_now = now_utc + timedelta(hours=tz_offset)
 
-            # Soatni moslashtirish
-            if local_now.hour != progress.reminder_time.hour:
+            # Vaqtni moslashtirish (soat va daqiqa, ±2 daqiqa oynasi)
+            rt = progress.reminder_time
+            now_mins = local_now.hour * 60 + local_now.minute
+            rem_mins = rt.hour * 60 + rt.minute
+            if not (0 <= now_mins - rem_mins <= 2):
                 continue
 
             # Bugun allaqachon yuborilganmi?
