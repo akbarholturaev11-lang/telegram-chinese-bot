@@ -13,6 +13,7 @@ from app.bot.handlers.course import (
     filter_unlocked_lessons,
     send_course_completion_prompt,
 )
+from app.bot.keyboards.course_context import course_tushundim_keyboard
 from app.bot.keyboards.course import (
     lesson_selection_keyboard,
     review_choice_keyboard,
@@ -496,9 +497,19 @@ async def handle_text_message(message: Message, session):
         )
         await session.commit()
 
+        _content_steps = {
+            "intro", "vocab", "vocabulary", "dialogue", "grammar",
+            "vocab_1", "vocab_2",
+            "dialogue_1", "dialogue_2", "dialogue_3", "dialogue_4",
+        }
+        if progress.current_step in _content_steps:
+            ai_keyboard = course_tushundim_keyboard(user_lang)
+        else:
+            ai_keyboard = _keyboard_for_step(user_lang, progress.current_step, lesson)
+
         await message.answer(
             tutor_text,
-            reply_markup=_keyboard_for_step(user_lang, progress.current_step, lesson),
+            reply_markup=ai_keyboard,
             parse_mode="HTML",
         )
         return
