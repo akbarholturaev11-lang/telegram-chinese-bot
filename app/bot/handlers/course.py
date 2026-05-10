@@ -840,8 +840,14 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
     )
 
 
-def _keyboard_for_step(lang: str, step: str):
+def _keyboard_for_step(lang: str, step: str, lesson=None):
     """Har qanday step uchun to'g'ri klaviaturani qaytaradi (V1 + V2)."""
+    from app.services.course_engine_service import is_v2_lesson as _is_v2
+    v2 = lesson is not None and _is_v2(lesson)
+
+    # V2 intro — "Davom etamiz" (vocab_1 ga o'tadi)
+    if step == "intro" and v2:
+        return course_next_step_keyboard(lang)
     # V2 vocab steps — audio + next
     if step in ("vocab_1", "vocab_2"):
         return course_vocab_v2_keyboard(lang)
@@ -865,11 +871,20 @@ def _keyboard_for_step(lang: str, step: str):
     return get_course_keyboard_for_step(lang, step)
 
 
+def _v2_remap(step: str, lesson) -> str:
+    """V2 dars uchun V1 step nomini V2 ekvivalentiga o'zgartiradi."""
+    from app.services.course_engine_service import is_v2_lesson as _is_v2
+    if not _is_v2(lesson):
+        return step
+    mapping = {"vocab": "vocab_1", "dialogue": "dialogue_1"}
+    return mapping.get(step, step)
+
+
 async def _send_step(respond, user, lesson, step: str, lang: str, session):
     """Step kontentini format qilib yuboradi (V1 va V2 uchun)."""
     text = format_step(lesson, lang, step)
     if text is not None:
-        keyboard = _keyboard_for_step(lang, step)
+        keyboard = _keyboard_for_step(lang, step, lesson)
         await respond(text, reply_markup=keyboard, parse_mode="HTML")
     else:
         # AI tutor orqali javob
@@ -881,7 +896,7 @@ async def _send_step(respond, user, lesson, step: str, lang: str, session):
             step=step,
             user_message="",
         )
-        keyboard = get_course_keyboard_for_step(lang, step)
+        keyboard = _keyboard_for_step(lang, step, lesson)
         await respond(text, reply_markup=keyboard, parse_mode="HTML")
 
 
@@ -903,6 +918,9 @@ async def _go_to_step(callback, session, step: str):
         await callback.answer()
         await callback.message.answer(t(error_key, lang))
         return
+
+    # V2 dars uchun V1 step nomlarini V2 ga remap qilamiz
+    step = _v2_remap(step, lesson)
 
     waiting_for_val = "exercise_answer" if step == "exercise" else "none"
     await engine.progress_repo.set_current_lesson_and_step(
