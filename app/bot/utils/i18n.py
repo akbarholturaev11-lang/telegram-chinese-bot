@@ -421,7 +421,7 @@ COURSE_I18N = {
         "course_reminder_disabled": "❌ Ёдраскунак хомӯш шуд.",
         "course_reminder_choose_time": "⏰ Вақти ёдраскунакро интихоб кунед.",
         "course_reminder_saved": "✅ Вақти ёдраскунак нигоҳ дошта шуд.",
-        "course_reminder_text": "⏰ Вақти дарси имрӯза расид. Курси худро идома диҳед.",
+        "course_reminder_text": "⏰ <b>Вақти дарс расид!</b>\n\n<blockquote>📚 Забони хитоиро идома диҳед.\nҲар рӯз 15 дақиқа — натиҷаи калон!</blockquote>",
 
         "course_no_lesson_found": "Дарс пайдо нашуд.",
         "course_lesson_not_unlocked": "Ин дарс ҳоло кушода нест.",
@@ -529,7 +529,7 @@ COURSE_I18N = {
         "course_reminder_disabled": "❌ Напоминание выключено.",
         "course_reminder_choose_time": "⏰ Выберите время напоминания.",
         "course_reminder_saved": "✅ Время напоминания сохранено.",
-        "course_reminder_text": "⏰ Пора заниматься. Продолжите ваш курс HSK.",
+        "course_reminder_text": "⏰ <b>Время урока!</b>\n\n<blockquote>📚 Продолжайте изучать китайский язык.\n15 минут в день — и результат не заставит ждать!</blockquote>",
 
         "course_no_lesson_found": "Урок не найден.",
         "course_lesson_not_unlocked": "Этот урок пока не открыт.",
@@ -634,7 +634,7 @@ COURSE_I18N = {
         "course_reminder_disabled": "❌ Eslatma o’chirildi.",
         "course_reminder_choose_time": "⏰ Eslatma vaqtini tanlang.",
         "course_reminder_saved": "✅ Eslatma vaqti saqlandi.",
-        "course_reminder_text": "⏰ Bugungi dars vaqti bo’ldi. HSK kursingizni davom ettiring.",
+        "course_reminder_text": "⏰ <b>Dars vaqti keldi!</b>\n\n<blockquote>📚 Bugun ham xitoy tilini o’rganing.\nHar kun 15 daqiqa — katta natija!</blockquote>",
 
         "course_choose_lesson": "Qaysi darsdan boshlamoqchisiz?",
         "course_no_lessons_available": "Bu daraja uchun hozircha darslar mavjud emas.",

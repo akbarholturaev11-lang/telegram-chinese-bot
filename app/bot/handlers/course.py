@@ -1121,7 +1121,7 @@ async def course_set_timezone_handler(callback: CallbackQuery, session):
     progress.reminder_tz_offset = tz_offset
     await session.commit()
 
-    tz_labels = {3: "UTC+3 🇷🇺", 5: "UTC+5 🇺🇿", 6: "UTC+6", 8: "UTC+8 🇨🇳"}
+    tz_labels = {3: "UTC+3 🇷🇺 Москва", 5: "UTC+5 🇺🇿🇹🇯 Тошкент/Душанбе", 8: "UTC+8 🇨🇳 Пекин"}
     tz_label = tz_labels.get(tz_offset, f"UTC+{tz_offset}")
     time_str = progress.reminder_time.strftime("%H:%M")
 
