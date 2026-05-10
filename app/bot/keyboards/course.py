@@ -202,6 +202,31 @@ def course_reminder_notification_keyboard(lang: str) -> InlineKeyboardMarkup:
     return builder.as_markup()
 
 
+def next_study_time_inline_keyboard(lang: str) -> InlineKeyboardMarkup:
+    """Keyingi o'qish vaqtini tanlash — inline tugmalar (ReplyKeyboard o'rniga)."""
+    skip_labels = {
+        "uz": "⏩ O'tkazib yuborish",
+        "ru": "⏩ Пропустить",
+        "tj": "⏩ Гузаронидан",
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="09:00", callback_data="course:study_time:09:00"),
+            InlineKeyboardButton(text="14:00", callback_data="course:study_time:14:00"),
+        ],
+        [
+            InlineKeyboardButton(text="19:00", callback_data="course:study_time:19:00"),
+            InlineKeyboardButton(text="21:00", callback_data="course:study_time:21:00"),
+        ],
+        [
+            InlineKeyboardButton(
+                text=skip_labels.get(lang, skip_labels["ru"]),
+                callback_data="course:skip_next_study_time",
+            ),
+        ],
+    ])
+
+
 def reminder_time_keyboard(lang: str) -> ReplyKeyboardMarkup:
     cancel_map = {
         "uz": "❌ Bekor qilish",

@@ -12,6 +12,7 @@ from app.bot.keyboards.course import (
     course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
     course_grammar_keyboard, course_homework_keyboard,
     course_next_step_keyboard, course_vocab_v2_keyboard, course_dialogue_n_keyboard,
+    next_study_time_inline_keyboard,
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
@@ -326,7 +327,10 @@ async def run_course_entry_flow(
         return
 
     if getattr(progress, "waiting_for", None) == "next_study_time":
-        await respond(t("course_next_study_time_optional", lang))
+        await respond(
+            t("course_next_study_time_optional", lang),
+            reply_markup=next_study_time_inline_keyboard(lang),
+        )
         return
 
     if (
@@ -1012,13 +1016,80 @@ async def course_repeat_step(callback: CallbackQuery, session):
     await _send_step(callback.message.answer, user, lesson, step, lang, session)
 
 
+async def _finish_study_time_flow(callback: CallbackQuery, session, saved_text: str):
+    """Vaqt saqlangandan yoki o'tkazib yuborgandan keyin umumiy tugash oqimi."""
+    engine = CourseEngineService(session)
+    user_repo = UserRepository(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    lang = (user.language if user and user.language else "ru")
+
+    await callback.message.edit_reply_markup(reply_markup=None)
+    await callback.message.answer(saved_text, parse_mode="HTML")
+
+    _, progress, lesson, err = await engine.get_current_lesson(callback.from_user.id)
+    if err or not lesson:
+        return
+
+    if getattr(progress, "waiting_for", None) == "review_choice":
+        await callback.message.answer(
+            t("course_review_choice", lang),
+            reply_markup=review_choice_keyboard(lang),
+        )
+    else:
+        await send_course_completion_prompt(
+            respond=callback.message.answer,
+            engine=engine,
+            lesson=lesson,
+            lang=lang,
+        )
+
+
+@router.callback_query(F.data.startswith("course:study_time:"))
+async def course_set_study_time_handler(callback: CallbackQuery, session):
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+    time_str = callback.data.split(":")[-2] + ":" + callback.data.split(":")[-1]  # "09:00"
+
+    # "09:00" → datetime bugun uchun
+    try:
+        h, m = int(time_str.split(":")[0]), int(time_str.split(":")[1])
+        now = datetime.now(timezone.utc)
+        next_study_at = now.replace(hour=h, minute=m, second=0, microsecond=0)
+        if next_study_at <= now:
+            # Agar vaqt o'tib ketgan bo'lsa — ertaga
+            from datetime import timedelta
+            next_study_at = next_study_at + timedelta(days=1)
+    except Exception:
+        await callback.answer()
+        return
+
+    engine = CourseEngineService(session)
+    await engine.set_next_study_at(callback.from_user.id, next_study_at)
+
+    saved_labels = {
+        "uz": f"✅ Keyingi dars vaqti saqlandi: <b>{time_str}</b>",
+        "ru": f"✅ Время следующего урока сохранено: <b>{time_str}</b>",
+        "tj": f"✅ Вақти дарси навбатӣ сабт шуд: <b>{time_str}</b>",
+    }
+    await callback.answer(f"✅ {time_str}")
+    await _finish_study_time_flow(callback, session, saved_labels.get(lang, saved_labels["ru"]))
+
+
 @router.callback_query(F.data == "course:skip_next_study_time")
 async def course_skip_next_study_time_handler(callback: CallbackQuery, session):
     if await _block_if_course_disabled(callback, session):
         return
 
     user_repo = UserRepository(session)
-
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
     if not user:
         await callback.answer()
@@ -1027,10 +1098,11 @@ async def course_skip_next_study_time_handler(callback: CallbackQuery, session):
 
     lang = user.language if user.language else "ru"
 
+    engine = CourseEngineService(session)
+    await engine.set_next_study_at(callback.from_user.id, None)
+
     await callback.answer()
-    await callback.message.answer(
-        t("course_next_study_time_skipped", lang)
-    )
+    await _finish_study_time_flow(callback, session, t("course_next_study_time_skipped", lang))
 
 
 _AUDIO_UNAVAILABLE = {

@@ -17,6 +17,7 @@ from app.bot.keyboards.course import (
     review_choice_keyboard,
     course_reminder_timezone_keyboard,
     reminder_time_keyboard,
+    next_study_time_inline_keyboard,
 )
 from app.bot.keyboards.course import course_intro_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
@@ -347,7 +348,7 @@ async def handle_text_message(message: Message, session):
                     await session.commit()
                     await message.answer(
                         t("course_next_study_time_optional", user_lang),
-                        reply_markup=_next_study_time_keyboard(user_lang),
+                        reply_markup=next_study_time_inline_keyboard(user_lang),
                     )
                 else:
                     # Eslatma allaqachon o'rnatilgan yoki 2 marta ko'rsatilgan — o'tkazib yuborish
@@ -403,7 +404,7 @@ async def handle_text_message(message: Message, session):
             if not next_study_at:
                 await message.answer(
                     t("course_invalid_time_format", user_lang),
-                    reply_markup=_next_study_time_keyboard(user_lang),
+                    reply_markup=next_study_time_inline_keyboard(user_lang),
                 )
                 return
 
