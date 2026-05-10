@@ -13,6 +13,9 @@ TEXTS = {
         "menu_start_lesson": "📘 Оғози дарс",
         "menu_profile": "👤 Профил",
         "menu_subscription": "💳 Обуна",
+        "menu_invite": "👥 Дӯст даъват кардан",
+        "menu_help": "❓ Ёрдам",
+        "menu_course_mode": "📚 Режими курс",
 
         "access_start_first": "Лутфан, аввал /start ро пахш кунед.",
         "access_blocked": "<b>🚫 Профили шумо баста шудааст</b>\n\n<blockquote>Ба профили шумо дастрасӣ маҳдуд аст. Барои кӯмак ба техподдержка нависед:\n@akbarchina</blockquote>",
@@ -113,6 +116,9 @@ TEXTS = {
         "menu_start_lesson": "📘 Начать урок",
         "menu_profile": "👤 Профиль",
         "menu_subscription": "💳 Подписка",
+        "menu_invite": "👥 Пригласить друга",
+        "menu_help": "❓ Помощь",
+        "menu_course_mode": "📚 Режим курса",
 
         "access_start_first": "Пожалуйста, сначала нажмите /start.",
         "access_blocked": "<b>🚫 Ваш профиль заблокирован</b>\n\n<blockquote>Доступ к профилю ограничен. Для помощи напишите в техподдержку:\n@akbarchina</blockquote>",
@@ -209,6 +215,9 @@ TEXTS = {
         "menu_start_lesson": "📘 Darsni boshlash",
         "menu_profile": "👤 Profil",
         "menu_subscription": "💳 Obuna",
+        "menu_invite": "👥 Do'st chaqirish",
+        "menu_help": "❓ Yordam",
+        "menu_course_mode": "📚 Kurs rejimi",
 
         "access_start_first": "Iltimos, avval /start ni bosing.",
         "access_blocked": "<b>🚫 Profilingiz bloklangan</b>\n\n<blockquote>Profilingizga kirish cheklangan. Yordam uchun texnik yordamga yozing:\n@akbarchina</blockquote>",

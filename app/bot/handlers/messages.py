@@ -320,7 +320,10 @@ async def handle_text_message(message: Message, session):
 
             if (message.text or "").strip() == skip_map.get(user_lang, "Пропустить"):
                 await engine.set_next_study_at(message.from_user.id, None)
-                await message.answer(t("course_next_study_time_skipped", user_lang))
+                await message.answer(
+                    t("course_next_study_time_skipped", user_lang),
+                    reply_markup=course_menu_keyboard(user_lang),
+                )
                 _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
                 if refreshed_error:
                     return
@@ -347,7 +350,10 @@ async def handle_text_message(message: Message, session):
                 return
 
             await engine.set_next_study_at(message.from_user.id, next_study_at)
-            await message.answer(t("course_next_study_time_saved", user_lang))
+            await message.answer(
+                t("course_next_study_time_saved", user_lang),
+                reply_markup=course_menu_keyboard(user_lang),
+            )
             _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(message.from_user.id)
             if refreshed_error:
                 return

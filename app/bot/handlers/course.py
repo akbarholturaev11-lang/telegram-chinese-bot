@@ -226,6 +226,7 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
         session=session,
         telegram_id=callback.from_user.id,
         respond=callback.message.answer,
+        show_menu=True,
     )
 
 
@@ -272,7 +273,7 @@ async def run_course_entry_flow(
     session,
     telegram_id: int,
     respond,
-    show_menu: bool = False,
+    show_menu: bool = True,
 ):
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
@@ -306,6 +307,9 @@ async def run_course_entry_flow(
             waiting_for="none",
         )
 
+    # Kurs rejimiga kirish bilanoq menyuni ko'rsat
+    await respond(t("course_menu_title", lang), reply_markup=course_menu_keyboard(lang))
+
     if not progress.current_lesson_id:
         lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
 
@@ -319,10 +323,6 @@ async def run_course_entry_flow(
             reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang),
         )
         return
-
-    # Faqat menu tugmasi bosilganda menuni ko'rsat
-    if show_menu:
-        await respond("📚", reply_markup=course_menu_keyboard(lang))
 
     if getattr(progress, "waiting_for", None) == "next_study_time":
         await respond(t("course_next_study_time_optional", lang))
@@ -415,6 +415,7 @@ async def course_command_handler(message: Message, session):
         session=session,
         telegram_id=message.from_user.id,
         respond=message.answer,
+        show_menu=True,
     )
 
 
