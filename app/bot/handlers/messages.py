@@ -301,13 +301,37 @@ async def handle_text_message(message: Message, session):
             if isinstance(result, dict) and result.get("feedback_text"):
                 await message.answer(result["feedback_text"])
             else:
-                  await message.answer(t("course_homework_received", user_lang))
+                await message.answer(t("course_homework_received", user_lang))
 
             if isinstance(result, dict) and result.get("ask_next_study_time"):
-                await message.answer(
-                    t("course_next_study_time_optional", user_lang),
-                    reply_markup=_next_study_time_keyboard(user_lang),
-                )
+                reminder_already_set = getattr(progress, "reminder_enabled", False)
+                shown_count = getattr(progress, "reminder_prompt_count", 0) or 0
+
+                if not reminder_already_set and shown_count < 2:
+                    # Faqat eslatma o'rnatilmagan va 2 martadan kam ko'rsatilganda chiqar
+                    progress.reminder_prompt_count = shown_count + 1
+                    await session.commit()
+                    await message.answer(
+                        t("course_next_study_time_optional", user_lang),
+                        reply_markup=_next_study_time_keyboard(user_lang),
+                    )
+                else:
+                    # Eslatma allaqachon o'rnatilgan yoki 2 marta ko'rsatilgan — o'tkazib yuborish
+                    await engine.set_next_study_at(message.from_user.id, None)
+                    _, rp, rl, re_err = await engine.get_current_lesson(message.from_user.id)
+                    if not re_err:
+                        if rp.waiting_for == "review_choice":
+                            await message.answer(
+                                t("course_review_choice", user_lang),
+                                reply_markup=review_choice_keyboard(user_lang),
+                            )
+                        else:
+                            await send_course_completion_prompt(
+                                respond=message.answer,
+                                engine=engine,
+                                lesson=rl,
+                                lang=user_lang,
+                            )
 
             return
 
