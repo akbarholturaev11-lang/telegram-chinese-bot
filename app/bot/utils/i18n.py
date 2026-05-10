@@ -101,6 +101,9 @@ TEXTS = {
         "admin_approve_button": "✅ Тасдиқ кардан",
         "admin_reject_button": "❌ Рад кардан",
         "image_invalid_format": "Ин формат дастгирӣ намешавад. Лутфан суратро ҳамчун фото ё файли image фиристед.",
+
+        "course_promo_caption": "📚 <b>Режими курс</b> — омӯзиши зеҳноний забони чинигӣ!\n\nДарсҳои қадам ба қадам, картҳои калима, машқҳои грамматикӣ ва муҳовара бо AI.",
+        "course_promo_button": "📚 Режими курсро оғоз кардан",
     },
     "ru": {
         "welcome": "Добро пожаловать, {name}!",
@@ -165,6 +168,9 @@ TEXTS = {
         "subscription_discount_ready": "✅ Скидка 20% активирована.",
 
         "image_invalid_format": "Этот формат не поддерживается. Пожалуйста, отправьте изображение как фото или image-файл.",
+
+        "course_promo_caption": "📚 <b>Режим курса</b> — учите китайский с умным ботом!\n\nПошаговые уроки, карточки слов, грамматические упражнения и диалоги с AI.",
+        "course_promo_button": "📚 Начать режим курса",
         "subscription_discount_plan_10_days": "10 дней — 23 сомони",
         "subscription_discount_plan_1_month": "1 месяц — 71 сомони",
         "subscription_discount_plan_10_days_yuan": "10 дней — 23 ¥",
@@ -251,7 +257,10 @@ TEXTS = {
         "subscription_invite_button": "👥 Do‘st chaqirish",
         "subscription_back_to_main": "⬅️ Oddiy obunaga qaytish",
 
-        "image_invalid_format": "Bu format qo‘llanmaydi. Iltimos, rasmni foto yoki image-fayl sifatida yuboring.",
+        "image_invalid_format": "Bu format qo’llanmaydi. Iltimos, rasmni foto yoki image-fayl sifatida yuboring.",
+
+        "course_promo_caption": "📚 <b>Kurs rejimi</b> — xitoy tilini aqlli bot bilan o’rganing!\n\nBosqichma-bosqich darslar, so’z kartochkalari, grammatika mashqlari va AI bilan suhbat.",
+        "course_promo_button": "📚 Kurs rejimini boshlash",
         "checkout_change_plan_button": "🔄 Boshqa tarifni tanlash",
         "payment_send_screenshot_only": "Iltimos, faqat to‘lov skrinshotini yuboring.",
         "subscription_discount_text_blocked": "Siz allaqachon chegirma ishlatyapsiz. Oddiy obunaga qayting.",

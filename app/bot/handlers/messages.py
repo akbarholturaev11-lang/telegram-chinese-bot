@@ -1,8 +1,9 @@
 import json
+import os
 from datetime import datetime, timezone, time
 
 from aiogram import F, Router
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, FSInputFile
 
 from app.bot.utils.response_effect import ResponseEffect
 from app.bot.handlers.course import (
@@ -25,6 +26,7 @@ from app.bot.keyboards.checkout import checkout_keyboard
 from app.bot.keyboards.main_menu import main_menu_keyboard, course_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.keyboards.referral import referral_daily_limit_keyboard
+from app.bot.keyboards.mode import course_promo_keyboard
 from app.bot.utils.course_formatter import format_intro
 from app.repositories.message_repo import MessageRepository
 from app.repositories.user_repo import UserRepository
@@ -454,6 +456,41 @@ async def handle_text_message(message: Message, session):
         return
 
     await message.answer(reply)
+
+    # Show course promo after 3rd QA message (once per user)
+    refreshed_user = await user_repo.get_by_telegram_id(message.from_user.id)
+    if (
+        refreshed_user
+        and not refreshed_user.course_promo_sent
+        and refreshed_user.questions_used >= 3
+        and refreshed_user.learning_mode == "qa"
+    ):
+        refreshed_user.course_promo_sent = True
+        await session.commit()
+
+        lang_photo_map = {
+            "uz": "app/static/course_promo/uz.jpg",
+            "tj": "app/static/course_promo/tj.jpg",
+            "ru": "app/static/course_promo/ru.jpg",
+        }
+        photo_path = lang_photo_map.get(user_lang, "app/static/course_promo/ru.jpg")
+        if os.path.exists(photo_path):
+            await message.answer_photo(
+                FSInputFile(photo_path),
+                caption=t("course_promo_caption", user_lang),
+                reply_markup=course_promo_keyboard(user_lang),
+                parse_mode="HTML",
+            )
+
+
+@router.callback_query(F.data == "course_promo:start")
+async def handle_course_promo_start(callback: CallbackQuery, session):
+    await callback.answer()
+    await run_course_entry_flow(
+        session=session,
+        telegram_id=callback.from_user.id,
+        respond=callback.message.answer,
+    )
 
 
 @router.message(F.photo)

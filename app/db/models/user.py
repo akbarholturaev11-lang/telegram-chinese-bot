@@ -68,6 +68,8 @@ class User(Base):
 
     referrer_id: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
 
+    course_promo_sent: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         default=lambda: datetime.now(timezone.utc),
