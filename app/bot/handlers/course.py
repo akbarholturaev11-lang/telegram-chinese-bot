@@ -360,6 +360,23 @@ async def run_course_entry_flow(
 
     step = progress.current_step
 
+    # V1 → V2 migratsiya: eski "vocab"/"dialogue" stepida qolgan foydalanuvchilarni
+    # V2 ekvivalentiga ko'chiramiz (V2 darslar uchun)
+    from app.services.course_engine_service import is_v2_lesson
+    if is_v2_lesson(lesson):
+        if step == "vocab":
+            step = "vocab_1"
+            await engine.progress_repo.set_current_lesson_and_step(
+                progress=progress, lesson_id=lesson.id, step=step, waiting_for="none"
+            )
+            await session.commit()
+        elif step == "dialogue":
+            step = "dialogue_1"
+            await engine.progress_repo.set_current_lesson_and_step(
+                progress=progress, lesson_id=lesson.id, step=step, waiting_for="none"
+            )
+            await session.commit()
+
     if step == "exercise" and getattr(progress, "waiting_for", "none") != "exercise_answer":
         await engine.progress_repo.set_waiting_for(progress, "exercise_answer")
         await session.commit()
@@ -1001,18 +1018,32 @@ _AUDIO_UNAVAILABLE = (
     "🔇 Аудио ҳоло дастрас нест"
 )
 
-# Audio fayllari joyi: app/static/audio/{level}/lesson_{order:02d}/{name}.ogg
-# Masalan: app/static/audio/hsk1/lesson_01/vocab.ogg
-#          app/static/audio/hsk1/lesson_01/dialogue_1.ogg
-import os
+# ─── Audio fayl joylash qoidasi ───────────────────────────────────────────────
+# Birinchi navbatda dars-spesifik path qidiriladi, keyin level-wide:
+#   app/static/audio/{level}/lesson_{NN}/{name}.ogg   ← birinchi
+#   app/static/audio/{level}/{name}.ogg               ← fallback
+#
+# Misol: hsk2/lesson_03/dialogue_1.ogg  yoki  hsk2/dialogue_1.ogg
+# ─────────────────────────────────────────────────────────────────────────────
 from pathlib import Path
 from aiogram.types import FSInputFile
 
 _AUDIO_BASE = Path(__file__).resolve().parents[3] / "app" / "static" / "audio"
 
 
+def _find_audio(level: str, order: int, filename: str) -> Path | None:
+    """Avval lesson-spesifik, keyin level-wide joydan audio faylini qidiradi."""
+    lesson_path = _AUDIO_BASE / level / f"lesson_{order:02d}" / filename
+    if lesson_path.exists():
+        return lesson_path
+    level_path = _AUDIO_BASE / level / filename
+    if level_path.exists():
+        return level_path
+    return None
+
+
 async def _send_audio_file(callback: CallbackQuery, session, filename: str):
-    """Joriy dars audio faylini topib yuboradi yoki alert ko'rsatadi."""
+    """Joriy dars audio faylini topib yuboradi yoki xabar ko'rsatadi."""
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
 
@@ -1028,10 +1059,10 @@ async def _send_audio_file(callback: CallbackQuery, session, filename: str):
 
     level = (lesson.level or "hsk1").lower()
     order = lesson.lesson_order or 1
-    audio_path = _AUDIO_BASE / level / f"lesson_{order:02d}" / filename
+    audio_path = _find_audio(level, order, filename)
 
     await callback.answer()
-    if audio_path.exists():
+    if audio_path:
         await callback.message.answer_voice(FSInputFile(str(audio_path)))
     else:
         await callback.message.answer(_AUDIO_UNAVAILABLE)
