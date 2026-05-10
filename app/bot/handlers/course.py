@@ -11,6 +11,7 @@ from app.bot.keyboards.course import (
     lesson_selection_keyboard, review_choice_keyboard,
     course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
     course_grammar_keyboard, course_homework_keyboard,
+    course_next_step_keyboard,
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
@@ -24,7 +25,7 @@ from app.bot.keyboards.course_context import (
 from app.config import COURSE_MODE_ENABLED
 from app.bot.utils.course_formatter import (
     format_intro, format_vocab, format_dialogue,
-    format_grammar, format_exercise,
+    format_grammar, format_exercise, format_step,
 )
 from app.bot.keyboards.main_menu import course_menu_keyboard, main_menu_keyboard
 from app.bot.keyboards.course import course_reminder_timezone_keyboard
@@ -358,39 +359,17 @@ async def run_course_entry_flow(
         return
 
     step = progress.current_step
-    formatter_map = {
-        "intro":    lambda: format_intro(lesson, lang),
-        "vocab":    lambda: format_vocab(lesson, lang),
-        "dialogue": lambda: format_dialogue(lesson, lang),
-        "grammar":  lambda: format_grammar(lesson, lang),
-        "exercise": lambda: format_exercise(lesson, lang),
-    }
-    step_keyboards = {
-        "intro":    lambda: course_intro_keyboard(lang),
-        "vocab":    lambda: course_vocab_keyboard(lang),
-        "dialogue": lambda: course_dialogue_keyboard(lang),
-        "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: None,
-    }
-    if step in formatter_map:
-        text = formatter_map[step]()
-        keyboard = step_keyboards.get(step, lambda: None)()
-        if step == "exercise" and getattr(progress, "waiting_for", "none") != "exercise_answer":
-            await engine.progress_repo.set_waiting_for(progress, "exercise_answer")
-            await session.commit()
-    elif step == "homework":
+
+    if step == "exercise" and getattr(progress, "waiting_for", "none") != "exercise_answer":
+        await engine.progress_repo.set_waiting_for(progress, "exercise_answer")
+        await session.commit()
+
+    if step == "homework":
         text = _format_homework_text(lang, lesson.homework_json)
-        keyboard = None
-    else:
-        text = await tutor.generate_step_response(
-            user_language=user.language,
-            user_level=user.level,
-            lesson=lesson,
-            step=step,
-            user_message="",
-        )
         keyboard = get_course_keyboard_for_step(lang, step)
-    await respond(text, reply_markup=keyboard, parse_mode="HTML")
+        await respond(text, reply_markup=keyboard, parse_mode="HTML")
+    else:
+        await _send_step(respond, user, lesson, step, lang, session)
 
 @router.message(F.text == "/course")
 async def course_command_handler(message: Message, session):
@@ -679,17 +658,10 @@ async def course_review_last_handler(callback: CallbackQuery, session):
         return
 
     step = progress.current_step
-    formatter_map = {
-        "intro":    lambda: format_intro(lesson, lang),
-        "vocab":    lambda: format_vocab(lesson, lang),
-        "dialogue": lambda: format_dialogue(lesson, lang),
-        "grammar":  lambda: format_grammar(lesson, lang),
-        "exercise": lambda: format_exercise(lesson, lang),
-    }
-    text = formatter_map[step]() if step in formatter_map else ""
+    text = format_step(lesson, lang, step) or ""
 
     await callback.answer()
-    await callback.message.answer(text)
+    await callback.message.answer(text, parse_mode="HTML")
 
 
 
@@ -851,14 +823,47 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
     )
 
 
+def _keyboard_for_step(lang: str, step: str):
+    """Har qanday step uchun to'g'ri klaviaturani qaytaradi (V1 + V2)."""
+    # V2 formatted steps — universal "Next" button
+    if step in ("vocab_1", "vocab_2") or step.startswith("dialogue_"):
+        return course_next_step_keyboard(lang)
+    # V1 steps
+    if step == "intro":
+        return course_intro_keyboard(lang)
+    if step == "vocab":
+        return course_vocab_keyboard(lang)
+    if step == "dialogue":
+        return course_dialogue_keyboard(lang)
+    if step == "grammar":
+        return course_grammar_keyboard(lang)
+    # exercise, satisfaction_check, homework, completed — handled by get_course_keyboard_for_step
+    return get_course_keyboard_for_step(lang, step)
+
+
+async def _send_step(respond, user, lesson, step: str, lang: str, session):
+    """Step kontentini format qilib yuboradi (V1 va V2 uchun)."""
+    text = format_step(lesson, lang, step)
+    if text is not None:
+        keyboard = _keyboard_for_step(lang, step)
+        await respond(text, reply_markup=keyboard, parse_mode="HTML")
+    else:
+        # AI tutor orqali javob
+        tutor = CourseTutorService()
+        text = await tutor.generate_step_response(
+            user_language=user.language,
+            user_level=user.level,
+            lesson=lesson,
+            step=step,
+            user_message="",
+        )
+        keyboard = get_course_keyboard_for_step(lang, step)
+        await respond(text, reply_markup=keyboard, parse_mode="HTML")
+
+
 async def _go_to_step(callback, session, step: str):
     if await _block_if_course_disabled(callback, session):
         return
-
-    from app.bot.keyboards.course import (
-        course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
-        course_grammar_keyboard,
-    )
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
@@ -884,36 +889,8 @@ async def _go_to_step(callback, session, step: str):
     )
     await session.commit()
 
-    formatter_map = {
-        "intro":    lambda: format_intro(lesson, lang),
-        "vocab":    lambda: format_vocab(lesson, lang),
-        "dialogue": lambda: format_dialogue(lesson, lang),
-        "grammar":  lambda: format_grammar(lesson, lang),
-        "exercise": lambda: format_exercise(lesson, lang),
-    }
-    step_keyboards = {
-        "intro":    lambda: course_intro_keyboard(lang),
-        "vocab":    lambda: course_vocab_keyboard(lang),
-        "dialogue": lambda: course_dialogue_keyboard(lang),
-        "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: None,
-    }
-    if step in formatter_map:
-        text = formatter_map[step]()
-        keyboard = step_keyboards.get(step, lambda: None)()
-    else:
-        tutor = CourseTutorService()
-        text = await tutor.generate_step_response(
-            user_language=user.language,
-            user_level=user.level,
-            lesson=lesson,
-            step=step,
-            user_message="",
-        )
-        keyboard = get_course_keyboard_for_step(lang, step)
-
     await callback.answer()
-    await callback.message.answer(text, reply_markup=keyboard, parse_mode="HTML")
+    await _send_step(callback.message.answer, user, lesson, step, lang, session)
 
 
 @router.callback_query(F.data == "course:go_vocab")
@@ -932,15 +909,43 @@ async def course_go_grammar(callback: CallbackQuery, session):
 async def course_go_exercise(callback: CallbackQuery, session):
     await _go_to_step(callback, session, "exercise")
 
+
+@router.callback_query(F.data == "course:go_next_step")
+async def course_go_next_step(callback: CallbackQuery, session):
+    """V2 darslar uchun universal 'Davom etamiz' tugmasi."""
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+
+    user, progress, lesson, error_key = await engine.go_to_next_step(callback.from_user.id)
+    if error_key:
+        await callback.answer()
+        await callback.message.answer(t(error_key, lang))
+        return
+
+    step = progress.current_step
+
+    # Exercise stepiga o'tganda waiting_for ni yangilaymiz
+    if step == "exercise":
+        await engine.progress_repo.set_waiting_for(progress, "exercise_answer")
+        await session.commit()
+
+    await callback.answer()
+    await _send_step(callback.message.answer, user, lesson, step, lang, session)
+
 @router.callback_query(F.data == "course:repeat_step")
 async def course_repeat_step(callback: CallbackQuery, session):
     if await _block_if_course_disabled(callback, session):
         return
-
-    from app.bot.keyboards.course import (
-        course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
-        course_grammar_keyboard,
-    )
 
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
@@ -958,27 +963,8 @@ async def course_repeat_step(callback: CallbackQuery, session):
         return
 
     step = progress.current_step
-
-    formatter_map = {
-        "intro":    lambda: format_intro(lesson, lang),
-        "vocab":    lambda: format_vocab(lesson, lang),
-        "dialogue": lambda: format_dialogue(lesson, lang),
-        "grammar":  lambda: format_grammar(lesson, lang),
-        "exercise": lambda: format_exercise(lesson, lang),
-    }
-    text = formatter_map[step]() if step in formatter_map else ""
-
-    step_keyboards = {
-        "intro":    lambda: course_intro_keyboard(lang),
-        "vocab":    lambda: course_vocab_keyboard(lang),
-        "dialogue": lambda: course_dialogue_keyboard(lang),
-        "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: None,
-    }
-
-    keyboard = step_keyboards.get(step, lambda: None)()
     await callback.answer()
-    await callback.message.answer(text, reply_markup=keyboard)
+    await _send_step(callback.message.answer, user, lesson, step, lang, session)
 
 
 @router.callback_query(F.data == "course:skip_next_study_time")

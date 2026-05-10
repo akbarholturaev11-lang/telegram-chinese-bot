@@ -78,6 +78,18 @@ def course_homework_keyboard(lang: str) -> InlineKeyboardMarkup:
     ]])
 
 
+def course_next_step_keyboard(lang: str) -> InlineKeyboardMarkup:
+    """V2 darslar uchun universal 'Davom etamiz' tugmasi."""
+    labels = {
+        "uz": "▶️ Davom etamiz",
+        "tj": "▶️ Идома медиҳем",
+        "ru": "▶️ Продолжаем",
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:go_next_step")
+    ]])
+
+
 def review_choice_keyboard(lang: str) -> InlineKeyboardMarkup:
     yes_labels = {"uz": "✅ Ha, takrorlaymiz", "tj": "✅ Бале, такрор мекунем", "ru": "✅ Да, повторим"}
     no_labels  = {"uz": "➡️ Yo'q, keyingisiga", "tj": "➡️ Не, ба навбатӣ", "ru": "➡️ Нет, к следующему"}

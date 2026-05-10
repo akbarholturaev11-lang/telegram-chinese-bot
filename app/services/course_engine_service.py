@@ -8,7 +8,8 @@ from app.repositories.course_attempt_repo import CourseAttemptRepository
 from app.services.course_tutor_service import CourseTutorService
 
 
-COURSE_STEP_ORDER = [
+# ─── V1: eski format (HSK1 va grammar_notes si yo'q darslar) ───────────────
+COURSE_STEP_ORDER_V1 = [
     "intro",
     "vocab",
     "dialogue",
@@ -18,6 +19,64 @@ COURSE_STEP_ORDER = [
     "homework",
     "completed",
 ]
+
+# ─── V2: yangi format (grammar_notes inline, vocab/dialog bo'lingan) ─────────
+COURSE_STEP_ORDER_V2_BASE = [
+    "intro",
+    "vocab_1",
+    "vocab_2",          # bo'sh bo'lsa o'tkazib yuboriladi
+    "dialogue_1",
+    "dialogue_2",       # bo'sh bo'lsa o'tkazib yuboriladi
+    "dialogue_3",       # bo'sh bo'lsa o'tkazib yuboriladi
+    "dialogue_4",       # bo'sh bo'lsa o'tkazib yuboriladi
+    "exercise",
+    "satisfaction_check",
+    "homework",
+    "completed",
+]
+
+# Backward compat alias
+COURSE_STEP_ORDER = COURSE_STEP_ORDER_V1
+
+
+def _parse_json(value, default):
+    if value is None or value == "":
+        return default
+    if isinstance(value, (dict, list)):
+        return value
+    try:
+        return json.loads(value)
+    except Exception:
+        return default
+
+
+def is_v2_lesson(lesson) -> bool:
+    """V2 formatmi? dialogue_json ichida grammar_notes bo'lsa V2."""
+    if lesson is None:
+        return False
+    dialogues = _parse_json(getattr(lesson, "dialogue_json", None), [])
+    if not isinstance(dialogues, list) or not dialogues:
+        return False
+    return any(isinstance(d, dict) and d.get("grammar_notes") for d in dialogues)
+
+
+def get_step_order(lesson) -> list:
+    """Darsga mos step tartibini qaytaradi."""
+    if not is_v2_lesson(lesson):
+        return COURSE_STEP_ORDER_V1
+
+    vocab = _parse_json(getattr(lesson, "vocabulary_json", None), [])
+    dialogues = _parse_json(getattr(lesson, "dialogue_json", None), [])
+
+    steps = ["intro", "vocab_1"]
+    if len(vocab) > 8:
+        steps.append("vocab_2")
+
+    for i in range(1, min(len(dialogues) + 1, 5)):
+        steps.append(f"dialogue_{i}")
+
+    steps += ["exercise", "satisfaction_check", "homework", "completed"]
+    return steps
 
 
 class CourseEngineService:
@@ -121,32 +180,37 @@ class CourseEngineService:
 
         return user, progress, lesson, ""
 
-    def get_next_step_name(self, current_step: str) -> str:
-        if current_step not in COURSE_STEP_ORDER:
+    def get_next_step_name(self, current_step: str, lesson=None) -> str:
+        """Lesson berilsa, unga mos step tartibidan keyingisini qaytaradi."""
+        order = get_step_order(lesson) if lesson is not None else COURSE_STEP_ORDER_V1
+
+        if current_step not in order:
             return "intro"
 
-        idx = COURSE_STEP_ORDER.index(current_step)
-        if idx >= len(COURSE_STEP_ORDER) - 1:
+        idx = order.index(current_step)
+        if idx >= len(order) - 1:
             return "completed"
 
-        return COURSE_STEP_ORDER[idx + 1]
+        return order[idx + 1]
 
-    def get_prev_step_name(self, current_step: str) -> str:
-        if current_step not in COURSE_STEP_ORDER:
+    def get_prev_step_name(self, current_step: str, lesson=None) -> str:
+        order = get_step_order(lesson) if lesson is not None else COURSE_STEP_ORDER_V1
+
+        if current_step not in order:
             return "intro"
 
-        idx = COURSE_STEP_ORDER.index(current_step)
+        idx = order.index(current_step)
         if idx <= 0:
             return "intro"
 
-        return COURSE_STEP_ORDER[idx - 1]
+        return order[idx - 1]
 
     async def go_to_next_step(self, telegram_id: int):
         user, progress, lesson, error_key = await self.get_current_lesson(telegram_id)
         if error_key:
             return None, None, None, error_key
 
-        next_step = self.get_next_step_name(progress.current_step)
+        next_step = self.get_next_step_name(progress.current_step, lesson)
         await self.progress_repo.set_current_lesson_and_step(
             progress=progress,
             lesson_id=progress.current_lesson_id,
@@ -162,7 +226,7 @@ class CourseEngineService:
         if error_key:
             return None, None, None, error_key
 
-        prev_step = self.get_prev_step_name(progress.current_step)
+        prev_step = self.get_prev_step_name(progress.current_step, lesson)
         await self.progress_repo.set_current_lesson_and_step(
             progress=progress,
             lesson_id=progress.current_lesson_id,
