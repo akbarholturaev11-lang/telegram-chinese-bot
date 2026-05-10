@@ -6,6 +6,7 @@ from datetime import datetime, timezone, timedelta
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
+from app.repositories.course_audio_repo import CourseAudioRepository
 from app.db.models.user import User
 from app.db.models.payment import Payment
 
@@ -200,6 +201,84 @@ async def admin_giveaccess_info(callback: CallbackQuery, session):
         "Buyruq: <code>/giveaccess TELEGRAM_ID PLAN</code>\n\n"
         "Planlar: <code>10_days</code> | <code>1_month</code>\n\n"
         "Misol: <code>/giveaccess 123456789 1_month</code>",
+        parse_mode="HTML",
+    )
+
+
+@router.message(Command("audio_list"))
+async def admin_audio_list_handler(message: Message, session):
+    """Yuklangan audio fayllar ro'yxati: /audio_list hsk1 1"""
+    if not _is_admin(message.from_user.id):
+        return
+
+    parts = message.text.strip().split()
+    if len(parts) < 3:
+        await message.answer(
+            "Foydalanish: <code>/audio_list hsk1 1</code>\n"
+            "(level va lesson_order)",
+            parse_mode="HTML",
+        )
+        return
+
+    level = parts[1].lower()
+    try:
+        lesson_order = int(parts[2])
+    except ValueError:
+        await message.answer("❌ lesson_order raqam bo'lishi kerak")
+        return
+
+    repo = CourseAudioRepository(session)
+    rows = await repo.list_for_lesson(level, lesson_order)
+
+    if not rows:
+        await message.answer(f"🔇 {level} / lesson_{lesson_order:02d} uchun audio yo'q")
+        return
+
+    lines = [f"🎵 <b>{level} — Dars {lesson_order}</b>\n"]
+    for row in rows:
+        lines.append(f"  <code>{row.audio_type}</code> → <code>{row.file_id[:30]}…</code>")
+    await message.answer("\n".join(lines), parse_mode="HTML")
+
+
+@router.message(
+    F.voice | F.audio,
+    F.caption.regexp(r"^(hsk\d+)\s+(\d+)\s+(vocab|dialogue_\d+)$"),
+)
+async def admin_upload_audio_handler(message: Message, session):
+    """Audio yuklash: kaptionida  hsk1 3 dialogue_1  yozing.
+
+    Fayl turini bot aniqlab, file_id ni DB ga saqlaydi.
+    Misol caption: hsk1 1 vocab   yoki   hsk2 3 dialogue_2
+    """
+    if not _is_admin(message.from_user.id):
+        return
+
+    caption = (message.caption or "").strip()
+    parts = caption.split()
+    level = parts[0].lower()
+    try:
+        lesson_order = int(parts[1])
+    except (IndexError, ValueError):
+        await message.answer("❌ Caption noto'g'ri format: <code>hsk1 3 dialogue_1</code>", parse_mode="HTML")
+        return
+    audio_type = parts[2].lower()
+
+    # file_id olish (voice yoki audio)
+    if message.voice:
+        file_id = message.voice.file_id
+    elif message.audio:
+        file_id = message.audio.file_id
+    else:
+        await message.answer("❌ Audio yoki voice fayl yuboring")
+        return
+
+    repo = CourseAudioRepository(session)
+    await repo.upsert(level=level, lesson_order=lesson_order, audio_type=audio_type, file_id=file_id)
+
+    await message.answer(
+        f"✅ Saqlandi!\n"
+        f"📍 <b>{level}</b> · Dars <b>{lesson_order}</b> · <code>{audio_type}</code>\n"
+        f"🔑 file_id: <code>{file_id[:40]}…</code>",
         parse_mode="HTML",
     )
 

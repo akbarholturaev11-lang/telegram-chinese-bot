@@ -1043,25 +1043,11 @@ _AUDIO_UNAVAILABLE = (
 #
 # Misol: hsk2/lesson_03/dialogue_1.ogg  yoki  hsk2/dialogue_1.ogg
 # ─────────────────────────────────────────────────────────────────────────────
-from pathlib import Path
-from aiogram.types import FSInputFile
-
-_AUDIO_BASE = Path(__file__).resolve().parents[3] / "app" / "static" / "audio"
+from app.repositories.course_audio_repo import CourseAudioRepository
 
 
-def _find_audio(level: str, order: int, filename: str) -> Path | None:
-    """Avval lesson-spesifik, keyin level-wide joydan audio faylini qidiradi."""
-    lesson_path = _AUDIO_BASE / level / f"lesson_{order:02d}" / filename
-    if lesson_path.exists():
-        return lesson_path
-    level_path = _AUDIO_BASE / level / filename
-    if level_path.exists():
-        return level_path
-    return None
-
-
-async def _send_audio_file(callback: CallbackQuery, session, filename: str):
-    """Joriy dars audio faylini topib yuboradi yoki xabar ko'rsatadi."""
+async def _send_audio_file(callback: CallbackQuery, session, audio_type: str):
+    """DB dan file_id topib yuboradi, yo'q bo'lsa xabar ko'rsatadi."""
     user_repo = UserRepository(session)
     engine = CourseEngineService(session)
 
@@ -1077,18 +1063,20 @@ async def _send_audio_file(callback: CallbackQuery, session, filename: str):
 
     level = (lesson.level or "hsk1").lower()
     order = lesson.lesson_order or 1
-    audio_path = _find_audio(level, order, filename)
+
+    audio_repo = CourseAudioRepository(session)
+    file_id = await audio_repo.get(level=level, lesson_order=order, audio_type=audio_type)
 
     await callback.answer()
-    if audio_path:
-        await callback.message.answer_voice(FSInputFile(str(audio_path)))
+    if file_id:
+        await callback.message.answer_voice(file_id)
     else:
         await callback.message.answer(_AUDIO_UNAVAILABLE)
 
 
 @router.callback_query(F.data == "course:audio_vocab")
 async def course_audio_vocab_handler(callback: CallbackQuery, session):
-    await _send_audio_file(callback, session, "vocab.ogg")
+    await _send_audio_file(callback, session, "vocab")
 
 
 @router.callback_query(F.data.startswith("course:audio_dialogue:"))
@@ -1097,13 +1085,13 @@ async def course_audio_dialogue_n_handler(callback: CallbackQuery, session):
         n = int(callback.data.split(":")[-1])
     except (ValueError, IndexError):
         n = 1
-    await _send_audio_file(callback, session, f"dialogue_{n}.ogg")
+    await _send_audio_file(callback, session, f"dialogue_{n}")
 
 
-# V1 eski handler (endi ishlatilmaydi, lekin eski callback_data uchun qoldirildi)
+# V1 eski handler (eski callback_data uchun)
 @router.callback_query(F.data == "course:audio_dialogue")
 async def course_audio_dialogue_handler(callback: CallbackQuery, session):
-    await _send_audio_file(callback, session, "dialogue_1.ogg")
+    await _send_audio_file(callback, session, "dialogue_1")
 
 
 @router.callback_query(F.data.startswith("course:set_tz:"))
