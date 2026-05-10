@@ -7,6 +7,7 @@ from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
 from app.bot.utils.response_effect import ResponseEffect
 from app.bot.handlers.course import (
     get_course_keyboard_for_step,
+    _keyboard_for_step,
     run_course_entry_flow,
     _resolve_lessons_for_user_level,
     filter_unlocked_lessons,
@@ -277,7 +278,7 @@ async def handle_text_message(message: Message, session):
 
             await message.answer(
                 tutor_text,
-                reply_markup=get_course_keyboard_for_step(user_lang, refreshed_progress.current_step),
+                reply_markup=_keyboard_for_step(user_lang, refreshed_progress.current_step, refreshed_lesson),
                 parse_mode="HTML",
             )
             return
@@ -497,7 +498,7 @@ async def handle_text_message(message: Message, session):
 
         await message.answer(
             tutor_text,
-            reply_markup=get_course_keyboard_for_step(user_lang, progress.current_step),
+            reply_markup=_keyboard_for_step(user_lang, progress.current_step, lesson),
             parse_mode="HTML",
         )
         return
