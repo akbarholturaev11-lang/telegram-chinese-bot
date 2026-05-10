@@ -11,7 +11,7 @@ from app.bot.keyboards.course import (
     lesson_selection_keyboard, review_choice_keyboard,
     course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
     course_grammar_keyboard, course_homework_keyboard,
-    course_next_step_keyboard,
+    course_next_step_keyboard, course_vocab_v2_keyboard, course_dialogue_n_keyboard,
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
@@ -825,9 +825,16 @@ async def course_start_next_lesson_handler(callback: CallbackQuery, session):
 
 def _keyboard_for_step(lang: str, step: str):
     """Har qanday step uchun to'g'ri klaviaturani qaytaradi (V1 + V2)."""
-    # V2 formatted steps — universal "Next" button
-    if step in ("vocab_1", "vocab_2") or step.startswith("dialogue_"):
-        return course_next_step_keyboard(lang)
+    # V2 vocab steps — audio + next
+    if step in ("vocab_1", "vocab_2"):
+        return course_vocab_v2_keyboard(lang)
+    # V2 dialogue_N steps — audio + next
+    if step.startswith("dialogue_"):
+        try:
+            n = int(step.split("_", 1)[1])
+        except (ValueError, IndexError):
+            n = 1
+        return course_dialogue_n_keyboard(lang, n)
     # V1 steps
     if step == "intro":
         return course_intro_keyboard(lang)
@@ -994,15 +1001,60 @@ _AUDIO_UNAVAILABLE = (
     "🔇 Аудио ҳоло дастрас нест"
 )
 
+# Audio fayllari joyi: app/static/audio/{level}/lesson_{order:02d}/{name}.ogg
+# Masalan: app/static/audio/hsk1/lesson_01/vocab.ogg
+#          app/static/audio/hsk1/lesson_01/dialogue_1.ogg
+import os
+from pathlib import Path
+from aiogram.types import FSInputFile
+
+_AUDIO_BASE = Path(__file__).resolve().parents[3] / "app" / "static" / "audio"
+
+
+async def _send_audio_file(callback: CallbackQuery, session, filename: str):
+    """Joriy dars audio faylini topib yuboradi yoki alert ko'rsatadi."""
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+        return
+
+    user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)
+    if error_key or not lesson:
+        await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+        return
+
+    level = (lesson.level or "hsk1").lower()
+    order = lesson.lesson_order or 1
+    audio_path = _AUDIO_BASE / level / f"lesson_{order:02d}" / filename
+
+    await callback.answer()
+    if audio_path.exists():
+        await callback.message.answer_voice(FSInputFile(str(audio_path)))
+    else:
+        await callback.message.answer(_AUDIO_UNAVAILABLE)
+
 
 @router.callback_query(F.data == "course:audio_vocab")
-async def course_audio_vocab_handler(callback: CallbackQuery):
-    await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+async def course_audio_vocab_handler(callback: CallbackQuery, session):
+    await _send_audio_file(callback, session, "vocab.ogg")
 
 
+@router.callback_query(F.data.startswith("course:audio_dialogue:"))
+async def course_audio_dialogue_n_handler(callback: CallbackQuery, session):
+    try:
+        n = int(callback.data.split(":")[-1])
+    except (ValueError, IndexError):
+        n = 1
+    await _send_audio_file(callback, session, f"dialogue_{n}.ogg")
+
+
+# V1 eski handler (endi ishlatilmaydi, lekin eski callback_data uchun qoldirildi)
 @router.callback_query(F.data == "course:audio_dialogue")
-async def course_audio_dialogue_handler(callback: CallbackQuery):
-    await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+async def course_audio_dialogue_handler(callback: CallbackQuery, session):
+    await _send_audio_file(callback, session, "dialogue_1.ogg")
 
 
 @router.callback_query(F.data.startswith("course:set_tz:"))

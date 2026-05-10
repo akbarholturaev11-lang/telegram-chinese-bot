@@ -51,13 +51,13 @@ def _parse_json(value, default):
 
 
 def is_v2_lesson(lesson) -> bool:
-    """V2 formatmi? dialogue_json ichida grammar_notes bo'lsa V2."""
+    """V2 formatmi? dialogue_json ichida block_no bo'lsa V2 (barcha mavjud darslar)."""
     if lesson is None:
         return False
     dialogues = _parse_json(getattr(lesson, "dialogue_json", None), [])
     if not isinstance(dialogues, list) or not dialogues:
         return False
-    return any(isinstance(d, dict) and d.get("grammar_notes") for d in dialogues)
+    return any(isinstance(d, dict) and d.get("block_no") for d in dialogues)
 
 
 def get_step_order(lesson) -> list:

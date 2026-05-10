@@ -79,7 +79,7 @@ def course_homework_keyboard(lang: str) -> InlineKeyboardMarkup:
 
 
 def course_next_step_keyboard(lang: str) -> InlineKeyboardMarkup:
-    """V2 darslar uchun universal 'Davom etamiz' tugmasi."""
+    """V2 darslar uchun universal 'Davom etamiz' tugmasi (audiosiz)."""
     labels = {
         "uz": "▶️ Davom etamiz",
         "tj": "▶️ Идома медиҳем",
@@ -87,6 +87,38 @@ def course_next_step_keyboard(lang: str) -> InlineKeyboardMarkup:
     }
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(text=labels.get(lang, labels["ru"]), callback_data="course:go_next_step")
+    ]])
+
+
+def course_vocab_v2_keyboard(lang: str) -> InlineKeyboardMarkup:
+    """V2 vocab_1 / vocab_2 step: [🔉]  [▶️ Davom etamiz]."""
+    next_labels = {
+        "uz": "▶️ Davom etamiz",
+        "tj": "▶️ Идома медиҳем",
+        "ru": "▶️ Продолжаем",
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="🔉", callback_data="course:audio_vocab"),
+        InlineKeyboardButton(
+            text=next_labels.get(lang, next_labels["ru"]),
+            callback_data="course:go_next_step",
+        ),
+    ]])
+
+
+def course_dialogue_n_keyboard(lang: str, n: int) -> InlineKeyboardMarkup:
+    """V2 dialogue_N step: [🔉]  [▶️ Davom etamiz]."""
+    next_labels = {
+        "uz": "▶️ Davom etamiz",
+        "tj": "▶️ Идома медиҳем",
+        "ru": "▶️ Продолжаем",
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text="🔉", callback_data=f"course:audio_dialogue:{n}"),
+        InlineKeyboardButton(
+            text=next_labels.get(lang, next_labels["ru"]),
+            callback_data="course:go_next_step",
+        ),
     ]])
 
 
