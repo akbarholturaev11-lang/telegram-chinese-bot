@@ -13,6 +13,10 @@ def _parse(value: Any, default: Any = None):
         return default
 
 
+# ─── Emoji raqamlar ────────────────────────────────────────────────────────
+_NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
+
+
 def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     vocab = _parse(lesson.vocabulary_json, [])
     title = lesson.title or ""
@@ -224,6 +228,226 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
     return "\n".join(lines)
 
+
+# ─────────────────────────────────────────────────────────────────────────────
+# V2 formatters — vocab_1 / vocab_2 / dialogue_N
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _format_word_block(word: dict, index: int, lang: str, lines: list):
+    """Bitta so'z blokini lines ga qo'shadi (V2 style HTML)."""
+    zh      = word.get("zh", "")
+    pinyin  = word.get("pinyin", "")
+    meaning = word.get(lang) or word.get("meaning") or ""
+    ex_zh   = word.get("example_zh", "")
+    ex_pin  = word.get("example_pinyin", "")
+    ex_lang = word.get(f"example_{lang}") or word.get("example") or ""
+
+    num = _NUMS[index] if index < len(_NUMS) else f"{index + 1}."
+    lines.append("─────────────")
+    lines.append(f"{num}  <b>{zh}</b>")
+    lines.append(f"     <i>{pinyin}</i>")
+    lines.append(f"     👉 {meaning}")
+    if ex_zh:
+        lines.append("")
+        lines.append(f"     💬 <b>{ex_zh}</b>")
+        if ex_pin:
+            lines.append(f"        <i>{ex_pin}</i>")
+        if ex_lang:
+            lines.append(f"        {ex_lang}")
+    lines.append("")
+
+
+def format_vocab_1(lesson, lang: str) -> str:
+    """V2: birinchi 8 ta so'z (vocab_1 step)."""
+    vocab = _parse(lesson.vocabulary_json, [])
+    total = len(vocab)
+    page  = vocab[:8]
+    title = lesson.title or ""
+
+    hdr = {
+        "uz": "📖 Yangi so'zlar 🇨🇳",
+        "tj": "📖 Калимаҳои нав 🇨🇳",
+        "ru": "📖 Новые слова 🇨🇳",
+    }
+    hint_tpl = {
+        "uz": "✨ Bugun <b>{}</b> ta yangi so'z — darsni tugatgach amalda ishlata olasiz!",
+        "tj": "✨ Имрӯз <b>{}</b> калимаи нав — пас аз дарс онҳоро истифода карда метавонед!",
+        "ru": "✨ Сегодня <b>{}</b> новых слов — после урока сможете их использовать!",
+    }
+
+    lines = [
+        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        hdr.get(lang, hdr["ru"]),
+        "",
+        hint_tpl.get(lang, hint_tpl["ru"]).format(total),
+        "",
+    ]
+    for i, word in enumerate(page):
+        if isinstance(word, dict):
+            _format_word_block(word, i, lang, lines)
+    lines.append("─────────────")
+    return "\n".join(lines)
+
+
+def format_vocab_2(lesson, lang: str) -> str:
+    """V2: 9+ so'zlar (vocab_2 step). Bo'sh bo'lsa, bo'sh string qaytaradi."""
+    vocab = _parse(lesson.vocabulary_json, [])
+    page  = vocab[8:]
+    if not page:
+        return ""
+    title = lesson.title or ""
+
+    hdr = {
+        "uz": "📖 Yangi so'zlar — davomi 🇨🇳",
+        "tj": "📖 Калимаҳои нав — давом 🇨🇳",
+        "ru": "📖 Новые слова — продолжение 🇨🇳",
+    }
+
+    lines = [
+        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        hdr.get(lang, hdr["ru"]),
+        "",
+    ]
+    for i, word in enumerate(page):
+        if isinstance(word, dict):
+            _format_word_block(word, i, lang, lines)
+    lines.append("─────────────")
+    return "\n".join(lines)
+
+
+def format_dialogue_n(lesson, lang: str, n: int) -> str:
+    """V2: n-chi dialog bloki (1-indexed), grammar_notes inline qo'yilgan."""
+    dialogues = _parse(lesson.dialogue_json, [])
+    if not isinstance(dialogues, list) or n < 1 or n > len(dialogues):
+        return ""
+    block = dialogues[n - 1]
+    if not isinstance(block, dict):
+        return ""
+
+    title   = lesson.title or ""
+    section = block.get("section_label", "") or f"课文 {n}"
+    scene   = (
+        block.get(f"scene_{lang}")
+        or block.get("scene_uz")
+        or block.get("scene_ru")
+        or block.get("scene_label_zh")
+        or ""
+    )
+    header  = " · ".join(filter(None, [section, scene]))
+
+    dlg_hdr = {
+        "uz": "🎭 Dialog",
+        "tj": "🎭 Муколама",
+        "ru": "🎭 Диалог",
+    }
+
+    lines = [
+        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        f"{dlg_hdr.get(lang, dlg_hdr['ru'])} {n}",
+        "",
+    ]
+    if header:
+        lines.append(f"📍 <b>{header}</b>")
+        lines.append("")
+
+    lines.append("━━━━━━━━━━━━━━")
+
+    dialogue_lines = block.get("dialogue") or block.get("lines") or []
+    for line in dialogue_lines:
+        if not isinstance(line, dict):
+            continue
+        speaker     = line.get("speaker", "")
+        zh          = line.get("zh", "")
+        pinyin      = line.get("pinyin", "")
+        translation = (
+            line.get("translation")
+            or line.get(lang)
+            or line.get("uz")
+            or ""
+        )
+        icon = "👤" if speaker == "A" else "👥"
+        lines.append(f"{icon} <b>{speaker}:</b>  <b>{zh}</b>")
+        lines.append(f"       <i>{pinyin}</i>")
+        lines.append(f"       {translation}")
+        lines.append("")
+
+    lines.append("━━━━━━━━━━━━━━")
+
+    # ─── Inline grammatika eslatmalari ────────────────────────────
+    grammar_notes = block.get("grammar_notes", [])
+    if grammar_notes:
+        gram_hdr = {
+            "uz": "📐 Grammatika eslatmasi",
+            "tj": "📐 Эзоҳи грамматикӣ",
+            "ru": "📐 Грамматическая заметка",
+        }
+        lines.append("")
+        lines.append(f"<b>{gram_hdr.get(lang, gram_hdr['ru'])}</b>")
+        lines.append("")
+        for note in grammar_notes:
+            if not isinstance(note, dict):
+                continue
+            pattern = note.get("pattern", "")
+            explanation = (
+                note.get(f"explanation_{lang}")
+                or note.get("explanation_uz")
+                or note.get("explanation_ru")
+                or note.get("explanation", "")
+            )
+            ex_zh  = note.get("example_zh", "")
+            ex_pin = note.get("example_pinyin", "")
+            ex_tr  = (
+                note.get(f"example_{lang}")
+                or note.get("example_uz")
+                or note.get("example_ru")
+                or note.get("example_translation", "")
+            )
+            if pattern:
+                lines.append(f"📌 <code>{pattern}</code>")
+            if explanation:
+                lines.append(f"   {explanation}")
+            if ex_zh:
+                lines.append(f"   💬 <b>{ex_zh}</b>")
+                if ex_pin:
+                    lines.append(f"      <i>{ex_pin}</i>")
+                if ex_tr:
+                    lines.append(f"      {ex_tr}")
+            lines.append("")
+
+    return "\n".join(lines).rstrip()
+
+
+def format_step(lesson, lang: str, step: str) -> str | None:
+    """Universal dispatcher: har qanday step nomi uchun formatlangan matn qaytaradi.
+
+    Agar step formatter_map da bo'lmasa — None qaytaradi (AI tutor ishlatiladi).
+    """
+    if step == "intro":
+        return format_intro(lesson, lang)
+    if step == "vocab":
+        return format_vocab(lesson, lang)
+    if step == "vocab_1":
+        return format_vocab_1(lesson, lang)
+    if step == "vocab_2":
+        return format_vocab_2(lesson, lang)
+    if step == "dialogue":
+        return format_dialogue(lesson, lang)
+    if step.startswith("dialogue_"):
+        try:
+            n = int(step.split("_", 1)[1])
+        except (ValueError, IndexError):
+            n = 1
+        return format_dialogue_n(lesson, lang, n)
+    if step == "grammar":
+        return format_grammar(lesson, lang)
+    if step == "exercise":
+        return format_exercise(lesson, lang)
+    return None  # AI tutor handle qiladi
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# V1 formatters (original, o'zgarmagan)
+# ─────────────────────────────────────────────────────────────────────────────
 
 def format_intro(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     title = lesson.title or ""

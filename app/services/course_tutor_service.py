@@ -5,7 +5,12 @@ from app.services.ai_service import AIService
 COURSE_MODEL = "o4-mini"
 
 # Steps where "press button below" hint is appended — exercise is handled separately (no hint)
-_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar"}
+_CONVERSATIONAL_STEPS = {
+    "intro", "vocab", "vocabulary", "dialogue", "grammar",
+    # V2 steps:
+    "vocab_1", "vocab_2",
+    "dialogue_1", "dialogue_2", "dialogue_3", "dialogue_4",
+}
 
 _PRESS_BUTTON_HINT = {
     "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",
@@ -283,13 +288,83 @@ QOIDALAR:
 
         return prompt, data
 
+    def _prompt_vocab_1(self, lesson, user_language, user_level) -> tuple:
+        """V2: birinchi 8 ta so'z."""
+        vocab = self._parse(getattr(lesson, "vocabulary_json", None), [])
+        vocab_page = vocab[:8]
+        title = self._safe(getattr(lesson, "title", ""))
+        data = {"lesson_title": title, "vocabulary": vocab_page}
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Bu darsning birinchi qismidagi so'zlarni qiziqarli tarzda o'rgat.
+
+SO'ZLAR (1–8):
+{json.dumps(data, ensure_ascii=False, indent=2)}
+
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol
+- Jami 15 qatordan oshmasin
+{_EXPLANATION_RULE}"""
+        return prompt, data
+
+    def _prompt_vocab_2(self, lesson, user_language, user_level) -> tuple:
+        """V2: 9+ so'zlar."""
+        vocab = self._parse(getattr(lesson, "vocabulary_json", None), [])
+        vocab_page = vocab[8:]
+        title = self._safe(getattr(lesson, "title", ""))
+        data = {"lesson_title": title, "vocabulary": vocab_page}
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Bu darsning ikkinchi qismidagi so'zlarni o'rgat.
+
+SO'ZLAR (9+):
+{json.dumps(data, ensure_ascii=False, indent=2)}
+
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol
+- Jami 15 qatordan oshmasin
+{_EXPLANATION_RULE}"""
+        return prompt, data
+
+    def _prompt_dialogue_n(self, lesson, user_language, user_level, n: int = 1) -> tuple:
+        """V2: n-chi dialog bloki (grammar_notes inline)."""
+        import json as _json
+        dialogues = self._parse(getattr(lesson, "dialogue_json", None), [])
+        block = dialogues[n - 1] if isinstance(dialogues, list) and len(dialogues) >= n else {}
+        title = self._safe(getattr(lesson, "title", ""))
+        data = {"lesson_title": title, "dialogue_block": block, "block_number": n}
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Bu dialogni va unga bog'liq grammatikani qisqa tushuntir.
+
+DIALOG MA'LUMOTI:
+{_json.dumps(data, ensure_ascii=False, indent=2)}
+
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir qator: <b>Xitoycha</b> [<code>pinyin</code>] — tarjima
+- Dialogdan 1-2 ta foydali ibora va grammar_notes ni qisqa tushuntir
+- Jami 12 qatordan oshmasin
+{_EXPLANATION_RULE}"""
+        return prompt, data
+
     # ─── STEP ROUTER ────────────────────────────────────────────
 
     def _build_prompt_for_step(self, lesson, step: str, user_language: str, user_level: str) -> tuple:
+        # V2 dialogue_N steps
+        if step.startswith("dialogue_"):
+            try:
+                n = int(step.split("_", 1)[1])
+            except (ValueError, IndexError):
+                n = 1
+            return self._prompt_dialogue_n(lesson, user_language, user_level, n)
+
         handlers = {
             "intro":               self._prompt_intro,
             "vocab":               self._prompt_vocab,
             "vocabulary":          self._prompt_vocab,
+            # V2 vocab steps
+            "vocab_1":             self._prompt_vocab_1,
+            "vocab_2":             self._prompt_vocab_2,
             "dialogue":            self._prompt_dialogue,
             "grammar":             self._prompt_grammar,
             "exercise":            self._prompt_exercise,
