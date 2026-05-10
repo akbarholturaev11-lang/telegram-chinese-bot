@@ -230,12 +230,7 @@ async def handle_text_message(message: Message, session):
             await engine.progress_repo.set_reminder(progress, enabled=True, reminder_time=parsed_reminder)
             await engine.progress_repo.set_waiting_for(progress, "none")
             await session.commit()
-            time_str = parsed_reminder.strftime("%H:%M")
-            await message.answer(
-                t("course_reminder_saved_msg", user_lang, time=time_str),
-                reply_markup=course_menu_keyboard(user_lang),
-                parse_mode="HTML",
-            )
+            # Faqat bitta blok — timezone tanlash (yakuniy xabar timezone tanlanganida yuboriladi)
             await message.answer(
                 t("course_reminder_tz_title", user_lang),
                 reply_markup=course_reminder_timezone_keyboard(),

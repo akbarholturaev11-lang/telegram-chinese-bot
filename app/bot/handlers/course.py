@@ -1127,12 +1127,11 @@ async def course_set_timezone_handler(callback: CallbackQuery, session):
 
     await callback.answer()
     try:
-        await callback.message.edit_text(
-            t("course_reminder_tz_saved", lang, time=time_str, tz=tz_label),
-            parse_mode="HTML",
-        )
+        await callback.message.delete()
     except Exception:
-        await callback.message.answer(
-            t("course_reminder_tz_saved", lang, time=time_str, tz=tz_label),
-            parse_mode="HTML",
-        )
+        pass
+    await callback.message.answer(
+        t("course_reminder_tz_saved", lang, time=time_str, tz=tz_label),
+        reply_markup=course_menu_keyboard(lang),
+        parse_mode="HTML",
+    )
