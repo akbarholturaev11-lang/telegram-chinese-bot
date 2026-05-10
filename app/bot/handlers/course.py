@@ -1099,6 +1099,23 @@ async def course_skip_next_study_time_handler(callback: CallbackQuery, session):
     )
 
 
+_AUDIO_UNAVAILABLE = (
+    "🔇 Audio hozircha mavjud emas\n"
+    "🔇 Аудио пока недоступно\n"
+    "🔇 Аудио ҳоло дастрас нест"
+)
+
+
+@router.callback_query(F.data == "course:audio_vocab")
+async def course_audio_vocab_handler(callback: CallbackQuery):
+    await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+
+
+@router.callback_query(F.data == "course:audio_dialogue")
+async def course_audio_dialogue_handler(callback: CallbackQuery):
+    await callback.answer(_AUDIO_UNAVAILABLE, show_alert=True)
+
+
 @router.callback_query(F.data.startswith("course:set_tz:"))
 async def course_set_timezone_handler(callback: CallbackQuery, session):
     user_repo = UserRepository(session)
