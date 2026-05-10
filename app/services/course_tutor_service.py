@@ -2,7 +2,7 @@ import json
 from typing import Any
 from app.services.ai_service import AIService
 
-COURSE_MODEL = "gpt-4.1"
+COURSE_MODEL = "o4-mini"
 
 # Steps that have the "I understood" advance button — append hint to AI response
 _CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise", "quiz"}
