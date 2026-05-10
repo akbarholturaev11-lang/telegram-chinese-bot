@@ -14,7 +14,6 @@ COURSE_STEP_ORDER = [
     "dialogue",
     "grammar",
     "exercise",
-    "quiz",
     "satisfaction_check",
     "homework",
     "completed",

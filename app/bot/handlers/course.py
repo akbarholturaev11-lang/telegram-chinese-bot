@@ -693,62 +693,6 @@ async def course_review_last_handler(callback: CallbackQuery, session):
 
 
 
-@router.callback_query(F.data == "course:retry_test")
-async def course_retry_test_handler(callback: CallbackQuery, session):
-    if await _block_if_course_disabled(callback, session):
-        return
-
-    user_repo = UserRepository(session)
-    engine = CourseEngineService(session)
-    tutor = CourseTutorService()
-
-    user = await user_repo.get_by_telegram_id(callback.from_user.id)
-    if not user:
-        await callback.answer()
-        await callback.message.answer(t("access_start_first", "ru"))
-        return
-
-    lang = user.language if user.language else "ru"
-
-    if user.status != "active":
-        await callback.answer()
-        await callback.message.answer(
-            t("course_only_active_users", lang),
-            reply_markup=payment_method_keyboard(lang),
-            parse_mode="HTML",
-        )
-        return
-
-    user.learning_mode = "course"
-    await session.commit()
-
-    user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)
-    if error_key:
-        await callback.answer()
-        await callback.message.answer(t(error_key, lang))
-        return
-
-    await engine.progress_repo.set_current_lesson_and_step(
-        progress=progress,
-        lesson_id=lesson.id,
-        step="quiz",
-    )
-    await session.commit()
-
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step="quiz",
-        user_message=t("course_start_quiz", lang),
-    )
-
-    await callback.answer()
-    await callback.message.answer(
-        text,
-        reply_markup=get_course_keyboard_for_step(lang, "quiz"),
-        parse_mode="HTML",
-    )
 
 
 @router.callback_query(F.data == "course:satisfied_yes")
@@ -987,47 +931,6 @@ async def course_go_grammar(callback: CallbackQuery, session):
 @router.callback_query(F.data == "course:go_exercise")
 async def course_go_exercise(callback: CallbackQuery, session):
     await _go_to_step(callback, session, "exercise")
-
-@router.callback_query(F.data == "course:go_quiz")
-async def course_go_quiz(callback: CallbackQuery, session):
-    await _go_to_step(callback, session, "quiz")
-
-
-@router.callback_query(F.data == "course:finish_quiz")
-async def course_finish_quiz(callback: CallbackQuery, session):
-    if await _block_if_course_disabled(callback, session):
-        return
-
-    user_repo = UserRepository(session)
-    engine = CourseEngineService(session)
-    tutor = CourseTutorService()
-
-    user = await user_repo.get_by_telegram_id(callback.from_user.id)
-    if not user:
-        await callback.answer()
-        return
-
-    lang = user.language if user.language else "ru"
-    user, progress, lesson, error_key = await engine.mark_quiz_passed_and_go_to_satisfaction(callback.from_user.id)
-    if error_key:
-        await callback.answer()
-        await callback.message.answer(t(error_key, lang))
-        return
-
-    text = await tutor.generate_step_response(
-        user_language=user.language,
-        user_level=user.level,
-        lesson=lesson,
-        step="satisfaction_check",
-        user_message="",
-    )
-
-    await callback.answer()
-    await callback.message.answer(
-        text,
-        reply_markup=course_satisfaction_keyboard(lang),
-        parse_mode="HTML",
-    )
 
 @router.callback_query(F.data == "course:repeat_step")
 async def course_repeat_step(callback: CallbackQuery, session):

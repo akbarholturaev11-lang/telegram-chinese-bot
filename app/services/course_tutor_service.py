@@ -5,7 +5,7 @@ from app.services.ai_service import AIService
 COURSE_MODEL = "o4-mini"
 
 # Steps where "press button below" hint is appended — exercise is handled separately (no hint)
-_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "quiz"}
+_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar"}
 
 _PRESS_BUTTON_HINT = {
     "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",

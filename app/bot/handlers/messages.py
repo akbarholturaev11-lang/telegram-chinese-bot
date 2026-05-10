@@ -314,23 +314,23 @@ async def handle_text_message(message: Message, session):
             await engine.progress_repo.set_current_lesson_and_step(
                 progress=progress,
                 lesson_id=progress.current_lesson_id,
-                step="quiz",
-                waiting_for="none",
+                step="satisfaction_check",
+                waiting_for="satisfaction_answer",
             )
             await session.commit()
 
-            quiz_text = await tutor.generate_step_response(
+            satisfaction_text = await tutor.generate_step_response(
                 user_language=current_user.language,
                 user_level=current_user.level,
                 lesson=lesson,
-                step="quiz",
+                step="satisfaction_check",
                 user_message="",
             )
 
             await message.answer(eval_text, parse_mode="HTML")
             await message.answer(
-                quiz_text,
-                reply_markup=get_course_keyboard_for_step(user_lang, "quiz"),
+                satisfaction_text,
+                reply_markup=get_course_keyboard_for_step(user_lang, "satisfaction_check"),
                 parse_mode="HTML",
             )
             return
