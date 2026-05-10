@@ -10,7 +10,7 @@ from app.bot.utils.i18n import t
 from app.bot.keyboards.course import (
     lesson_selection_keyboard, review_choice_keyboard,
     course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
-    course_grammar_keyboard, course_exercise_keyboard, course_homework_keyboard,
+    course_grammar_keyboard, course_homework_keyboard,
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
@@ -370,11 +370,14 @@ async def run_course_entry_flow(
         "vocab":    lambda: course_vocab_keyboard(lang),
         "dialogue": lambda: course_dialogue_keyboard(lang),
         "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: course_exercise_keyboard(lang),
+        "exercise": lambda: None,
     }
     if step in formatter_map:
         text = formatter_map[step]()
         keyboard = step_keyboards.get(step, lambda: None)()
+        if step == "exercise" and getattr(progress, "waiting_for", "none") != "exercise_answer":
+            await engine.progress_repo.set_waiting_for(progress, "exercise_answer")
+            await session.commit()
     elif step == "homework":
         text = _format_homework_text(lang, lesson.homework_json)
         keyboard = None
@@ -910,7 +913,7 @@ async def _go_to_step(callback, session, step: str):
 
     from app.bot.keyboards.course import (
         course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
-        course_grammar_keyboard, course_exercise_keyboard,
+        course_grammar_keyboard,
     )
 
     user_repo = UserRepository(session)
@@ -928,11 +931,12 @@ async def _go_to_step(callback, session, step: str):
         await callback.message.answer(t(error_key, lang))
         return
 
+    waiting_for_val = "exercise_answer" if step == "exercise" else "none"
     await engine.progress_repo.set_current_lesson_and_step(
         progress=progress,
         lesson_id=lesson.id,
         step=step,
-        waiting_for="none",
+        waiting_for=waiting_for_val,
     )
     await session.commit()
 
@@ -948,7 +952,7 @@ async def _go_to_step(callback, session, step: str):
         "vocab":    lambda: course_vocab_keyboard(lang),
         "dialogue": lambda: course_dialogue_keyboard(lang),
         "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: course_exercise_keyboard(lang),
+        "exercise": lambda: None,
     }
     if step in formatter_map:
         text = formatter_map[step]()
@@ -1032,7 +1036,7 @@ async def course_repeat_step(callback: CallbackQuery, session):
 
     from app.bot.keyboards.course import (
         course_intro_keyboard, course_vocab_keyboard, course_dialogue_keyboard,
-        course_grammar_keyboard, course_exercise_keyboard,
+        course_grammar_keyboard,
     )
 
     user_repo = UserRepository(session)
@@ -1066,7 +1070,7 @@ async def course_repeat_step(callback: CallbackQuery, session):
         "vocab":    lambda: course_vocab_keyboard(lang),
         "dialogue": lambda: course_dialogue_keyboard(lang),
         "grammar":  lambda: course_grammar_keyboard(lang),
-        "exercise": lambda: course_exercise_keyboard(lang),
+        "exercise": lambda: None,
     }
 
     keyboard = step_keyboards.get(step, lambda: None)()

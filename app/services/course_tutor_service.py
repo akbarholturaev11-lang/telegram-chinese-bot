@@ -4,14 +4,25 @@ from app.services.ai_service import AIService
 
 COURSE_MODEL = "o4-mini"
 
-# Steps that have the "I understood" advance button — append hint to AI response
-_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "exercise", "quiz"}
+# Steps where "press button below" hint is appended — exercise is handled separately (no hint)
+_CONVERSATIONAL_STEPS = {"intro", "vocab", "vocabulary", "dialogue", "grammar", "quiz"}
 
 _PRESS_BUTTON_HINT = {
     "uz": "\n\n✅ <i>Tushundingiz bo'lsa, pastdagi tugmani bosing.</i>",
     "ru": "\n\n✅ <i>Если поняли — нажмите кнопку ниже.</i>",
     "tj": "\n\n✅ <i>Агар фаҳмидед, тугмаи поёниро пахш кунед.</i>",
 }
+
+# MUHIM QOIDA — barcha tushuntirish bulimlari uchun (intro/vocab/dialogue/grammar)
+_EXPLANATION_RULE = """
+MUHIM QOIDA (ASOSIY VAZIFA):
+- Sen HECH QACHON foydalanuvchiga mashq, savol yoki test bermaysan
+- Sening vazifang: foydalanuvchiga hozirgi mavzuni tushuntirish
+- Agar foydalanuvchi savol bersa — tushuntir, misollar keltir
+- Har bir javob oxirida yana biror narsani tushuntirishni TAKLIF qil
+  (masalan: "Yana so'zlar haqida misollar xohlaysizmi?" yoki "Grammatika qoidasi haqida ko'proq aytaymi?")
+- Aslo: "Endi mashq qilamiz", "Quyidagi savolga javob bering", "Sinab ko'ring" dema
+"""
 
 
 class CourseTutorService:
@@ -48,18 +59,19 @@ class CourseTutorService:
             "dialogue_preview": dialogue[:1],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Welcome the student to this lesson warmly.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Talabani bu darsga iliq kutib ol.
 
-LESSON DATA:
+DARS MA'LUMOTLARI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, adapted for {user_level} level
-- Use <b>...</b> for Chinese characters, <code>...</code> for pinyin
-- Max 4 lines total
-- Preview 2-3 vocabulary words and the main grammar topic to spark curiosity
-- Do NOT teach yet — just introduce
-- End with an energetic line like "Ready? Let's go! 🚀" (in {user_language})"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasiga moslashtirilgan
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code> ishlatilsin
+- Jami 4 qatordan oshmasin
+- 2-3 ta so'z va asosiy grammatika mavzusini qiziqarli tarzda tanishtir
+- Hali o'qitma — faqat tanishtir
+- Oxirida "Tayyor? Ketdik! 🚀" kabi quvnoq gap bilan tugat ({user_language} tilida)
+{_EXPLANATION_RULE}"""
 
         return prompt, data
 
@@ -69,18 +81,19 @@ RULES:
 
         data = {"lesson_title": title, "vocabulary": vocab}
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Teach the vocabulary for this lesson engagingly.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Bu darsning so'zlarini qiziqarli tarzda o'rgat.
 
-VOCABULARY DATA:
+SO'ZLAR MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese characters, <code>...</code> for pinyin
-- Format each word: <b>汉字</b> [<code>pīnyīn</code>] — meaning — one short example sentence
-- If similar words exist (e.g. 我/你, 大/小, 去/来), compare them side by side to show the difference
-- Max 2 lines per word, total response under 15 lines
-- If student asks about a word outside this list, politely redirect to the current vocabulary"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol jumla
+- O'xshash so'zlar bo'lsa (masalan 我/你, 大/小), ularni yonma-yon solishtir
+- So'z boshiga 2 qatordan oshmasin, jami 15 qatordan kam
+- Foydalanuvchi savollarini tushuntir, keyin TAKLIF qil (masalan: "Yana qaysi so'z haqida ko'proq bilmoqchisiz?")
+{_EXPLANATION_RULE}"""
 
         return prompt, data
 
@@ -90,19 +103,20 @@ RULES:
 
         data = {"lesson_title": title, "dialogue": dialogue}
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Teach this dialogue step by step.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Bu dialogni qadamma-qadam o'rgat.
 
-DIALOGUE DATA:
+DIALOG MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- Present each line: <b>Chinese</b> [<code>pinyin</code>] — meaning in {user_language}
-- After presenting, briefly explain the context (where/when this conversation happens)
-- Highlight 1-2 useful patterns from the dialogue with a real-life comparison
-- Max 12 lines total
-- Answer student questions ONLY about this dialogue"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir qator: <b>Xitoycha</b> [<code>pinyin</code>] — {user_language}dagi ma'nosi
+- Taqdimotdan keyin kontekstni qisqacha tushuntir (bu suhbat qayerda/qachon bo'ladi)
+- Dialogdan 1-2 ta foydali iboralarni amaliy hayot bilan solishtirgan holda tushuntir
+- Jami 12 qatordan oshmasin
+- Foydalanuvchi dialog haqida savol bersa — tushuntir va TAKLIF qil (masalan: "Ushbu ibora boshqa situatsiyalarda qanday ishlatiladi, ko'rmoqchimisiz?")
+{_EXPLANATION_RULE}"""
 
         return prompt, data
 
@@ -117,18 +131,20 @@ RULES:
             "lesson_vocabulary": vocab[:5],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Teach the grammar points clearly and concisely.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Grammatika qoidalarini aniq va qisqa tushuntir.
 
-GRAMMAR DATA:
+GRAMMATIKA MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- For each grammar point: rule → pattern with blanks → 2 examples using lesson_vocabulary
-- If there are similar-looking structures (e.g. 的/地/得, 吗/呢, 在/有), compare them with a quick tip
-- Examples must use ONLY lesson_vocabulary — no outside words
-- Max 10 lines total"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir grammatika nuqtasi: qoida → bo'sh joy bilan naqsh → dars lug'atidan 2 ta misol
+- O'xshash tuzilmalar bo'lsa (masalan 的/地/得, 吗/呢, 在/有), tezkor maslahat bilan solishtir
+- Misollar FAQAT lesson_vocabulary so'zlaridan foydalansin
+- Jami 10 qatordan oshmasin
+- Foydalanuvchi savol bersa tushuntir va TAKLIF qil (masalan: "Bu qoidani boshqa misollar bilan ko'rmoqchimisiz?")
+{_EXPLANATION_RULE}"""
 
         return prompt, data
 
@@ -154,19 +170,25 @@ RULES:
             "allowed_grammar": grammar[:3],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Give short practice exercises.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Foydalanuvchi mashq javoblarini tekshir.
 
-EXERCISE DATA:
+MASHQ MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- Create 2-3 exercises using ONLY allowed_vocabulary and allowed_grammar
-- Mix formats: fill-in-the-blank AND translate a sentence
-- When checking: ✅ correct answer or ❌ + correct answer with a short tip
-- Be encouraging: "Well done! 👏" or "Almost! Here's a tip..."
-- Max 10 lines total"""
+ASOSIY VAZIFA:
+- Foydalanuvchi javob yubormasa: javob kutilmoqda, hech narsa qo'shma
+- Foydalanuvchi javob yuborsa:
+  * Har bir javobni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
+  * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat va qisqa izoh ber
+  * TO'G'RI FORMATNI ko'rsat (masalan: <b>汉字</b> [<code>pinyin</code>])
+  * Xatolarni aniq va qisqa tushuntir
+  * Rag'batlantiruvchi so'zlar ishlatilsin: "Yaxshi! 👏" yoki "Deyarli to'g'ri! Mana maslahat..."
+
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Jami 10 qatordan oshmasin
+- Keyingi bo'limga o'tish haqida HECH NARSA dema — tizim o'zi o'tkazadi"""
 
         return prompt, data
 
@@ -181,19 +203,25 @@ RULES:
             "test_grammar": grammar[:3],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Give a short quiz to test understanding.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Test savollarini ber va javoblarni tekshir.
 
-QUIZ DATA:
+TEST MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- 3-4 questions only (multiple choice or fill-in-the-blank)
-- Use ONLY test_vocabulary and test_grammar — no outside content
-- After student answers: show score, mark ✅/❌ per question, briefly explain mistakes
-- Be encouraging
-- Max 10 lines per interaction"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Birinchi chaqiruvda: FAQAT 3-4 ta savol ber (ko'p tanlovli yoki bo'sh to'ldirish)
+- FAQAT test_vocabulary va test_grammar dan foydalanilsin — tashqi kontent yo'q
+- Foydalanuvchi javob yuborganda:
+  * Har bir savolni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
+  * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat
+  * TO'G'RI FORMATNI ko'rsat (masalan: <b>汉字</b> [<code>pinyin</code>])
+  * Umumiy ball ber (masalan: 3/4 ✅)
+  * Xatolarni qisqa tushuntir
+- Rag'batlantiruvchi bo'l
+- Har bir o'zaro muloqotda 10 qatordan oshmasin
+{_EXPLANATION_RULE}"""
 
         return prompt, data
 
@@ -201,16 +229,16 @@ RULES:
         title = self._safe(getattr(lesson, "title", ""))
         data = {"lesson_title": title}
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Check if the student understood this lesson.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Talaba bu darsni tushunganini tekshir.
 
-LESSON: {title}
+DARS: {title}
 
-RULES:
-- Reply ONLY in {user_language}
-- Ask ONE simple question: did you understand the lesson?
-- Keep it to 2 lines maximum
-- Do NOT teach new content
-- Do NOT move forward — wait for the student's answer via the buttons"""
+QOIDALAR:
+- Faqat {user_language} tilida javob ber
+- BITTA oddiy savol ber: darsni tushundingizmi?
+- Maksimal 2 qator
+- Yangi kontent o'qitma
+- Oldinga siljima — talabaning tugmalar orqali javobini kut"""
 
         return prompt, data
 
@@ -234,18 +262,22 @@ RULES:
             "allowed_grammar": grammar[:3],
         }
 
-        prompt = f"""You are a friendly HSK Chinese tutor. Assign and evaluate homework.
+        prompt = f"""Sen do'stona HSK xitoy tili o'qituvchisisан. Uy vazifasini baholash.
 
-HOMEWORK DATA:
+UY VAZIFASI MA'LUMOTI:
 {json.dumps(data, ensure_ascii=False, indent=2)}
 
-RULES:
-- Reply ONLY in {user_language}, {user_level} level
-- Use <b>...</b> for Chinese, <code>...</code> for pinyin
-- Give ONE clear homework task using ONLY allowed_vocabulary and allowed_grammar
-- When student submits: give score 0-100, mark each item ✅/❌, short specific feedback
-- Be encouraging and concrete about what was good and what needs work
-- Max 8 lines"""
+ASOSIY VAZIFA — FOYDALANUVCHI JAVOBINI TEKSHIR:
+- Har bir bandni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
+- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI va TO'G'RI FORMATNI ko'rsat
+- Ball ber: 0-100
+- Nimasi yaxshi va nimani yaxshilash kerakligini aniq ayt
+- Rag'batlantiruvchi va aniq bo'l
+
+QOIDALAR:
+- Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Maksimal 8 qator"""
 
         return prompt, data
 
@@ -281,7 +313,7 @@ RULES:
 
         full_text = prompt
         if user_message:
-            full_text += f"\n\nSTUDENT MESSAGE:\n{user_message}"
+            full_text += f"\n\nFOYDALANUVCHI XABARI:\n{user_message}"
 
         response = await self.ai_service.generate_reply(
             text=full_text,
