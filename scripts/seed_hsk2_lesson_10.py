@@ -23,7 +23,11 @@ LESSON = {
         {"no": 6, "zh": "西瓜", "pinyin": "xīguā",    "pos": "n.",    "uz": "tarvuz",                                   "ru": "арбуз",                                    "tj": "тарбуз"},
         {"no": 7, "zh": "正在", "pinyin": "zhèngzài", "pos": "adv.", "uz": "hozir …qilmoqda (davom etayotgan harakat)","ru": "сейчас … (продолжающееся действие)",       "tj": "ҳоло …қилмоқда (амали ҷорӣ)"},
         {"no": 8, "zh": "手机", "pinyin": "shǒujī",   "pos": "n.",    "uz": "mobil telefon",                            "ru": "мобильный телефон",                        "tj": "телефони мобилӣ"},
-        {"no": 9, "zh": "洗",   "pinyin": "xǐ",        "pos": "v.",    "uz": "yuvmoq",                                   "ru": "мыть, стирать",                            "tj": "шустан"},
+        {"no": 9,  "zh": "洗",   "pinyin": "xǐ",       "pos": "v.",    "uz": "yuvmoq",                                   "ru": "мыть, стирать",                            "tj": "шустан"},
+        {"no": 10, "zh": "药",   "pinyin": "yào",      "pos": "n.",    "uz": "dori-darmon",                              "ru": "лекарство",                                "tj": "дору"},
+        {"no": 11, "zh": "身体", "pinyin": "shēntǐ",   "pos": "n.",    "uz": "tana, sog'liq",                            "ru": "тело, здоровье",                           "tj": "тан, саломатӣ"},
+        {"no": 12, "zh": "准备", "pinyin": "zhǔnbèi",  "pos": "v.",    "uz": "tayyorlanmoq, tayyorlamoq",                "ru": "готовиться, подготавливать",               "tj": "омода шудан, тайёр кардан"},
+        {"no": 13, "zh": "报纸", "pinyin": "bàozhǐ",   "pos": "n.",    "uz": "gazeta",                                   "ru": "газета",                                   "tj": "рӯзнома"},
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
@@ -137,6 +141,35 @@ LESSON = {
                 {"zh": "早睡早起对身体好。", "pinyin": "Zǎo shuì zǎo qǐ duì shēntǐ hǎo.", "uz": "Erta yotib erta turish sog'liq uchun foydali.", "ru": "Ложиться и вставать рано полезно для здоровья.", "tj": "Барвақт хобидан ва барвақт хестан барои саломатӣ хуб аст."},
             ]
         },
+        {
+            "no": 3,
+            "title_zh": "副词"正在"和语气助词"呢"",
+            "title_uz": "'Zhèngzài' ravishi va 'ne' yuklama (davom etayotgan harakat)",
+            "title_ru": "Наречие 'zhèngzài' и частица 'ne' (продолжающееся действие)",
+            "title_tj": "Зарфи 'zhèngzài' ва зарраи 'ne' (амали ҷорӣ)",
+            "rule_uz": (
+                "'正在' ravishi fe'l oldidan kelib, harakatning aynan hozir davom etayotganini bildiradi.\n"
+                "Ingliz tilidagi 'am/is/are …-ing' ga o'xshaydi.\n"
+                "Gap oxiriga '呢' yuklama qo'shilsa, davom etayotgan holat yanada ta'kidlanadi.\n"
+                "Tuzilish: 正在 + fe'l (+呢). Shuningdek, faqat '在 + fe'l' yoki 'fe'l + 着 + 呢' ham ishlatiladi."
+            ),
+            "rule_ru": (
+                "Наречие '正在' стоит перед глаголом и указывает, что действие происходит прямо сейчас.\n"
+                "Аналог английского 'am/is/are …-ing'.\n"
+                "Если в конце добавляется частица '呢', продолжение состояния подчёркивается.\n"
+                "Структура: 正在 + глагол (+呢). Также используется: 在 + глагол или глагол + 着 + 呢."
+            ),
+            "rule_tj": (
+                "Зарфи '正在' пеш аз феъл меояд ва нишон медиҳад амал айни ҳол ҷараён дорад.\n"
+                "Ба 'am/is/are …-ing' дар забони англисӣ монанд аст.\n"
+                "Агар дар охири ҷумла зарраи '呢' илова шавад, ҷараёни ҳолат бештар таъкид мешавад.\n"
+                "Сохтор: 正在 + феъл (+呢). Инчунин: 在 + феъл ё феъл + 着 + 呢 истифода мешавад."
+            ),
+            "examples": [
+                {"zh": "妈妈正在准备午饭呢！", "pinyin": "Māma zhèngzài zhǔnbèi wǔfàn ne!", "uz": "Ona hozir tushlikni tayyorlayapti!", "ru": "Мама сейчас готовит обед!", "tj": "Модар ҳоло нисфирӯзиро тайёр мекунад!"},
+                {"zh": "你在找什么？", "pinyin": "Nǐ zài zhǎo shénme?", "uz": "Siz nima qidiryapsiz?", "ru": "Что ты ищешь?", "tj": "Ту чӣ мекобӣ?"},
+            ]
+        },
     ], ensure_ascii=False),
     "exercise_json": json.dumps([
         {
@@ -166,10 +199,25 @@ LESSON = {
                 {"prompt_uz": "妈妈___准备午饭呢。（正在）", "prompt_ru": "妈妈___准备午饭呢。（正在）", "prompt_tj": "妈妈___准备午饭呢。（正在）", "answer": "正在", "pinyin": "zhèngzài"},
             ]
         },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "别找了，手机在桌子上呢，电脑旁边。", "prompt_ru": "别找了，手机在桌子上呢，电脑旁边。", "prompt_tj": "别找了，手机在桌子上呢，电脑旁边。", "answer": "Qidirishni bas qil, telefon stol ustida, kompyuter yonida.", "pinyin": "Bié zhǎo le, shǒujī zài zhuōzi shang ne, diànnǎo pángbiān."},
+                {"prompt_uz": "看电视对学汉语有帮助。", "prompt_ru": "看电视对学汉语有帮助。", "prompt_tj": "看电视对学汉语有帮助。", "answer": "Televizor ko'rish xitoy tili o'rganishga yordam beradi.", "pinyin": "Kàn diànshì duì xué Hànyǔ yǒu bāngzhù."},
+            ]
+        },
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["手机", "鸡蛋", "西瓜", "洗", "帮助"]},
         {"no": 2, "answers": ["别", "别", "对", "正在"]},
+        {"no": 3, "answers": [
+            "Qidirishni bas qil, telefon stol ustida, kompyuter yonida.",
+            "Televizor ko'rish xitoy tili o'rganishga yordam beradi.",
+        ]},
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

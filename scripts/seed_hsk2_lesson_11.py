@@ -152,11 +152,26 @@ LESSON = {
                 {"prompt_uz": "U ___ bugun kelmaydi. (可能)", "prompt_ru": "Он ___ сегодня не придёт. (可能)", "prompt_tj": "Ӯ ___ имрӯз намеояд. (可能)", "answer": "可能", "pinyin": "kěnéng"},
                 {"prompt_uz": "Oldinda gap___yotgan odam o'qituvchi. (话)", "prompt_ru": "Тот человек впереди, который раз___, — учитель. (话)", "prompt_tj": "Он касе ки пеш гап ___ мезанад муаллим аст. (话)", "answer": "话", "pinyin": "huà"}
             ]
+        },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "他比我大三岁。", "prompt_ru": "他比我大三岁。", "prompt_tj": "他比我大三岁。", "answer": "U mendan uch yosh katta.", "pinyin": "Tā bǐ wǒ dà sān suì."},
+                {"prompt_uz": "前边说话的那个人是不是我的汉语老师？你可能不认识她。", "prompt_ru": "前边说话的那个人是不是我的汉语老师？你可能不认识她。", "prompt_tj": "前边说话的那个人是不是我的汉语老师？你可能不认识她。", "answer": "Oldinda gapirgan odam mening xitoy tili o'qituvchim emasmi? Siz uni tanimas ehtimol.", "pinyin": "Qiánbian shuōhuà de nà ge rén shì bú shì wǒ de Hànyǔ lǎoshī? Nǐ kěnéng bù rènshi tā."},
+            ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["唱歌", "便宜", "可能", "去年", "右边"]},
-        {"no": 2, "answers": ["比", "三", "可能", "话"]}
+        {"no": 2, "answers": ["比", "三", "可能", "话"]},
+        {"no": 3, "answers": [
+            "U mendan uch yosh katta.",
+            "Oldinda gapirgan odam mening xitoy tili o'qituvchim emasmi? Siz uni tanimas ehtimol.",
+        ]}
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

@@ -21,7 +21,13 @@ LESSON = {
         {"no": 4, "zh": "次", "pinyin": "cì", "pos": "m.", "uz": "marta, safar (harakat o'lchovi)", "ru": "раз (счётное слово для действий)", "tj": "маротиба, бор (воҳиди шуморавӣ)"},
         {"no": 5, "zh": "玩儿", "pinyin": "wánr", "pos": "v.", "uz": "o'ynamoq, sayr qilmoq, dam olmoq", "ru": "играть, гулять, отдыхать", "tj": "бозӣ кардан, сайр кардан, истироҳат кардан"},
         {"no": 6, "zh": "晴", "pinyin": "qíng", "pos": "adj.", "uz": "ochiq (ob-havo), quyoshli", "ru": "ясный, солнечный (о погоде)", "tj": "ҳаво равшан, офтобӣ"},
-        {"no": 7, "zh": "百", "pinyin": "bǎi", "pos": "num.", "uz": "yuz (100)", "ru": "сто (100)", "tj": "сад (100)"}
+        {"no": 7,  "zh": "百",   "pinyin": "bǎi",      "pos": "num.", "uz": "yuz (100)",                                    "ru": "сто (100)",                           "tj": "сад (100)"},
+        {"no": 8,  "zh": "自己", "pinyin": "zìjǐ",     "pos": "pron.", "uz": "o'zi, o'zing",                               "ru": "сам, сама, себя",                     "tj": "худ, худаш"},
+        {"no": 9,  "zh": "旅游", "pinyin": "lǚyóu",    "pos": "v.",   "uz": "sayohat qilmoq",                              "ru": "путешествовать",                      "tj": "сафар кардан, гашт кардан"},
+        {"no": 10, "zh": "跑步", "pinyin": "pǎobù",    "pos": "v.",   "uz": "yugurmoq, estafeta yugurishi",                "ru": "бегать, делать пробежку",             "tj": "давидан, ҷиқ задан"},
+        {"no": 11, "zh": "参加", "pinyin": "cānjia",   "pos": "v.",   "uz": "qatnashmoq, ishtiroq etmoq",                  "ru": "участвовать, принимать участие",      "tj": "иштирок кардан, ширкат кардан"},
+        {"no": 12, "zh": "表演", "pinyin": "biǎoyǎn",  "pos": "v./n.", "uz": "sahna ko'rsatmoq; tamosha, spektakl",        "ru": "выступать; выступление, спектакль",   "tj": "намоиш додан; намоиш, спектакл"},
+        {"no": 13, "zh": "商店", "pinyin": "shāngdiàn","pos": "n.",   "uz": "do'kon, magazin",                             "ru": "магазин",                             "tj": "дӯкон, мағоза"}
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
@@ -148,11 +154,26 @@ LESSON = {
                 {"prompt_uz": "___ havo sovuq, u hali ham yugurdi. (虽然)", "prompt_ru": "___ погода была холодной, он всё равно побежал. (虽然)", "prompt_tj": "___ ҳаво сард буд, вай боз ҳам давид. (虽然)", "answer": "虽然", "pinyin": "suīrán"},
                 {"prompt_uz": "Garchi ingliz tili qiyin bo'lsa ham, ___ u yaxshi o'rganmoqda. (但是)", "prompt_ru": "Хотя английский сложный, ___ она хорошо его учит. (但是)", "prompt_tj": "Гарчи забони англисӣ душвор бошад ҳам, ___ вай хуб меомӯзад. (但是)", "answer": "但是", "pinyin": "dànshì"}
             ]
+        },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "我虽然去过好几次，但是还想再去中国玩儿。", "prompt_ru": "我虽然去过好几次，但是还想再去中国玩儿。", "prompt_tj": "我虽然去过好几次，但是还想再去中国玩儿。", "answer": "Men garchi bir necha marta borgan bo'lsam ham, lekin yana Xitoyga sayohat qilmoqchiman.", "pinyin": "Wǒ suīrán qùguo hǎo jǐ cì, dànshì hái xiǎng zài qù Zhōngguó wánr."},
+                {"prompt_uz": "买过一次，这儿的东西还可以，就是有点儿贵。", "prompt_ru": "买过一次，这儿的东西还可以，就是有点儿贵。", "prompt_tj": "买过一次，这儿的东西还可以，就是有点儿贵。", "answer": "Bir marta olganman, bu yerdagi narsalar yomonmas, faqat biroz qimmat.", "pinyin": "Mǎiguo yí cì, zhèr de dōngxi hái kěyǐ, jiùshì yǒudiǎnr guì."},
+            ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["有意思", "但是", "虽然", "次", "晴"]},
-        {"no": 2, "answers": ["过", "次", "虽然", "但是"]}
+        {"no": 2, "answers": ["过", "次", "虽然", "但是"]},
+        {"no": 3, "answers": [
+            "Men garchi bir necha marta borgan bo'lsam ham, lekin yana Xitoyga sayohat qilmoqchiman.",
+            "Bir marta olganman, bu yerdagi narsalar yomonmas, faqat biroz qimmat.",
+        ]}
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

@@ -22,7 +22,12 @@ LESSON = {
         {"no": 5, "zh": "大家", "pinyin": "dàjiā", "pos": "pron.", "uz": "hamma, barchalar", "ru": "все, каждый", "tj": "ҳама, тамоми"},
         {"no": 6, "zh": "更", "pinyin": "gèng", "pos": "adv.", "uz": "yanada, bundan ham ko'proq", "ru": "ещё более, ещё больше", "tj": "ҳатто бештар, боз ҳам зиёдтар"},
         {"no": 7, "zh": "妹妹", "pinyin": "mèimei", "pos": "n.", "uz": "singil", "ru": "младшая сестра", "tj": "хоҳари хурдӣ"},
-        {"no": 8, "zh": "阴", "pinyin": "yīn", "pos": "adj.", "uz": "bulutli, quyosh ko'rinmaydi", "ru": "пасмурный, облачный", "tj": "абрнок, офтоб намоён нест"}
+        {"no": 8,  "zh": "阴",   "pinyin": "yīn",    "pos": "adj.", "uz": "bulutli, quyosh ko'rinmaydi",              "ru": "пасмурный, облачный",                  "tj": "абрнок, офтоб намоён нест"},
+        {"no": 9,  "zh": "旅游", "pinyin": "lǚyóu",  "pos": "v.",   "uz": "sayohat qilmoq",                           "ru": "путешествовать",                       "tj": "сафар кардан, гашт кардан"},
+        {"no": 10, "zh": "伞",   "pinyin": "sǎn",    "pos": "n.",   "uz": "soyabon, qoʻldagi yomg'irdan saqlash",    "ru": "зонт",                                 "tj": "чатр"},
+        {"no": 11, "zh": "月",   "pinyin": "yuè",    "pos": "n.",   "uz": "oy (vaqt o'lchovi)",                      "ru": "месяц",                                "tj": "моҳ (вақти ченкунӣ)"},
+        {"no": 12, "zh": "节日", "pinyin": "jiérì",  "pos": "n.",   "uz": "bayram, tantana",                         "ru": "праздник",                             "tj": "ид, ҷашн"},
+        {"no": 13, "zh": "祝",   "pinyin": "zhù",    "pos": "v.",   "uz": "tilak bildirmoq, tabriklamoq",            "ru": "желать, поздравлять",                  "tj": "орзу кардан, табрик гуфтан"}
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
@@ -106,6 +111,35 @@ LESSON = {
                 {"zh": "都八点四十了！", "pinyin": "Dōu bā diǎn sìshí le!", "uz": "Soat sakkiz qirq bo'lib qoldi!", "ru": "Уже восемь сорок!", "tj": "Дигар соати ҳашту чил шуд!"},
                 {"zh": "都等她半个小时了！", "pinyin": "Dōu děng tā bàn ge xiǎoshí le!", "uz": "Uni yarim soatdan beri kutib turibmiz!", "ru": "Мы уже полчаса её ждём!", "tj": "Мо нимсоат интизораш шудем!"}
             ]
+        },
+        {
+            "no": 3,
+            "title_zh": "副词"更"的用法",
+            "title_uz": "'Gèng' (yanada, bundan ham ko'proq) ravishining ishlatilishi",
+            "title_ru": "Использование наречия '更' (ещё более, ещё больше)",
+            "title_tj": "Истифодаи зарфи '更' (ҳатто бештар, боз ҳам зиёдтар)",
+            "rule_uz": (
+                "'更' ravishi sifat yoki ravish oldidan kelib, qiyoslashni kuchaytiradi: 'yanada, bundan ham ko'proq'.\n"
+                "Tuzilish: A 比 B 更 + sifat (A dan B dan yanada …).\n"
+                "'更' mustaqil ham qo'llanadi: '我希望明年更好' (Umid qilamanki keyingi yil yanada yaxshi bo'lsin).\n"
+                "'还' (hái) bilan almashtirib ham ishlatilishi mumkin."
+            ),
+            "rule_ru": (
+                "Наречие '更' стоит перед прилагательным или наречием и усиливает сравнение: 'ещё более, ещё больше'.\n"
+                "Структура: A 比 B 更 + прилагательное (A ещё более … чем B).\n"
+                "'更' употребляется и самостоятельно: '我希望明年更好' (Надеюсь, в следующем году будет ещё лучше).\n"
+                "Может взаимозаменяться с '还' (hái) в некоторых контекстах."
+            ),
+            "rule_tj": (
+                "Зарфи '更' пеш аз сифат ё зарф меояд ва муқоисаро тақвият медиҳад: 'ҳатто бештар, боз ҳам зиёдтар'.\n"
+                "Сохтор: A 比 B 更 + сифат (A аз B ҳатто … бештар).\n"
+                "'更' мустақилона ҳам истифода мешавад: '我希望明年更好' (Умедворам соли оянда боз ҳам беҳтар шавад).\n"
+                "Дар баъзе контекстҳо бо '还' (hái) иваз шуда метавонад."
+            ),
+            "examples": [
+                {"zh": "希望我们的公司明年更好！", "pinyin": "Xīwàng wǒmen de gōngsī míngnián gèng hǎo!", "uz": "Umid qilamanki kompaniyamiz kelasi yil yanada yaxshilansin!", "ru": "Надеюсь, в следующем году наша компания будет ещё лучше!", "tj": "Умедворам ширкати мо соли оянда боз ҳам беҳтар шавад!"},
+                {"zh": "北京比这儿更好玩儿。", "pinyin": "Běijīng bǐ zhèr gèng hǎo wánr.", "uz": "Pekin bu yerdan yanada qiziqarliroq.", "ru": "В Пекине ещё интереснее, чем здесь.", "tj": "Пекин аз ин ҷо боз ҳам ҷолибтар аст."},
+            ]
         }
     ], ensure_ascii=False),
     "exercise_json": json.dumps([
@@ -135,11 +169,26 @@ LESSON = {
                 {"prompt_uz": "Uka ___ besh yoshda bo'lib qoldi. (都)", "prompt_ru": "Братишка ___ исполнилось пять лет. (都)", "prompt_tj": "Бародари хурдӣ ___ панҷ сола шуд. (都)", "answer": "都", "pinyin": "dōu"},
                 {"prompt_uz": "Tez orada yomg'ir yog'___, kirgin! (要)", "prompt_ru": "Скоро ___ дождь, заходи! (要)", "prompt_tj": "Зуд борон меша___д, дар! (要)", "answer": "要", "pinyin": "yào"}
             ]
+        },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "新年就要到了。", "prompt_ru": "新年就要到了。", "prompt_tj": "新年就要到了。", "answer": "Yangi yil yaqinlashib qoldi.", "pinyin": "Xīnnián jiù yào dào le."},
+                {"prompt_uz": "好的，快要下雨了，你路上慢点儿。", "prompt_ru": "好的，快要下雨了，你路上慢点儿。", "prompt_tj": "好的，快要下雨了，你路上慢点儿。", "answer": "Yaxshi, tez orada yomg'ir yog'adi, yo'lda ehtiyot bo'ling.", "pinyin": "Hǎo de, kuài yào xiàyǔ le, nǐ lùshang màn diǎnr."},
+            ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["新年", "票", "火车站", "妹妹", "更"]},
-        {"no": 2, "answers": ["就", "了", "都", "要"]}
+        {"no": 2, "answers": ["就", "了", "都", "要"]},
+        {"no": 3, "answers": [
+            "Yangi yil yaqinlashib qoldi.",
+            "Yaxshi, tez orada yomg'ir yog'adi, yo'lda ehtiyot bo'ling.",
+        ]}
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

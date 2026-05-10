@@ -188,10 +188,25 @@ LESSON = {
                 {"prompt_uz": "我___一次去北京。（第）", "prompt_ru": "我___一次去北京。（第）", "prompt_tj": "我___一次去北京。（第）", "answer": "第", "pinyin": "dì"},
             ]
         },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "题太多，我没做完。", "prompt_ru": "题太多，我没做完。", "prompt_tj": "题太多，我没做完。", "answer": "Savollar juda ko'p edi, men tamomlaolmadim.", "pinyin": "Tí tài duō, wǒ méi zuòwán."},
+                {"prompt_uz": "他从下个星期一开始上班。", "prompt_ru": "他从下个星期一开始上班。", "prompt_tj": "他从下个星期一开始上班。", "answer": "U kelasi dushanba kundan boshlab ishga chiqadi.", "pinyin": "Tā cóng xià ge xīngqīyī kāishǐ shàngbān."},
+            ]
+        },
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["错", "跳舞", "第一", "希望", "懂"]},
         {"no": 2, "answers": ["没", "完", "从", "第"]},
+        {"no": 3, "answers": [
+            "Savollar juda ko'p edi, men tamomlaolmadim.",
+            "U kelasi dushanba kundan boshlab ishga chiqadi.",
+        ]},
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

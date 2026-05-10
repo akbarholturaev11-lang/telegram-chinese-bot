@@ -152,11 +152,26 @@ LESSON = {
                 {"prompt_uz": "To'g'ri ___ oldinga yuring. (往)", "prompt_ru": "Идите прямо ___. (往)", "prompt_tj": "Рост ___ пеш равед. (往)", "answer": "往", "pinyin": "wǎng"},
                 {"prompt_uz": "Uning yigit do'sti bor ___? (是)", "prompt_ru": "У неё же есть парень? (是)", "prompt_tj": "Магар ӯ дӯстписар надорад ___ ? (是)", "answer": "是", "pinyin": "shì"}
             ]
+        },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "门开着呢，请进。", "prompt_ru": "门开着呢，请进。", "prompt_tj": "门开着呢，请进。", "answer": "Eshik ochiq turibdi, marhamat kiring.", "pinyin": "Mén kāi zhe ne, qǐng jìn."},
+                {"prompt_uz": "从这儿一直往前走，到了前面的路口再往右走。", "prompt_ru": "从这儿一直往前走，到了前面的路口再往右走。", "prompt_tj": "从这儿一直往前走，到了前面的路口再往右走。", "answer": "Bu yerdan to'g'ri oldinga boring, oldindagi chorrahaga yetgach o'ngga buriling.", "pinyin": "Cóng zhèr yìzhí wǎng qián zǒu, dào le qiánmian de lùkǒu zài wǎng yòu zǒu."},
+            ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["铅笔", "宾馆", "路口", "笑", "拿"]},
-        {"no": 2, "answers": ["着", "着", "往", "是"]}
+        {"no": 2, "answers": ["着", "着", "往", "是"]},
+        {"no": 3, "answers": [
+            "Eshik ochiq turibdi, marhamat kiring.",
+            "Bu yerdan to'g'ri oldinga boring, oldindagi chorrahaga yetgach o'ngga buriling.",
+        ]}
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

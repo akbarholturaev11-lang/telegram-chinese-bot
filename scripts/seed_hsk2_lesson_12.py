@@ -23,7 +23,11 @@ LESSON = {
         {"no": 6, "zh": "穿", "pinyin": "chuān", "pos": "v.", "uz": "kiymoq (kiyim-bosh)", "ru": "надевать, носить (одежду)", "tj": "пӯшидан (либос)"},
         {"no": 7, "zh": "进", "pinyin": "jìn", "pos": "v.", "uz": "kirmoq", "ru": "войти, заходить", "tj": "даромадан"},
         {"no": 8, "zh": "弟弟", "pinyin": "dìdi", "pos": "n.", "uz": "uka", "ru": "младший брат", "tj": "бародари хурдӣ"},
-        {"no": 9, "zh": "近", "pinyin": "jìn", "pos": "adj.", "uz": "yaqin", "ru": "близкий, недалёкий", "tj": "наздик"}
+        {"no": 9,  "zh": "近",  "pinyin": "jìn",    "pos": "adj.", "uz": "yaqin",                                   "ru": "близкий, недалёкий",             "tj": "наздик"},
+        {"no": 10, "zh": "身体", "pinyin": "shēntǐ", "pos": "n.",   "uz": "tana, sog'liq",                           "ru": "тело, здоровье",                 "tj": "тан, саломатӣ"},
+        {"no": 11, "zh": "少",  "pinyin": "shǎo",   "pos": "adj.", "uz": "oz, kam",                                  "ru": "мало, немного",                  "tj": "кам, андак"},
+        {"no": 12, "zh": "早",  "pinyin": "zǎo",    "pos": "adj./adv.", "uz": "erta; ertaroq",                       "ru": "ранний; рано, пораньше",         "tj": "барвақт; зудтар"},
+        {"no": 13, "zh": "冷",  "pinyin": "lěng",   "pos": "adj.", "uz": "sovuq",                                   "ru": "холодный",                       "tj": "сард"}
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
@@ -107,6 +111,35 @@ LESSON = {
                 {"zh": "我妻子比我做饭做得好。", "pinyin": "Wǒ qīzi bǐ wǒ zuò fàn zuò de hǎo.", "uz": "Xotinim mendan yaxshiroq ovqat pishiradi.", "ru": "Моя жена готовит лучше меня.", "tj": "Занам аз ман беҳтар хӯрок мепазад."},
                 {"zh": "你比我早起一个小时。", "pinyin": "Nǐ bǐ wǒ zǎo qǐ yí ge xiǎoshí.", "uz": "Siz mendan bir soat oldin turasiz.", "ru": "Ты встаёшь на час раньше меня.", "tj": "Шумо аз ман як соат зудтар бармехезед."}
             ]
+        },
+        {
+            "no": 3,
+            "title_zh": "趋向补语（进、出、上、下）",
+            "title_uz": "Yo'nalish to'ldiruvchisi (进, 出, 上, 下)",
+            "title_ru": "Направленное дополнение (进, 出, 上, 下)",
+            "title_tj": "Иловаи самт (进, 出, 上, 下)",
+            "rule_uz": (
+                "Yo'nalish to'ldiruvchisi fe'ldan keyin kelib, harakatning yo'nalishini bildiradi.\n"
+                "Oddiy shakl: fe'l + 进/出/上/下 (va h.k.)\n"
+                "Murakkab shakl: fe'l + 进/出 + 来/去 (yaqin yoki uzoqlashuv uchun).\n"
+                "Masalan: 进来 (kiring — yaqin), 进去 (kiring — uzoq), 出来/出去 (chiqing)."
+            ),
+            "rule_ru": (
+                "Направленное дополнение ставится после глагола и указывает направление действия.\n"
+                "Простая форма: глагол + 进/出/上/下 и т.д.\n"
+                "Составная форма: глагол + 进/出 + 来/去 (для приближения или удаления).\n"
+                "Например: 进来 (войдите — приближение), 进去 (войдите — удаление), 出来/出去 (выйдите)."
+            ),
+            "rule_tj": (
+                "Иловаи самт баъд аз феъл меояд ва самти амалро нишон медиҳад.\n"
+                "Шакли оддӣ: феъл + 进/出/上/下 ва ғ.\n"
+                "Шакли мураккаб: феъл + 进/出 + 来/去 (барои наздик шудан ё дур шудан).\n"
+                "Масалан: 进来 (дароед — наздик), 进去 (дароед — дур), 出来/出去 (берун шавед)."
+            ),
+            "examples": [
+                {"zh": "外边冷，我们进房间吧。", "pinyin": "Wàibian lěng, wǒmen jìn fángjiān ba.", "uz": "Tashqari sovuq, xonaga kiraylik.", "ru": "На улице холодно, давай зайдём в комнату.", "tj": "Берун сард аст, биёем ба хона дарем."},
+                {"zh": "她弟弟走进来了。", "pinyin": "Tā dìdi zǒu jìn lái le.", "uz": "Uning ukasi kirib keldi.", "ru": "Её младший брат вошёл (сюда).", "tj": "Бародари хурдиаш даромад."},
+            ]
         }
     ], ensure_ascii=False),
     "exercise_json": json.dumps([
@@ -136,11 +169,26 @@ LESSON = {
                 {"prompt_uz": "Bugun ___ o'n daraja. (零)", "prompt_ru": "Сегодня ___ десять градусов. (零)", "prompt_tj": "Имрӯз ___ даҳ дараҷа. (零)", "answer": "零", "pinyin": "líng"},
                 {"prompt_uz": "U juda uzoqda yasha___. (得)", "prompt_ru": "Он живёт очень далеко. (得)", "prompt_tj": "Ӯ хеле дур зиндагӣ мекун___. (得)", "answer": "得", "pinyin": "de"}
             ]
+        },
+        {
+            "no": 3,
+            "type": "translate_to_native",
+            "instruction_uz": "Quyidagi gaplarni o'zbek tiliga tarjima qiling:",
+            "instruction_ru": "Переведите следующие предложения на русский язык:",
+            "instruction_tj": "Ҷумлаҳои зеринро ба забони тоҷикӣ тарҷума кунед:",
+            "items": [
+                {"prompt_uz": "你穿得太少了，我们进房间吧。", "prompt_ru": "你穿得太少了，我们进房间吧。", "prompt_tj": "你穿得太少了，我们进房间吧。", "answer": "Siz juda kam kiyingiz, xonaga kiraylik.", "pinyin": "Nǐ chuān de tài shǎo le, wǒmen jìn fángjiān ba."},
+                {"prompt_uz": "我妻子比我做饭做得好。", "prompt_ru": "我妻子比我做饭做得好。", "prompt_tj": "我妻子比我做饭做得好。", "answer": "Xotinim mendan yaxshiroq ovqat pishiradi.", "pinyin": "Wǒ qīzi bǐ wǒ zuò fàn zuò de hǎo."},
+            ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
         {"no": 1, "answers": ["雪", "穿", "弟弟", "妻子", "近"]},
-        {"no": 2, "answers": ["得", "得", "零", "得"]}
+        {"no": 2, "answers": ["得", "得", "零", "得"]},
+        {"no": 3, "answers": [
+            "Siz juda kam kiyingiz, xonaga kiraylik.",
+            "Xotinim mendan yaxshiroq ovqat pishiradi.",
+        ]}
     ], ensure_ascii=False),
     "homework_json": json.dumps([
         {

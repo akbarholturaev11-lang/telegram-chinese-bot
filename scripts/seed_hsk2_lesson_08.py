@@ -25,6 +25,9 @@ LESSON = {
         {"no": 8,  "zh": "白",    "pinyin": "bái",      "pos": "adj.", "uz": "oq (rang)",                                 "ru": "белый (цвет)",                             "tj": "сафед (ранг)"},
         {"no": 9,  "zh": "黑",    "pinyin": "hēi",      "pos": "adj.", "uz": "qora (rang)",                               "ru": "чёрный (цвет)",                            "tj": "сиёҳ (ранг)"},
         {"no": 10, "zh": "贵",    "pinyin": "guì",      "pos": "adj.", "uz": "qimmat, narxi yuqori",                      "ru": "дорогой, высокая цена",                    "tj": "гарон, нарх баланд"},
+        {"no": 11, "zh": "病",    "pinyin": "bìng",     "pos": "v./n.", "uz": "kasal bo'lmoq; kasallik",                   "ru": "болеть; болезнь",                          "tj": "бемор шудан; беморӣ"},
+        {"no": 12, "zh": "运动",  "pinyin": "yùndòng",  "pos": "v./n.", "uz": "sport qilmoq; sport, mashq",                "ru": "заниматься спортом; спорт, движение",      "tj": "варзиш кардан; варзиш"},
+        {"no": 13, "zh": "颜色",  "pinyin": "yánsè",    "pos": "n.",   "uz": "rang",                                       "ru": "цвет",                                     "tj": "ранг"},
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
