@@ -1,13 +1,18 @@
 from aiogram import Router, F
 from aiogram.types import Message
 
+from app.config import settings
 from app.repositories.user_repo import UserRepository
 from app.bot.keyboards.subscription import payment_method_keyboard
+from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.utils.i18n import t
 
 
 router = Router()
 
+# ──────────────────────────────────────────────
+# QA rejim menyusi — barcha tugmalar handleri
+# ──────────────────────────────────────────────
 
 @router.message(F.text.in_([
     "💳 Обуна",
@@ -27,4 +32,109 @@ async def handle_subscription_button(message: Message, session):
         t("payment_method_choose", lang),
         reply_markup=payment_method_keyboard(lang),
         parse_mode="HTML",
+    )
+
+
+@router.message(F.text.in_([
+    "👤 Профил",
+    "👤 Профиль",
+    "👤 Profil",
+]))
+async def handle_profile_button(message: Message, session):
+    from app.bot.handlers.commands import _profile_text, profile_menu_keyboard
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    if not user:
+        return
+    lang = user.language if user.language else "ru"
+    await message.answer(
+        _profile_text(user, lang),
+        parse_mode="HTML",
+        reply_markup=profile_menu_keyboard(lang),
+    )
+
+
+@router.message(F.text.in_([
+    "👥 Дӯст даъват кардан",
+    "👥 Пригласить друга",
+    "👥 Do'st chaqirish",
+]))
+async def handle_invite_button(message: Message, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    if not user:
+        return
+    lang = user.language if user.language else "ru"
+    await user_repo.ensure_referral_code(user)
+    await session.commit()
+
+    referral_link = f"https://t.me/{settings.BOT_USERNAME}?start={user.referral_code}"
+
+    if lang == "tj":
+        text = (
+            "<b>🎁 Даъватномаи шумо</b>\n\n"
+            f"<blockquote>🔗 {referral_link}</blockquote>\n\n"
+            "👥 Агар дӯсти шумо бо ин силка ворид шавад,\n"
+            "✨ шумо <b>+5 саволи бонусӣ</b> мегиред."
+        )
+    elif lang == "uz":
+        text = (
+            "<b>🎁 Taklif havolangiz</b>\n\n"
+            f"<blockquote>🔗 {referral_link}</blockquote>\n\n"
+            "👥 Do'stingiz shu havola orqali kirib, botga 2 ta xabar yuborsa,\n"
+            "✨ siz <b>+5 bonus savol</b> olasiz."
+        )
+    else:
+        text = (
+            "<b>🎁 Ваше приглашение</b>\n\n"
+            f"<blockquote>🔗 {referral_link}</blockquote>\n\n"
+            "👥 Если друг войдёт по этой ссылке и напишет боту 2 сообщения,\n"
+            "✨ вы получите <b>+5 бонусных вопросов</b>."
+        )
+
+    await message.answer(text, parse_mode="HTML", disable_web_page_preview=True)
+
+
+@router.message(F.text.in_([
+    "❓ Ёрдам",
+    "❓ Помощь",
+    "❓ Yordam",
+]))
+async def handle_help_button(message: Message, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    lang = user.language if user and user.language else "ru"
+    await message.answer(
+        t("help_section_text", lang),
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+
+
+@router.message(F.text.in_([
+    "📚 Режими курс",
+    "📚 Режим курса",
+    "📚 Kurs rejimi",
+]))
+async def handle_course_mode_button(message: Message, session):
+    from app.bot.handlers.course import run_course_entry_flow
+    from app.config import COURSE_MODE_ENABLED
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    lang = user.language if user and user.language else "ru"
+
+    if not COURSE_MODE_ENABLED:
+        msg_map = {
+            "uz": "🚧 Kurs rejimi hozircha ishlab chiqilmoqda.",
+            "ru": "🚧 Режим курса сейчас в разработке.",
+            "tj": "🚧 Реҷаи курс ҳоло дар навсози аст.",
+        }
+        await message.answer(msg_map.get(lang, msg_map["ru"]))
+        return
+
+    await run_course_entry_flow(
+        session=session,
+        telegram_id=message.from_user.id,
+        respond=message.answer,
+        show_menu=True,
     )

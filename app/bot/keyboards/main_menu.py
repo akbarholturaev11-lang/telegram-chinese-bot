@@ -5,10 +5,14 @@ from app.bot.utils.i18n import t
 def main_menu_keyboard(lang: str) -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text=t("menu_start_lesson", lang))],
             [
                 KeyboardButton(text=t("menu_profile", lang)),
                 KeyboardButton(text=t("menu_subscription", lang)),
+            ],
+            [KeyboardButton(text=t("menu_course_mode", lang))],
+            [
+                KeyboardButton(text=t("menu_invite", lang)),
+                KeyboardButton(text=t("menu_help", lang)),
             ],
         ],
         resize_keyboard=True,
