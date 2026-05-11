@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import logging
 from contextlib import asynccontextmanager
 
 from aiogram import Bot
@@ -13,18 +14,20 @@ from app.services.daily_reset_service import DailyResetService
 from app.services.expiry_reminder_service import ExpiryReminderService
 from app.services.course_reminder_service import CourseReminderService
 
+logger = logging.getLogger(__name__)
 
 bot, dp = create_bot(settings)
 
 
 async def _seed_lessons() -> None:
     """Run all lesson seed scripts in the background after startup."""
+    logger.info("=== SEEDING START: loading all lesson scripts ===")
     try:
         async with async_session_maker() as session:
             count = await CourseSeedService(session).sync_all_lessons()
-        print(f"Seeding complete: {count} lessons in DB")
+        logger.info(f"=== SEEDING COMPLETE: {count} lessons in DB ===")
     except Exception as e:
-        print(f"Seeding error: {e}")
+        logger.error(f"=== SEEDING ERROR: {e} ===", exc_info=True)
 
 
 async def _background_scheduler(bot: Bot) -> None:

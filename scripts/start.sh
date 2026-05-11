@@ -27,4 +27,5 @@ alembic upgrade head && echo "Migrations OK." || {
 }
 
 echo "=== Starting uvicorn ==="
+export PYTHONUNBUFFERED=1
 exec uvicorn app.main:app --host 0.0.0.0 --port $PORT
