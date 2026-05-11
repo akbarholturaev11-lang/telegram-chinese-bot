@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 revision = "0013_add_reminder_tz_and_last_sent"
-down_revision = "0012"
+down_revision = "0012_add_payment_msg_ids"
 branch_labels = None
 depends_on = None
 
