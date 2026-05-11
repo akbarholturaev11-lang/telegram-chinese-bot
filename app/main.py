@@ -8,12 +8,23 @@ from fastapi import FastAPI
 from app.config import settings
 from app.bot.create_bot import create_bot
 from app.db.session import async_session_maker, init_db
+from app.services.course_seed_service import CourseSeedService
 from app.services.daily_reset_service import DailyResetService
 from app.services.expiry_reminder_service import ExpiryReminderService
 from app.services.course_reminder_service import CourseReminderService
 
 
 bot, dp = create_bot(settings)
+
+
+async def _seed_lessons() -> None:
+    """Run all lesson seed scripts in the background after startup."""
+    try:
+        async with async_session_maker() as session:
+            count = await CourseSeedService(session).sync_all_lessons()
+        print(f"Seeding complete: {count} lessons in DB")
+    except Exception as e:
+        print(f"Seeding error: {e}")
 
 
 async def _background_scheduler(bot: Bot) -> None:
@@ -32,14 +43,18 @@ async def _background_scheduler(bot: Bot) -> None:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
+    await init_db()                                          # faqat jadval yaratish (tez)
+    seed_task = asyncio.create_task(_seed_lessons())        # background seeding
     polling_task = asyncio.create_task(dp.start_polling(bot))
     scheduler_task = asyncio.create_task(_background_scheduler(bot))
     try:
-        yield
+        yield                                                # /health darhol ishlaydi
     finally:
+        seed_task.cancel()
         polling_task.cancel()
         scheduler_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await seed_task
         with contextlib.suppress(asyncio.CancelledError):
             await polling_task
         with contextlib.suppress(asyncio.CancelledError):
