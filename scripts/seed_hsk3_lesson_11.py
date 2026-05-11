@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Uydan chiqishdan oldin", "ru": "Перед выходом из дома", "tj": "Пеш аз баромадан аз хона"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你走了吗？别忘了把空调关了！", "pinyin": "Nǐ zǒu le ma? Bié wàng le bǎ kōngtiáo guān le!", "uz": "Ketayapsizmi? Konditsionerni o'chirishni unutma!", "ru": "Ты уходишь? Не забудь выключить кондиционер!", "tj": "Шумо меравед? Фаромӯш накунед ки кондитсионерро хомӯш кунед!"},
                 {"speaker": "B", "zh": "已经关了，你放心吧。", "pinyin": "Yǐjīng guān le, nǐ fàngxīn ba.", "uz": "Allaqachon o'chirdim, xotirjam bo'ling.", "ru": "Уже выключил, не беспокойся.", "tj": "Аллакай хомӯш кардам, хотирҷамъ бошед."},
                 {"speaker": "A", "zh": "窗户呢？把窗户也关上了吗？", "pinyin": "Chuānghù ne? Bǎ chuānghù yě guānshang le ma?", "uz": "Derazachi? Derazani ham yopdingizmi?", "ru": "А окно? Окно тоже закрыл?", "tj": "Тирезаро чӣ? Тирезаро ҳам бастед?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Xonani tartibga solish", "ru": "Уборка комнаты", "tj": "Тартиб додани хона"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你把房间收拾一下吧，太乱了！", "pinyin": "Nǐ bǎ fángjiān shōushi yīxià ba, tài luàn le!", "uz": "Xonangni bir tartibga sol, juda tarqoq!", "ru": "Убери комнату, слишком беспорядок!", "tj": "Хонаатро тартиб деҳ, хеле барҳам хӯрда!"},
                 {"speaker": "B", "zh": "好，我大概需要一个小时左右。", "pinyin": "Hǎo, wǒ dàgài xūyào yī gè xiǎoshí zuǒyòu.", "uz": "Yaxshi, menga taxminan bir soat kerak bo'ladi.", "ru": "Хорошо, мне нужно примерно около часа.", "tj": "Хуб, ба ман тахминан як соат лозим мешавад."},
                 {"speaker": "A", "zh": "先把东西都放到原来的地方。", "pinyin": "Xiān bǎ dōngxi dōu fàng dào yuánlái de dìfāng.", "uz": "Avval hamma narsani o'z joyiga qo'y.", "ru": "Сначала положи все вещи на место.", "tj": "Аввал ҳама чизро ба ҷои аслиаш монд."},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Kompyuterni o'chirish", "ru": "Выключение компьютера", "tj": "Хомӯш кардани компютер"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你用完电脑了吗？把电脑关了吧。", "pinyin": "Nǐ yòng wán diànnǎo le ma? Bǎ diànnǎo guān le ba.", "uz": "Kompyuterni ishlatib bo'ldingizmi? Kompyuterni o'chiring.", "ru": "Ты закончил с компьютером? Выключи его.", "tj": "Шумо компютерро тамом истифода бурдед? Компютерро хомӯш кунед."},
                 {"speaker": "B", "zh": "还没，还需要二十分钟左右。", "pinyin": "Hái méi, hái xūyào èrshí fēnzhōng zuǒyòu.", "uz": "Hali yo'q, yana taxminan yigirma daqiqa kerak.", "ru": "Ещё нет, нужно ещё около двадцати минут.", "tj": "Ҳанӯз не, боз тахминан бист дақиқа лозим аст."},
                 {"speaker": "A", "zh": "好，用完了记得把文件保存了再关。", "pinyin": "Hǎo, yòng wán le jìde bǎ wénjiàn bǎocún le zài guān.", "uz": "Yaxshi, tugatgach faylni saqlashni eslab, keyin o'chiring.", "ru": "Ладно, когда закончишь, не забудь сохранить файл перед закрытием.", "tj": "Хуб, тамом шуд, ёд кун ки фоилро сабт кун, баъд хомӯш кун."},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Eshikni qulflash", "ru": "Запирание двери", "tj": "Қулф задани дар"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "出门的时候把门锁上了吗？", "pinyin": "Chū mén de shíhou bǎ mén suǒshang le ma?", "uz": "Chiqayotganda eshikni qulfladingizmi?", "ru": "Когда выходил, дверь запер?", "tj": "Вақти баромадан дарро қулф задед?"},
                 {"speaker": "B", "zh": "锁了！我把门锁了，钥匙在包里。", "pinyin": "Suǒ le! Wǒ bǎ mén suǒ le, yàoshi zài bāo lǐ.", "uz": "Qulflash! Men eshikni qulflash, kalit sumkada.", "ru": "Запер! Я запер дверь, ключ в сумке.", "tj": "Қулф задам! Ман дарро қулф задам, калид дар сумка."},
                 {"speaker": "A", "zh": "好，那我们走吧，大约三十分钟左右到。", "pinyin": "Hǎo, nà wǒmen zǒu ba, dàyuē sānshí fēnzhōng zuǒyòu dào.", "uz": "Yaxshi, unda ketaylik, taxminan o'ttiz daqiqada yetamiz.", "ru": "Хорошо, тогда пойдём, примерно за тридцать минут доберёмся.", "tj": "Хуб, пас биравем, тахминан сӣ дақиқа мерасем."},

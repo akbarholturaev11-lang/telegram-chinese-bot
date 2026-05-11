@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Majlis haqida suhbat", "ru": "Разговор о собрании", "tj": "Суҳбат дар бораи мажлис"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "关于明天的会议，你觉得大家会同意吗？", "pinyin": "Guānyú míngtiān de huìyì, nǐ juéde dàjiā huì tóngyì ma?", "uz": "Ertangi majlis haqida, sizningcha hamma rozi bo'ladimi?", "ru": "Насчёт завтрашнего собрания, как думаешь, все согласятся?", "tj": "Дар бораи ҷалсаи фардо, ба фикри шумо ҳама розӣ мешаванд?"},
                 {"speaker": "B", "zh": "我相信他们会同意的！只要你好好解释，就没问题！", "pinyin": "Wǒ xiāngxìn tāmen huì tóngyì de! Zhǐyào nǐ hǎohǎo jiěshì, jiù méi wèntí!", "uz": "Ularning rozi bo'lishiga ishonaman! Faqat yaxshilab tushuntirsangiz, muammo yo'q!", "ru": "Я верю, что они согласятся! Только хорошо объясни, и проблем не будет!", "tj": "Ман боварам дорам, ки онҳо розӣ мешаванд! Танҳо хуб шарҳ диҳед, мушкиле нест!"},
                 {"speaker": "A", "zh": "好，我会好好准备关于计划的说明。", "pinyin": "Hǎo, wǒ huì hǎohǎo zhǔnbèi guānyú jìhuà de shuōmíng.", "uz": "Yaxshi, men reja haqidagi tushuntirishni yaxshilab tayyorlayman.", "ru": "Хорошо, я хорошо подготовлю объяснение о плане.", "tj": "Хуб, ман шарҳи нақшаро хуб тайёр мекунам."},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Tadbir haqida gaplashish", "ru": "Разговор о мероприятии", "tj": "Суҳбат дар бораи тадбир"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "关于这次活动，你有什么想法？", "pinyin": "Guānyú zhè cì huódòng, nǐ yǒu shénme xiǎngfǎ?", "uz": "Bu tadbir haqida qanday fikrlaringiz bor?", "ru": "Насчёт этого мероприятия, какие у тебя мысли?", "tj": "Дар бораи ин тадбир, чӣ фикр доред?"},
                 {"speaker": "B", "zh": "我觉得不但要邀请同学，而且还要邀请老师！", "pinyin": "Wǒ juéde búdàn yào yāoqǐng tóngxué, érqiě hái yào yāoqǐng lǎoshī!", "uz": "Menimcha, nafaqat sinfdoshlarni, balki o'qituvchilarni ham taklif qilish kerak!", "ru": "Я думаю, нужно пригласить не только одноклассников, но и учителей!", "tj": "Ба фикрам, на танҳо ҳамсинфонро, балки муаллимонро ҳам даъват кардан лозим аст!"},
                 {"speaker": "A", "zh": "好主意！只要大家参加，活动就会成功！", "pinyin": "Hǎo zhǔyì! Zhǐyào dàjiā cānjiā, huódòng jiù huì chénggōng!", "uz": "Zo'r fikr! Faqat hamma qatnashsa, tadbir muvaffaqiyatli bo'ladi!", "ru": "Отличная идея! Только бы все участвовали, мероприятие будет успешным!", "tj": "Ғояи олӣ! Танҳо ҳама иштирок кунанд, тадбир муваффақ мешавад!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Xitoy tili kurslari haqida", "ru": "О курсах китайского языка", "tj": "Дар бораи курсҳои забони чинӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "关于汉语课，你有什么建议？", "pinyin": "Guānyú Hànyǔ kè, nǐ yǒu shénme jiànyì?", "uz": "Xitoy tili kurslari haqida qanday takliflaringiz bor?", "ru": "Насчёт курсов китайского, какие у тебя предложения?", "tj": "Дар бораи курсҳои забони чинӣ, чӣ пешниҳод доред?"},
                 {"speaker": "B", "zh": "只要你每天练习，汉语就会越来越好！", "pinyin": "Zhǐyào nǐ měitiān liànxí, Hànyǔ jiù huì yuè lái yuè hǎo!", "uz": "Faqat har kuni mashq qilsangiz, xitoy tilingiz tobora yaxshilanadi!", "ru": "Только занимайся каждый день, китайский будет становиться всё лучше!", "tj": "Танҳо ҳар рӯз машқ кунед, забони чиниатон рӯз ба рӯз беҳтар мешавад!"},
                 {"speaker": "A", "zh": "这门课不但有用，而且很有意思！", "pinyin": "Zhè mén kè búdàn yǒuyòng, érqiě hěn yǒu yìsi!", "uz": "Bu kurs nafaqat foydali, balki juda qiziqarli ham!", "ru": "Этот курс не только полезный, но и очень интересный!", "tj": "Ин курс на танҳо муфид, балки хеле ҷолиб ҳам аст!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Muvaffaqiyat haqida", "ru": "Об успехе", "tj": "Дар бораи муваффақият"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "关于你的成功，你有什么秘诀？", "pinyin": "Guānyú nǐ de chénggōng, nǐ yǒu shénme mìjué?", "uz": "Muvaffaqiyatingiz haqida, sirrningiz nima?", "ru": "Насчёт вашего успеха, в чём ваш секрет?", "tj": "Дар бораи муваффақияти шумо, рози шумо чист?"},
                 {"speaker": "B", "zh": "只要你相信自己，就能成功！", "pinyin": "Zhǐyào nǐ xiāngxìn zìjǐ, jiù néng chénggōng!", "uz": "Faqat o'zingizga ishonsangiz, muvaffaqiyat qozonasiz!", "ru": "Только верь в себя, и добьёшься успеха!", "tj": "Танҳо ба худатон боварӣ дошта бошед, муваффақ мешавед!"},
                 {"speaker": "A", "zh": "不但要相信自己，而且还要努力工作！", "pinyin": "Búdàn yào xiāngxìn zìjǐ, érqiě hái yào nǔlì gōngzuò!", "uz": "Nafaqat o'ziga ishonish, balki ham qattiq ishlash kerak!", "ru": "Нужно не только верить в себя, но и усердно работать!", "tj": "На танҳо ба худ боварӣ доштан, балки ҳам сахт кор кардан лозим аст!"},

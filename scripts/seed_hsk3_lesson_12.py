@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Muhim narsalarni topshirish", "ru": "Передача важных вещей", "tj": "Супурдани чизҳои муҳим"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "把重要的东西放在我这儿吧，安全。", "pinyin": "Bǎ zhòngyào de dōngxi fàng zài wǒ zhèr ba, ānquán.", "uz": "Muhim narsalarni men oldimda qoldir, xavfsiz bo'ladi.", "ru": "Оставь важные вещи у меня, будет безопасно.", "tj": "Чизҳои муҳимро пеши ман монд, бехатар мешавад."},
                 {"speaker": "B", "zh": "好，我把钥匙交给你。你帮我保管吧。", "pinyin": "Hǎo, wǒ bǎ yàoshi jiāo gěi nǐ. Nǐ bāng wǒ bǎoguǎn ba.", "uz": "Yaxshi, kalitni sizga topshiraman. Saqlab qo'yib bering.", "ru": "Ладно, отдам тебе ключ. Сохрани, пожалуйста.", "tj": "Хуб, калидро ба шумо медиҳам. Нигоҳ доред."},
                 {"speaker": "A", "zh": "放心，我会好好保管的。", "pinyin": "Fàngxīn, wǒ huì hǎohǎo bǎoguǎn de.", "uz": "Xotirjam bo'ling, yaxshi saqlayman.", "ru": "Не беспокойся, я хорошо сохраню.", "tj": "Хотирҷамъ бошед, хуб нигоҳ медорам."},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Hujjatlarni saqlash", "ru": "Хранение документов", "tj": "Нигоҳ доштани ҳуҷҷатҳо"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你的证件放到哪儿了？", "pinyin": "Nǐ de zhèngjiàn fàng dào nǎr le?", "uz": "Hujjatlaringizni qayerga qo'ydingiz?", "ru": "Куда ты положил документы?", "tj": "Ҳуҷҷатҳоятонро куҷо гузоштед?"},
                 {"speaker": "B", "zh": "我把证件放在包里了，别担心。", "pinyin": "Wǒ bǎ zhèngjiàn fàng zài bāo lǐ le, bié dānxīn.", "uz": "Hujjatlarni sumkaga solib qo'ydim, xavotir olmang.", "ru": "Я положил документы в сумку, не беспокойся.", "tj": "Ман ҳуҷҷатҳоро дар сумка гузоштам, нигарон набошед."},
                 {"speaker": "A", "zh": "他才七点就回来了，真早！", "pinyin": "Tā cái qī diǎn jiù huílái le, zhēn zǎo!", "uz": "U soat yettiday uyga keldi, juda erta!", "ru": "Он уже в семь вернулся домой, так рано!", "tj": "Вай соати ҳафт баргашт ба хона, хеле барвақт!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "'才' va '就' farqi", "ru": "Разница '才' и '就'", "tj": "Фарқи '才' ва '就'"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你几点到的？我等了很久！", "pinyin": "Nǐ jǐ diǎn dào de? Wǒ děng le hěn jiǔ!", "uz": "Soat nechada keldingiz? Men ancha kutdim!", "ru": "Во сколько ты пришёл? Я долго ждал!", "tj": "Соати чанд омадед? Ман хеле интизор шудам!"},
                 {"speaker": "B", "zh": "我九点就到了，你怎么九点半才来？", "pinyin": "Wǒ jiǔ diǎn jiù dào le, nǐ zěnme jiǔ diǎn bàn cái lái?", "uz": "Men soat to'qqizda keldim, nima uchun siz soat to'qqiz yarimda keldingiz?", "ru": "Я пришёл в девять, почему ты пришёл только в половине десятого?", "tj": "Ман соати нӯҳ омадам, чаро шумо соати нӯҳ ва ним омадед?"},
                 {"speaker": "A", "zh": "对不起，我让你久等了！", "pinyin": "Duìbuqǐ, wǒ ràng nǐ jiǔ děng le!", "uz": "Kechirasiz, sizni uzoq kutdirdim!", "ru": "Извини, я заставил тебя долго ждать!", "tj": "Бубахшед, ман шуморо дер интизор гузоштам!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Yo'qotmaslik uchun ehtiyotkorlik", "ru": "Осторожность, чтобы не потерять", "tj": "Эҳтиёт барои гум накардан"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你把护照放到安全的地方了吗？", "pinyin": "Nǐ bǎ hùzhào fàng dào ānquán de dìfāng le ma?", "uz": "Pasportni xavfsiz joyga qo'ydingizmi?", "ru": "Ты положил паспорт в безопасное место?", "tj": "Оё шиносномаро дар ҷои бехатар гузоштед?"},
                 {"speaker": "B", "zh": "放了，让你担心了，不好意思。", "pinyin": "Fàng le, ràng nǐ dānxīn le, bù hǎo yìsi.", "uz": "Qo'ydim, sizni xavotir qildim, kechirasiz.", "ru": "Положил, извини, что заставил тебя беспокоиться.", "tj": "Гузоштам, ман шуморо нигарон кардам, бубахшед."},
                 {"speaker": "A", "zh": "小心点儿，别把它丢了！", "pinyin": "Xiǎoxīn diǎnr, bié bǎ tā diū le!", "uz": "Ehtiyot bo'ling, yo'qotmang!", "ru": "Будь осторожен, не потеряй его!", "tj": "Эҳтиёт бошед, гум накунед!"},

@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Imtihon oldidan suhbat", "ru": "Разговор перед экзаменом", "tj": "Суҳбат пеш аз имтиҳон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你最近在复习什么？", "pinyin": "Nǐ zuìjìn zài fùxí shénme?", "uz": "Siz yaqinda nimani takrorlamoqdasiz?", "ru": "Что ты сейчас повторяешь?", "tj": "Шумо охирон чиро такрор мекунед?"},
                 {"speaker": "B", "zh": "数学，数学比历史难多了！", "pinyin": "Shùxué, shùxué bǐ lìshǐ nán duō le!", "uz": "Matematika, matematika tarixdan ancha qiyin!", "ru": "Математику, математика намного сложнее истории!", "tj": "Математика, математика аз таърих хеле душвортар аст!"},
                 {"speaker": "A", "zh": "你数学成绩怎么样？", "pinyin": "Nǐ shùxué chéngjì zěnme yàng?", "uz": "Matematika baholaringiz qanday?", "ru": "Как у тебя оценки по математике?", "tj": "Баҳоҳои математикаи шумо чӣ тавр аст?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Fanlarni taqqoslash", "ru": "Сравнение предметов", "tj": "Муқоисаи фанҳо"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "物理比化学难吗？", "pinyin": "Wùlǐ bǐ huàxué nán ma?", "uz": "Fizika kimyodan qiyinroqmi?", "ru": "Физика сложнее химии?", "tj": "Оё физика аз химия душвортар аст?"},
                 {"speaker": "B", "zh": "物理不如化学难，但都需要复习。", "pinyin": "Wùlǐ bùrú huàxué nán, dàn dōu xūyào fùxí.", "uz": "Fizika kimyo kadar qiyin emas, lekin ikkalasi ham takrorlanishi kerak.", "ru": "Физика не такая сложная, как химия, но обе требуют повторения.", "tj": "Физика ба монанди химия душвор нест, аммо ҳарду такрор мехоҳанд."},
                 {"speaker": "A", "zh": "历史需要记几百个年代，很难！", "pinyin": "Lìshǐ xūyào jì jǐ bǎi gè niándài, hěn nán!", "uz": "Tarix uchun bir necha yuz yilni eslab qolish kerak, juda qiyin!", "ru": "В истории нужно запомнить несколько сотен дат, это очень сложно!", "tj": "Дар таърих чанд садсолаи таърихро ёд кардан лозим аст, хеле душвор!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "To'liq ball olish haqida", "ru": "О полном балле", "tj": "Дар бораи балли пурра"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你上次数学考了多少分？", "pinyin": "Nǐ shàng cì shùxué kǎo le duōshǎo fēn?", "uz": "O'tgan safar matematikadan necha ball oldingiz?", "ru": "Сколько ты набрал по математике в прошлый раз?", "tj": "Дафъаи гузашта аз математика чанд балл гирифтед?"},
                 {"speaker": "B", "zh": "九十多分，差一点儿满分！", "pinyin": "Jiǔshí duō fēn, chà yīdiǎnr mǎnfēn!", "uz": "To'qson dan ortiq ball, to'liq ballga oz qoldi!", "ru": "Больше девяноста, совсем чуть-чуть до полного балла!", "tj": "Наваду чанд балл, каме ба балли пурра монда!"},
                 {"speaker": "A", "zh": "太棒了！你比我好多了！", "pinyin": "Tài bàng le! Nǐ bǐ wǒ hǎo duō le!", "uz": "Zo'r! Siz mendan ancha yaxshisiz!", "ru": "Отлично! Ты намного лучше меня!", "tj": "Олӣ! Шумо аз ман хеле беҳтаред!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Imtihonga tayyorlanish rejasi", "ru": "План подготовки к экзамену", "tj": "Нақшаи омодагӣ ба имтиҳон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "考试还有几天？", "pinyin": "Kǎoshì hái yǒu jǐ tiān?", "uz": "Imtihonga necha kun qoldi?", "ru": "Сколько дней осталось до экзамена?", "tj": "То имтиҳон чанд рӯз монда?"},
                 {"speaker": "B", "zh": "还有十多天，时间不多了！", "pinyin": "Hái yǒu shí duō tiān, shíjiān bù duō le!", "uz": "O'n kundan ortiq qoldi, vaqt ko'p emas!", "ru": "Больше десяти дней, времени осталось немного!", "tj": "Даҳу чанд рӯз монда, вақт зиёд нест!"},
                 {"speaker": "A", "zh": "重要的内容一定要仔细复习。", "pinyin": "Zhòngyào de nèiróng yīdìng yào zǐxì fùxí.", "uz": "Muhim mavzularni albatta diqqat bilan takrorlamoq kerak.", "ru": "Важные темы обязательно нужно внимательно повторить.", "tj": "Мавзӯҳои муҳимро ҳатман бодиққат такрор кардан лозим аст."},

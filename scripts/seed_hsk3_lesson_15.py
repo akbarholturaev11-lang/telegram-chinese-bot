@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Tibbiy tekshiruv natijalari", "ru": "Результаты медицинского осмотра", "tj": "Натиҷаҳои муоинаи тиббӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "医生，检查结果怎么样？", "pinyin": "Yīshēng, jiǎnchá jiéguǒ zěnme yàng?", "uz": "Doktor, tekshiruv natijalari qanday?", "ru": "Доктор, каковы результаты осмотра?", "tj": "Духтур, натиҷаҳои муоина чӣ тавр аст?"},
                 {"speaker": "B", "zh": "除了血压以外，其他都没什么问题！", "pinyin": "Chúle xuèyā yǐwài, qítā dōu méi shénme wèntí!", "uz": "Qon bosimdan tashqari, boshqa hamma narsa muammosiz!", "ru": "Кроме давления крови, всё остальное без проблем!", "tj": "Ба ғайр аз фишори хун, ҳама чизи дигар мушкиле нест!"},
                 {"speaker": "A", "zh": "太好了！血压有什么问题？", "pinyin": "Tài hǎo le! Xuèyā yǒu shénme wèntí?", "uz": "Juda yaxshi! Qon bosimida qanday muammo bor?", "ru": "Отлично! Что с давлением?", "tj": "Олӣ! Фишори хун чӣ мушкилӣ дорад?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Sog'liq haqida muloqot", "ru": "Разговор о здоровье", "tj": "Муколама дар бораи саломатӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你最近身体怎么样？", "pinyin": "Nǐ zuìjìn shēntǐ zěnme yàng?", "uz": "Yaqinda sog'ligingiz qanday?", "ru": "Как у тебя здоровье последнее время?", "tj": "Охирон саломатиатон чӣ тавр?"},
                 {"speaker": "B", "zh": "除了有点儿累以外，其他都正常，极满意了！", "pinyin": "Chúle yǒudiǎnr lèi yǐwài, qítā dōu zhèngcháng, jí mǎnyì le!", "uz": "Biroz charchashdan tashqari, boshqa hammasi normal, juda mamnunam!", "ru": "Кроме небольшой усталости, всё нормально, очень доволен!", "tj": "Ба ғайр аз каме хасташавӣ, ҳама муқаррарӣ, ниҳоят қаноатмандам!"},
                 {"speaker": "A", "zh": "真好！健康是最重要的！", "pinyin": "Zhēn hǎo! Jiànkāng shì zuì zhòngyào de!", "uz": "Juda yaxshi! Sog'liq eng muhim narsa!", "ru": "Отлично! Здоровье — это самое важное!", "tj": "Хуб! Саломатӣ муҳимтарин чиз аст!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Muammoni hal qilish", "ru": "Решение проблемы", "tj": "Ҳал кардани мушкилот"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "项目报告除了结论以外，其他都写完了。", "pinyin": "Xiàngmù bàogào chúle jiélùn yǐwài, qítā dōu xiě wán le.", "uz": "Loyiha hisobotida xulosa qismidan tashqari, boshqa hammasi yozildi.", "ru": "В отчёте по проекту, кроме заключения, всё написано.", "tj": "Дар гузориши лоиҳа, ба ғайр аз хулоса, ҳама навишта шуд."},
                 {"speaker": "B", "zh": "好极了！结论什么时候能写完？", "pinyin": "Hǎo jí le! Jiélùn shénme shíhou néng xiě wán?", "uz": "Zo'r! Xulosa qachon yozib bo'linadi?", "ru": "Отлично! Когда будет готово заключение?", "tj": "Олӣ! Хулоса кай тамом мешавад?"},
                 {"speaker": "A", "zh": "今天晚上就能写完，别担心！", "pinyin": "Jīntiān wǎnshàng jiù néng xiě wán, bié dānxīn!", "uz": "Bu kechqurun yozib bo'linadi, xavotir olmang!", "ru": "Сегодня вечером закончу, не беспокойтесь!", "tj": "Имшаб тамом мешавад, нигарон набошед!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Kurs natijalarini muhokama qilish", "ru": "Обсуждение итогов курса", "tj": "Муҳокимаи натиҷаҳои курс"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "这次课除了语法以外，其他都完全没问题。", "pinyin": "Zhè cì kè chúle yǔfǎ yǐwài, qítā dōu wánquán méi wèntí.", "uz": "Bu kurs grammatikadan tashqari, boshqa hamma narsa mutlaqo muammosiz.", "ru": "На этом курсе, кроме грамматики, всё остальное совершенно без проблем.", "tj": "Дар ин курс, ба ғайр аз грамматика, ҳама чизи дигар пурра мушкиле нест."},
                 {"speaker": "B", "zh": "哪里哪里，你的语法也好极了！", "pinyin": "Nǎlǐ nǎlǐ, nǐ de yǔfǎ yě hǎo jí le!", "uz": "Yo'q yo'q, sizning grammatikangiz ham juda zo'r!", "ru": "Что вы, ваша грамматика тоже очень хороша!", "tj": "Не не, грамматикаи шумо ҳам ниҳоят олӣ аст!"},
                 {"speaker": "A", "zh": "谢谢老师，我觉得哪儿都还需要努力！", "pinyin": "Xièxie lǎoshī, wǒ juéde nǎr dōu hái xūyào nǔlì!", "uz": "Rahmat, o'qituvchi, menimcha hamma joyda hali harakat kerak!", "ru": "Спасибо, учитель, я думаю, везде ещё нужно стараться!", "tj": "Раҳмат, муаллим, ба фикрам ҳама ҷо ҳанӯз кӯшиш лозим аст!"},

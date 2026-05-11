@@ -31,8 +31,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Uyda ko'zoynak qidirayotganda", "scene_ru": "Поиск очков дома", "scene_tj": "Ҷустуҷӯи айнак дар хона",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我的眼镜呢？刚才还在桌子上，怎么突然找不到了？", "pinyin": "Wǒ de yǎnjìng ne? Gāngcái hái zài zhuōzi shàng, zěnme tūrán zhǎo bu dào le?", "uz": "Ko'zoynagim qani? Hozirgina stol ustida edi, qanday qilib to'satdan topib bo'lmay qoldi?", "ru": "Где мои очки? Только что были на столе — как вдруг не могу найти?", "tj": "Айнакам куҷост? Як лаҳза пеш рӯйи миз буд, чӣ тавр ногаҳон ёфта намешавад?"},
                 {"speaker": "B", "zh": "我帮你找。你刚才在哪儿坐的？", "pinyin": "Wǒ bāng nǐ zhǎo. Nǐ gāngcái zài nǎr zuò de?", "uz": "Senga yordam beraman. Sen hozirgina qayerda o'tirganding?", "ru": "Я помогу тебе найти. Где ты только что сидел?", "tj": "Ман ёрӣ мерасонам. Як лаҳза пеш дар куҷо нишаста будед?"},
                 {"speaker": "A", "zh": "我刚才在沙发上坐着看书。", "pinyin": "Wǒ gāngcái zài shāfā shàng zuò zhe kànshū.", "uz": "Men hozirgina divanда o'tirib kitob o'qiyotgan edim.", "ru": "Только что сидел на диване и читал книгу.", "tj": "Ман як лаҳза пеш рӯйи диван нишаста китоб мехондам."},
@@ -40,8 +42,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Idorada hujjat qidirayotganda", "scene_ru": "Поиск документа в офисе", "scene_tj": "Ҷустуҷӯи ҳуҷҷат дар идора",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你看见我的报告了吗？我刚才放在这里的。", "pinyin": "Nǐ kànjian wǒ de bàogào le ma? Wǒ gāngcái fàng zài zhèlǐ de.", "uz": "Mening hisobotimni ko'rdingizmi? Men hozirgina shu yerga qo'ygan edim.", "ru": "Ты видел мой доклад? Только что положил его здесь.", "tj": "Ҳисоботи маро дидед? Ман он лаҳза ин ҷо гузошта будам."},
                 {"speaker": "B", "zh": "经理刚拿走了一个文件，会不会是你的？", "pinyin": "Jīnglǐ gāng ná zǒu le yī ge wénjiàn, huì bu huì shì nǐ de?", "uz": "Menejer hozirgina bir hujjat olib ketdi, siznikimas?", "ru": "Менеджер только что унёс один документ — не твой ли это?", "tj": "Мудир ҳозир як ҳуҷҷат бурд, оё ин ҳуҷҷати шумо нест?"},
                 {"speaker": "A", "zh": "不清楚，我去问一下，能帮我找一下吗？", "pinyin": "Bù qīngchǔ, wǒ qù wèn yīxià, néng bāng wǒ zhǎo yīxià ma?", "uz": "Aniq emas, men borib so'rayman, bir qidirib berolaysizmi?", "ru": "Непонятно, я пойду спрошу — можете помочь поискать?", "tj": "Аниқ нест, ман рафта мепурсам, оё метавонед ёрӣ расонед?"},
@@ -49,8 +53,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Parkda uchrashuv", "scene_ru": "Встреча в парке", "scene_tj": "Вохӯрӣ дар боғ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你在公园里找什么？", "pinyin": "Nǐ zài gōngyuán lǐ zhǎo shénme?", "uz": "Parkda nima qidirayapsiz?", "ru": "Что ты ищешь в парке?", "tj": "Дар боғ чӣ меҷӯед?"},
                 {"speaker": "B", "zh": "我的钥匙突然找不到了！刚才还在口袋里的。", "pinyin": "Wǒ de yàoshi tūrán zhǎo bu dào le! Gāngcái hái zài kǒudài lǐ de.", "uz": "Kalitim to'satdan yo'qolib qoldi! Hozirgina cho'ntakda edi.", "ru": "Мои ключи вдруг исчезли! Только что были в кармане.", "tj": "Калидам ногаҳон гум шуд! Як лаҳза пеш дар ҷайб буд."},
                 {"speaker": "A", "zh": "你刚才在这里聊天了吗？也许在长椅上。", "pinyin": "Nǐ gāngcái zài zhèlǐ liáotiān le ma? Yěxǔ zài cháng yǐ shàng.", "uz": "Hozirgina bu yerda gaplashayotgan edingizmi? Ehtimol uzun o'rindiqda.", "ru": "Только что разговаривал здесь? Может быть, на скамейке.", "tj": "Як лаҳза пеш инҷо суҳбат мекардед? Шояд рӯйи нимкат."},
@@ -58,8 +64,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Xiyobonda musiqa eshitayotganda", "scene_ru": "На бульваре во время прослушивания музыки", "scene_tj": "Дар хиёбон ҳангоми гӯш кардани мусиқа",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你一边听音乐一边锻炼，特别厉害！", "pinyin": "Nǐ yībiān tīng yīnyuè yībiān duànliàn, tèbié lìhai!", "uz": "Musiqa tinglab ham mashq qilayapsiz, juda zo'rsiz!", "ru": "Ты и музыку слушаешь, и тренируешься — молодец!", "tj": "Шумо ҳам мусиқа мегӯшед ҳам машқ мекунед, хеле зӯр!"},
                 {"speaker": "B", "zh": "我觉得听音乐能让人更放松，锻炼效果更好！", "pinyin": "Wǒ juéde tīng yīnyuè néng ràng rén gèng fàngsōng, duànliàn xiàoguǒ gèng hǎo!", "uz": "Musiqa eshitish odamni yanada tinchitadi deb o'ylayman, mashqning samarasi bundan ham yaxshi bo'ladi!", "ru": "Я считаю, что музыка помогает расслабиться, и эффект от тренировки ещё лучше!", "tj": "Ман фикр мекунам, ки мусиқа ба одам боз ҳам осоишро медиҳад, натиҷаи машқ боз ҳам беҳтар мешавад!"},
                 {"speaker": "A", "zh": "你离开公园后，去哪儿呢？", "pinyin": "Nǐ líkāi gōngyuán hòu, qù nǎr ne?", "uz": "Parkdan ketganingizdan keyin qayerga bormoqchisiz?", "ru": "Куда ты пойдёшь после того, как уйдёшь из парка?", "tj": "Пас аз тарки боғ ба куҷо мераввед?"},

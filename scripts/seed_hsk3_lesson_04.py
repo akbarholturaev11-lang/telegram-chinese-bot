@@ -31,8 +31,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Sinfxonada talabalar haqida suhbat", "scene_ru": "Разговор о студентах в классе", "scene_tj": "Суҳбат дар бораи донишҷӯён дар синф",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你们班有没有又聪明又努力的学生？", "pinyin": "Nǐmen bān yǒu méiyǒu yòu cōngmíng yòu nǔlì de xuésheng?", "uz": "Sizlarda ham aqlli ham g'ayratli talaba bormi?", "ru": "Есть ли у вас в классе студент, который и умный, и старательный?", "tj": "Дар синфи шумо оё донишҷӯе ҳаст, ки ҳам зирак ҳам кӯшишкор бошад?"},
                 {"speaker": "B", "zh": "有！小丽又聪明又认真，总是第一个回答问题。", "pinyin": "Yǒu! Xiǎo Lì yòu cōngmíng yòu rènzhēn, zǒngshì dì yī ge huídá wèntí.", "uz": "Bor! Kichik Li ham aqlli ham mas'uliyatli, doim birinchi bo'lib savollarga javob beradi.", "ru": "Есть! Маленькая Ли и умная, и ответственная — всегда первой отвечает на вопросы.", "tj": "Ҳаст! Сяо Ли ҳам зирак ҳам масъулиятшинос аст, ҳамеша аввалин ҷавоб медиҳад."},
                 {"speaker": "A", "zh": "她是几年级的？", "pinyin": "Tā shì jǐ niánjí de?", "uz": "U nechanchi sinfda?", "ru": "Она в каком классе?", "tj": "Вай дар синфи чанд аст?"},
@@ -40,8 +42,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Supermarketda savdo xodimi haqida", "scene_ru": "О продавце в супермаркете", "scene_tj": "Дар бораи фурӯшанда дар супермаркет",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你看那个售货员，她总是笑着跟客人说话。", "pinyin": "Nǐ kàn nàge shòuhuòyuán, tā zǒngshì xiào zhe gēn kèrén shuōhuà.", "uz": "O'sha sotuvchiga qara, u doim kulib mehmonlar bilan gaplashadi.", "ru": "Посмотри на ту продавщицу — она всегда разговаривает с покупателями с улыбкой.", "tj": "Ба он фурӯшанда нигоҳ кун, вай ҳамеша бо табассум бо харидорон сӯҳбат мекунад."},
                 {"speaker": "B", "zh": "是啊，她又热情又认真，客人都很喜欢她。", "pinyin": "Shì a, tā yòu rèqíng yòu rènzhēn, kèrén dōu hěn xǐhuan tā.", "uz": "Ha, u ham iliq ham mas'uliyatli, barcha mehmonlar uni yaxshi ko'rishadi.", "ru": "Точно — она и приветливая, и ответственная, все покупатели её любят.", "tj": "Бале, вай ҳам гармсер ҳам масъулиятшинос аст, ҳама харидорон ӯро дӯст медоранд."},
                 {"speaker": "A", "zh": "她站着工作了这么多小时，不累吗？", "pinyin": "Tā zhàn zhe gōngzuò le zhème duō xiǎoshí, bù lèi ma?", "uz": "U shu qadar ko'p soat tik turib ishladi, charchamadimi?", "ru": "Она столько часов работала стоя — разве не устала?", "tj": "Вай ин қадар соатҳо истода кор кард, оё хаста нашуд?"},
@@ -49,8 +53,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Musobaqa fotosuratlari haqida", "scene_ru": "О фотографиях соревнований", "scene_tj": "Дар бораи аксҳои мусобақа",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "这张照片是在哪儿拍的？你们在参加比赛吗？", "pinyin": "Zhè zhāng zhàopiàn shì zài nǎr pāi de? Nǐmen zài cānjiā bǐsài ma?", "uz": "Bu rasm qayerda tushirilgan? Siz musobaqada qatnashyapsizmi?", "ru": "Где сделано это фото? Вы участвуете в соревновании?", "tj": "Ин акс дар куҷо гирифта шудааст? Шумо дар мусобақа иштирок мекардед?"},
                 {"speaker": "B", "zh": "对，这是去年的篮球比赛。我们班又努力又团结，赢了！", "pinyin": "Duì, zhè shì qùnián de lánqiú bǐsài. Wǒmen bān yòu nǔlì yòu tuánjié, yíng le!", "uz": "Ha, bu o'tgan yilgi basketbol musobaqasi. Bizning sinfimiz ham g'ayratli ham birjamul edi, yutdik!", "ru": "Да, это прошлогоднее баскетбольное соревнование. Наш класс и старательный, и дружный — победили!", "tj": "Бале, ин мусобақаи баскетболи соли гузашта аст. Синфи мо ҳам кӯшишкор ҳам якдил буд, ғалаба кардем!"},
                 {"speaker": "A", "zh": "太棒了！你是几年级的时候开始打篮球的？", "pinyin": "Tài bàng le! Nǐ shì jǐ niánjí de shíhou kāishǐ dǎ lánqiú de?", "uz": "Ajoyib! Nechanchi sinfda basketbol o'ynashni boshlagansiz?", "ru": "Отлично! В каком классе ты начал играть в баскетбол?", "tj": "Аъло! Дар синфи чанд баскетбол бозӣ карданро оғоз кардед?"},
@@ -58,8 +64,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Supermarketda tort sotib olish", "scene_ru": "Покупка торта в супермаркете", "scene_tj": "Харидани торт дар супермаркет",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我今天饿极了，我们去超市买点儿吃的吧。", "pinyin": "Wǒ jīntiān è jí le, wǒmen qù chāoshì mǎi diǎnr chī de ba.", "uz": "Men bugun juda ochinchman, supermarketga borib biroz yegulik sotib olaylik.", "ru": "Я сегодня страшно голоден — пойдём в супермаркет купим что-нибудь поесть.", "tj": "Ман имрӯз хеле гурусна ҳастам, биёед ба супермаркет равем каме хӯрокӣ харем."},
                 {"speaker": "B", "zh": "好啊！你想吃什么？超市里有很多又好吃又新鲜的东西。", "pinyin": "Hǎo a! Nǐ xiǎng chī shénme? Chāoshì lǐ yǒu hěn duō yòu hǎochī yòu xīnxiān de dōngxi.", "uz": "Yaxshi! Nima yemoqchisiz? Supermarketda juda ko'p ham mazali ham yangi narsalar bor.", "ru": "Хорошо! Что хочешь есть? В супермаркете много вкусного и свежего.", "tj": "Хуб! Чӣ хӯрдан мехоҳед? Дар супермаркет чизҳои ҳам хӯрданӣ ҳам тозаи зиёде ҳаст."},
                 {"speaker": "A", "zh": "我看到那边有蛋糕，又甜又好看！", "pinyin": "Wǒ kàndào nàbiān yǒu dàngāo, yòu tián yòu hǎokàn!", "uz": "U tomonda tort borini ko'rdim, ham shirin ham chiroyli!", "ru": "Я вижу там торт — и сладкий, и красивый!", "tj": "Он тараф торт мебинам, ҳам ширин ҳам зебо!"},

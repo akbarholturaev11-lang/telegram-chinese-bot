@@ -31,8 +31,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Uy ziyofatida", "scene_ru": "На домашней вечеринке", "scene_tj": "Дар зиёфати хонагӣ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "桌子上放着很多饮料，你想喝茶还是果汁？", "pinyin": "Zhuōzi shàng fàng zhe hěn duō yǐnliào, nǐ xiǎng hē chá háishi guǒzhī?", "uz": "Stol ustida ko'p ichimlik bor, choy ichmoqchimisiz yoki mevali sharbat?", "ru": "На столе много напитков, ты хочешь чай или сок?", "tj": "Рӯйи миз нӯшокиҳои зиёд гузошта шудааст, шумо чой ё шарбати мева мехоҳед?"},
                 {"speaker": "B", "zh": "来一杯果汁吧！这些水果看起来很新鲜。", "pinyin": "Lái yī bēi guǒzhī ba! Zhèxiē shuǐguǒ kànqǐlai hěn xīnxiān.", "uz": "Bir stakan mevali sharbat bering! Bu mevalar juda yangi ko'rinadi.", "ru": "Дайте сок! Эти фрукты выглядят очень свежими.", "tj": "Як пиёла шарбати мева биёред! Ин меваҳо хеле тоза менамоянд."},
                 {"speaker": "A", "zh": "这是从南方带来的，又新鲜又甜！", "pinyin": "Zhè shì cóng nánfāng dài lái de, yòu xīnxiān yòu tián!", "uz": "Bularni janubdan olib kelgan, ham yangi ham shirin!", "ru": "Их привезли с юга — и свежие, и сладкие!", "tj": "Инҳоро аз ҷануб овардаанд, ҳам тоза ҳам ширин!"},
@@ -40,8 +42,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Kiyim-kechak do'konida", "scene_ru": "В магазине одежды", "scene_tj": "Дар дӯкони либос",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "您好，您要买裤子还是裙子？", "pinyin": "Nínhǎo, nín yào mǎi kùzi háishi qúnzi?", "uz": "Salom, shim sotib olmoqchimisiz yoki yubka?", "ru": "Здравствуйте, вы хотите купить брюки или юбку?", "tj": "Салом, шумо шалвор мехоҳед харед ё дӯмон?"},
                 {"speaker": "B", "zh": "我要买一条裤子，你们有没有绿色的？", "pinyin": "Wǒ yào mǎi yī tiáo kùzi, nǐmen yǒu méiyǒu lǜ sè de?", "uz": "Menga bir juft shim kerak, sizlarda yashil rangdagisi bormi?", "ru": "Мне нужны одни брюки, у вас есть зелёные?", "tj": "Ман як шалвор мехоҳам харам, оё шумо сабз доред?"},
                 {"speaker": "A", "zh": "有，这边放着好几条呢，您喜欢深绿还是浅绿？", "pinyin": "Yǒu, zhèbiān fàng zhe hǎo jǐ tiáo ne, nín xǐhuan shēn lǜ háishi qiǎn lǜ?", "uz": "Bor, bu tomonda bir nechta turibdi, to'q yashilni yoqtirasizmi yoki och yashilni?", "ru": "Есть, здесь несколько штук — тёмно-зелёный или светло-зелёный?", "tj": "Ҳаст, ин тараф якчанд адад гузошта шудааст, сабзи торик ё сабзи равшан?"},
@@ -49,8 +53,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Tog' sayohatida", "scene_ru": "В горном походе", "scene_tj": "Ҳангоми сайри кӯҳ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你会爬山吗？今天我们打算去爬山。", "pinyin": "Nǐ huì páshān ma? Jīntiān wǒmen dǎsuàn qù páshān.", "uz": "Tog' tirmasha olasizmi? Bugun tog'ga chiqmoqchi edik.", "ru": "Ты умеешь лазать в горы? Сегодня планируем сходить.", "tj": "Оё ба кӯҳ баромада метавонӣ? Имрӯз нақша дорем ба кӯҳ равем."},
                 {"speaker": "B", "zh": "会，但是我怕累。坐缆车还是走路上去？", "pinyin": "Huì, dànshì wǒ pà lèi. Zuò lǎnchē háishi zǒulù shàngqù?", "uz": "Chiqaman, lekin charchashdan qo'rqaman. Kanatli aravacha bilan yoki piyoda?", "ru": "Умею, но боюсь устать. На фуникулёре или пешком?", "tj": "Метавонам, аммо аз хастагӣ метарсам. Бо канаткаш ё пиёда?"},
                 {"speaker": "A", "zh": "可以坐缆车或者走路，看你喜欢哪个。", "pinyin": "Kěyǐ zuò lǎnchē huòzhě zǒulù, kàn nǐ xǐhuan nǎge.", "uz": "Kanatli aravacha bilan yoki piyoda borish mumkin, o'zingiz tanlang.", "ru": "Можно на фуникулёре или пешком — на ваш выбор.", "tj": "Метавонед бо канаткаш ё пиёда, ба хоҳиши худ интихоб кунед."},
@@ -58,8 +64,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Mehmonxonada ro'yxatdan o'tish", "scene_ru": "Регистрация в гостинице", "scene_tj": "Қайдиёт дар меҳмонхона",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "您好，您要单人间还是双人间？", "pinyin": "Nínhǎo, nín yào dānrén jiān háishi shuāngrén jiān?", "uz": "Salom, sizga bir kishilik xona kerakmi yoki ikki kishilik?", "ru": "Здравствуйте, вам одноместный или двухместный номер?", "tj": "Салом, ба шумо як нафара хона лозим аст ё ду нафара?"},
                 {"speaker": "B", "zh": "两个人，要一间双人间。房间里有放空调吗？", "pinyin": "Liǎng ge rén, yào yī jiān shuāngrén jiān. Fángjiān lǐ yǒu fàng kōngtiáo ma?", "uz": "Ikki kishi uchun, ikki kishilik xona kerak. Xonada konditsioner bormi?", "ru": "Нас двое, нужен двухместный номер. В комнате есть кондиционер?", "tj": "Ду нафарем, як хонаи ду нафара лозим аст. Дар хона кондитсионер ҳаст?"},
                 {"speaker": "A", "zh": "有，房间里放着空调、电视和冰箱，非常舒服。", "pinyin": "Yǒu, fángjiān lǐ fàng zhe kōngtiáo, diànshì hé bīngxiāng, fēicháng shūfu.", "uz": "Bor, xonada konditsioner, televizor va muzlatgich o'rnatilgan, juda qulay.", "ru": "Да, в номере есть кондиционер, телевизор и холодильник — очень комфортно.", "tj": "Ҳаст, дар хона кондитсионер, телевизор ва яхдон гузошта шудааст, хеле роҳат аст."},

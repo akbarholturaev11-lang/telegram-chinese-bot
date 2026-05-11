@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Ish zo'riqishi haqida", "ru": "О стрессе на работе", "tj": "Дар бораи стресси корӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你看起来很累，怎么了？", "pinyin": "Nǐ kàn qǐlái hěn lèi, zěnme le?", "uz": "Siz juda charchagan ko'rinasiz, nima bo'ldi?", "ru": "Ты выглядишь очень уставшим, что случилось?", "tj": "Шумо хеле хаста менамоед, чӣ шуд?"},
                 {"speaker": "B", "zh": "我现在累得下了班就想睡觉！", "pinyin": "Wǒ xiànzài lèi de xià le bān jiù xiǎng shuìjiào!", "uz": "Hozir shu qadar charchaganmanki, ishdan chiqqanimdan so'ng darhol uxlashni xohlayman!", "ru": "Сейчас я так устал, что после работы сразу хочу спать!", "tj": "Ҳоло ман ончунон хастаам, ки баъд аз кор фавран хоб кардан мехоҳам!"},
                 {"speaker": "A", "zh": "如果每天都这么累，你要好好休息！", "pinyin": "Rúguǒ měitiān dōu zhème lèi, nǐ yào hǎohǎo xiūxi!", "uz": "Agar har kuni bu qadar charchangan bo'lsangiz, yaxshilab dam olishingiz kerak!", "ru": "Если каждый день так устаёшь, тебе нужно хорошенько отдохнуть!", "tj": "Агар ҳар рӯз ин қадар хаста шавед, бояд хуб-хуб истироҳат кунед!"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Ortiqcha ish haqida", "ru": "О сверхурочной работе", "tj": "Дар бораи изофа кор"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你最近经常加班吗？", "pinyin": "Nǐ zuìjìn jīngcháng jiābān ma?", "uz": "Yaqinda tez-tez ortiqcha ishlamoqdasizmi?", "ru": "Ты в последнее время часто работаешь сверхурочно?", "tj": "Охирон шумо зиёд изофа кор мекунед?"},
                 {"speaker": "B", "zh": "是的，累得连饭都吃不下去了！", "pinyin": "Shì de, lèi de lián fàn dōu chī bù xiàqù le!", "uz": "Ha, shu qadar charchaganmanki hatto ovqat ham yutolmayapman!", "ru": "Да, так устал, что даже есть не могу!", "tj": "Ҳа, ончунон хастаам, ки ҳатто хӯрок хӯрда наметавонам!"},
                 {"speaker": "A", "zh": "如果你慢慢减少加班，身体会好很多。", "pinyin": "Rúguǒ nǐ mànmàn jiǎnshǎo jiābān, shēntǐ huì hǎo hěn duō.", "uz": "Agar sekin-sekin ortiqcha ishni kamaytirsangiz, salomatligingiz ancha yaxshilanadi.", "ru": "Если постепенно сокращать сверхурочную работу, здоровье намного улучшится.", "tj": "Агар оҳиста-оҳиста изофа корро кам кунед, саломатиатон хеле беҳтар мешавад."},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Dam olish maslahatlar", "ru": "Советы по отдыху", "tj": "Тавсияҳои истироҳат"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "如果你好好放松，压力就会减少。", "pinyin": "Rúguǒ nǐ hǎohǎo fàngsōng, yālì jiù huì jiǎnshǎo.", "uz": "Agar yaxshilab dam olsangiz, bosim kamayadi.", "ru": "Если хорошенько расслабиться, стресс уменьшится.", "tj": "Агар хуб-хуб истироҳат кунед, фишор кам мешавад."},
                 {"speaker": "B", "zh": "我打算早早回家，好好睡一觉。", "pinyin": "Wǒ dǎsuàn zǎozǎo huí jiā, hǎohǎo shuì yī jiào.", "uz": "Men ertaroq uyga qaytib, yaxshilab uxlamoqchi.", "ru": "Я собираюсь пораньше вернуться домой и хорошенько поспать.", "tj": "Ман барвақт ба хона баргашта, хуб-хуб хобидан мехоҳам."},
                 {"speaker": "A", "zh": "对，如果你坚持早睡早起，精神会好很多！", "pinyin": "Duì, rúguǒ nǐ jiānchí zǎo shuì zǎo qǐ, jīngshén huì hǎo hěn duō!", "uz": "Ha, agar erta uxlab erta turish odatini saqlab qolsangiz, ruhingiz ancha yaxshi bo'ladi!", "ru": "Да, если привыкнуть рано ложиться и рано вставать, самочувствие намного улучшится!", "tj": "Ҳа, агар одати барвақт хобидан ва барвақт хестанро нигоҳ доред, ҳисси бошед хеле беҳтар мешавад!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Shartli rejalar haqida", "ru": "О планах при условии", "tj": "Дар бораи нақшаҳои шартӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "如果周末有时间，你想去哪儿放松？", "pinyin": "Rúguǒ zhōumò yǒu shíjiān, nǐ xiǎng qù nǎr fàngsōng?", "uz": "Agar dam olish kunlari vaqt bo'lsa, qayerda dam olmoqchi?", "ru": "Если на выходных будет время, куда хочешь пойти отдохнуть?", "tj": "Агар охири ҳафта вақт бошад, ба куҷо рафтан мехоҳед?"},
                 {"speaker": "B", "zh": "如果天气好，就好好在公园走走！", "pinyin": "Rúguǒ tiānqì hǎo, jiù hǎohǎo zài gōngyuán zǒuzou!", "uz": "Agar havo yaxshi bo'lsa, parkda yaxshilab yurib kelaman!", "ru": "Если погода будет хорошей, хорошенько погуляю в парке!", "tj": "Агар ҳаво хуб бошад, дар боғ хуб-хуб гаштам мекунам!"},
                 {"speaker": "A", "zh": "对，慢慢走，好好看看风景！", "pinyin": "Duì, mànmàn zǒu, hǎohǎo kànkan fēngjǐng!", "uz": "Ha, sekin-sekin yuring, manzarani yaxshilab ko'ring!", "ru": "Да, иди медленно, хорошенько посмотри на пейзаж!", "tj": "Ҳа, оҳиста-оҳиста биравед, хуб-хуб манзараро бубинед!"},

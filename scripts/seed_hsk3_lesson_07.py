@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Eski hamkasblar uchrashishi", "ru": "Встреча старых коллег", "tj": "Мулоқоти ҳамкорони қадимӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你好！好久不见，你还好吗？", "pinyin": "Nǐ hǎo! Hǎojiǔ bújiàn, nǐ hái hǎo ma?", "uz": "Salom! Ko'rishmaganimizga ancha bo'ldi, yaxshimisiz?", "ru": "Привет! Давно не виделись, как ты?", "tj": "Салом! Муддатест надидаем, чӣ ҳол доред?"},
                 {"speaker": "B", "zh": "挺好的！我们认识多久了？", "pinyin": "Tǐng hǎo de! Wǒmen rènshi duō jiǔ le?", "uz": "Yaxshi! Biz tanishganimizga qancha bo'ldi?", "ru": "Всё хорошо! Сколько лет мы уже знакомы?", "tj": "Хуб! Мо чанд вақт боз ошно ҳастем?"},
                 {"speaker": "A", "zh": "我跟你都认识五年了，时间过得真快！", "pinyin": "Wǒ gēn nǐ dōu rènshi wǔ nián le, shíjiān guò de zhēn kuài!", "uz": "Men siz bilan tanishganimizga besh yil bo'ldi, vaqt juda tez o'tadi!", "ru": "Мы с тобой знакомы уже пять лет, время летит так быстро!", "tj": "Ман бо шумо панҷ сол боз ошно ҳастем, вақт чӣ қадар тез мегузарад!"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Bankdagi ish haqida", "ru": "О работе в банке", "tj": "Дар бораи кор дар бонк"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我在银行工作，做了三年了。", "pinyin": "Wǒ zài yínháng gōngzuò, zuò le sān nián le.", "uz": "Men bankda ishlayman, uch yil bo'ldi.", "ru": "Я работаю в банке, уже три года.", "tj": "Ман дар бонк кор мекунам, се сол шуд."},
                 {"speaker": "B", "zh": "你对这份工作感兴趣吗？", "pinyin": "Nǐ duì zhè fèn gōngzuò gǎn xìngqù ma?", "uz": "Siz bu ishga qiziqasizmi?", "ru": "Вас интересует эта работа?", "tj": "Оё шумо ба ин кор шавқ доред?"},
                 {"speaker": "A", "zh": "很感兴趣！我对金融特别感兴趣。", "pinyin": "Hěn gǎn xìngqù! Wǒ duì jīnróng tèbié gǎn xìngqù.", "uz": "Juda qiziqaman! Men moliyaga ayniqsa qiziqaman.", "ru": "Очень интересует! Я особенно интересуюсь финансами.", "tj": "Хеле шавқ дорам! Ман ба молия хусусан шавқ дорам."},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "To'y yangiliklari", "ru": "Свадебные новости", "tj": "Хабарҳои арӯсӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "对了，你结婚了吗？", "pinyin": "Duì le, nǐ jiéhūn le ma?", "uz": "Ha aytgancha, siz uylandingizmi?", "ru": "Кстати, ты женился?", "tj": "Дар ҳар сурат, шумо издивоҷ кардед?"},
                 {"speaker": "B", "zh": "结婚两年了，你呢？", "pinyin": "Jiéhūn liǎng nián le, nǐ ne?", "uz": "Ikki yil bo'ldi, siz-chi?", "ru": "Уже два года в браке, а ты?", "tj": "Ду сол шуд, шумо чӣ?"},
                 {"speaker": "A", "zh": "我还没结婚，欢迎你们来我的婚礼！", "pinyin": "Wǒ hái méi jiéhūn, huānyíng nǐmen lái wǒ de hūnlǐ!", "uz": "Men hali uylanmadim, to'yimga marhamat keling!", "ru": "Я ещё не женился, добро пожаловать на мою свадьбу!", "tj": "Ман ҳанӯз издивоҷ накардаам, ба арӯсиям хуш омадед!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Poyezdga kechikish", "ru": "Опоздание на поезд", "tj": "Дер расидан ба қатора"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "火车几点开？", "pinyin": "Huǒchē jǐ diǎn kāi?", "uz": "Poyezd soat nechada jo'naydi?", "ru": "Во сколько отправляется поезд?", "tj": "Қатора соати чанд рафт мекунад?"},
                 {"speaker": "B", "zh": "差一刻八点，我们快点儿吧！", "pinyin": "Chà yī kè bā diǎn, wǒmen kuài diǎnr ba!", "uz": "Soat sakkizga chorak qoldi, tezroq boraylik!", "ru": "Без четверти восемь, давай поторопимся!", "tj": "Соати ҳашт чорак монда, зудтар биравем!"},
                 {"speaker": "A", "zh": "你去接他们，我去买票。", "pinyin": "Nǐ qù jiē tāmen, wǒ qù mǎi piào.", "uz": "Siz ularni kutib oling, men chipta sotib olaman.", "ru": "Ты встречай их, а я куплю билеты.", "tj": "Шумо онҳоро пешвоз гиред, ман чиптаро мехарам."},

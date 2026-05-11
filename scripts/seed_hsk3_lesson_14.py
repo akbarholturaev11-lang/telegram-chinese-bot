@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Dasturxon tayyorlash", "ru": "Подготовка стола", "tj": "Омода кардани дастархон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你把水果拿过来，我来切。", "pinyin": "Nǐ bǎ shuǐguǒ ná guò lái, wǒ lái qiē.", "uz": "Mevalarni olib keling, men kesaman.", "ru": "Принеси фрукты сюда, я порежу.", "tj": "Меваҳоро ин ҷо биёр, ман мебурам."},
                 {"speaker": "B", "zh": "好，先把苹果洗干净了再切吧。", "pinyin": "Hǎo, xiān bǎ píngguǒ xǐ gānjìng le zài qiē ba.", "uz": "Yaxshi, avval olmani yaxshilab yuvib, keyin kesaylik.", "ru": "Хорошо, сначала тщательно помой яблоки, потом режем.", "tj": "Хуб, аввал себро хуб бишӯем, баъд мебурем."},
                 {"speaker": "A", "zh": "对，先洗，再切，然后摆在盘子里。", "pinyin": "Duì, xiān xǐ, zài qiē, ránhòu bǎi zài pánzi lǐ.", "uz": "To'g'ri, avval yuvib, keyin kesib, so'ng laganga tizamiz.", "ru": "Верно, сначала мыть, потом резать, затем разложить на тарелку.", "tj": "Дуруст, аввал мешӯем, баъд мебурем, сипас дар табақ мечинем."},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Taom pishirish tartibi", "ru": "Порядок приготовления блюда", "tj": "Тартиби пухтани хӯрок"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "做这道菜怎么做？", "pinyin": "Zuò zhè dào cài zěnme zuò?", "uz": "Bu taomni qanday tayyorlash kerak?", "ru": "Как готовить это блюдо?", "tj": "Ин хӯрокро чӣ тавр пухтан?"},
                 {"speaker": "B", "zh": "先把肉切成小块，再放油，然后加蔬菜。", "pinyin": "Xiān bǎ ròu qiē chéng xiǎo kuài, zài fàng yóu, ránhòu jiā shūcài.", "uz": "Avval go'shtni kichik bo'laklarga kesing, keyin yog' soling, so'ng sabzavot qo'shing.", "ru": "Сначала нарежьте мясо на кусочки, потом добавьте масло, затем добавьте овощи.", "tj": "Аввал гӯштро ба порчаҳои хурд буред, баъд равған рехта, сипас сабзавот илова кунед."},
                 {"speaker": "A", "zh": "像你这样做，肯定很好吃！", "pinyin": "Xiàng nǐ zhèyàng zuò, kěndìng hěn hǎochī!", "uz": "Sizning usulda pishirsam, albatta juda mazali bo'ladi!", "ru": "Если готовить так, как ты, обязательно будет очень вкусно!", "tj": "Агар ба монанди шумо пазем, албатта хеле хушмаза мешавад!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Narsalarni joylashtirish", "ru": "Расстановка вещей", "tj": "Ҷой кардани чизҳо"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "请你把这些书搬过去放好。", "pinyin": "Qǐng nǐ bǎ zhèxiē shū bān guò qù fàng hǎo.", "uz": "Iltimos, bu kitoblarni ko'chirib u yerga qo'yib qo'ying.", "ru": "Пожалуйста, перенеси эти книги туда и поставь.", "tj": "Лутфан ин китобҳоро он ҷо бубар ва монд."},
                 {"speaker": "B", "zh": "好，先把大书搬过去，再拿小书。", "pinyin": "Hǎo, xiān bǎ dà shū bān guò qù, zài ná xiǎo shū.", "uz": "Yaxshi, avval katta kitoblarni ko'chirib, keyin kichik kitoblarni olaman.", "ru": "Хорошо, сначала перенесу большие книги, потом возьму маленькие.", "tj": "Хуб, аввал китобҳои калонро мебарам, баъд китобҳои хурдро мегирам."},
                 {"speaker": "A", "zh": "像这样摆，漂亮多了！", "pinyin": "Xiàng zhèyàng bǎi, piàoliang duō le!", "uz": "Shunday joylashtiring, ancha chiroyliroq bo'ladi!", "ru": "Расставь вот так, будет намного красивее!", "tj": "Ин тавр бичинед, хеле зебтар мешавад!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Mehmonlarni qabul qilishga tayyorlanish", "ru": "Подготовка к приёму гостей", "tj": "Омодагӣ барои пазироии меҳмонон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "客人快来了，你把椅子搬过来吧。", "pinyin": "Kèrén kuài lái le, nǐ bǎ yǐzi bān guò lái ba.", "uz": "Mehmonlar tez keladi, stullarni bu yerga ko'chirib keling.", "ru": "Гости скоро придут, принеси стулья сюда.", "tj": "Меҳмонон зуд меоянд, курсиҳоро ин ҷо биёр."},
                 {"speaker": "B", "zh": "好，像上次那样准备，还是有什么不同？", "pinyin": "Hǎo, xiàng shàng cì nàyàng zhǔnbèi, háishi yǒu shénme bùtóng?", "uz": "Yaxshi, o'tgan safar kabi tayyorlaymizmi, yoki farq bormi?", "ru": "Хорошо, готовить как в прошлый раз или что-то по-другому?", "tj": "Хуб, ба монанди дафъаи гузашта тайёр мекунем, ё фарке ҳаст?"},
                 {"speaker": "A", "zh": "先把饮料放到桌上，然后把水果摆好。", "pinyin": "Xiān bǎ yǐnliào fàng dào zhuō shàng, ránhòu bǎ shuǐguǒ bǎi hǎo.", "uz": "Avval ichimliklarni stolga qo'ying, so'ng mevalarni joylashtiring.", "ru": "Сначала поставь напитки на стол, затем расставь фрукты.", "tj": "Аввал нӯшокиҳоро ба болои миз гузоред, сипас меваҳоро мечинем."},

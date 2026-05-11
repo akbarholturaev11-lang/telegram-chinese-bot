@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Xitoy tili haqida suhbat", "ru": "Разговор о китайском языке", "tj": "Суҳбат дар бораи забони чинӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你的普通话说得真流利！", "pinyin": "Nǐ de pǔtōnghuà shuō de zhēn liúlì!", "uz": "Sizning mandarin tiligizdagi gapirish juda ravon!", "ru": "Ты говоришь на путунхуа очень свободно!", "tj": "Шумо ба забони путунхуа хеле равон ҳарф мезанед!"},
                 {"speaker": "B", "zh": "哪里，她的汉语说得跟中国人一样好。", "pinyin": "Nǎlǐ, tā de Hànyǔ shuō de gēn Zhōngguórén yīyàng hǎo.", "uz": "Nima deyaysiz, uning xitoycha gapirishi xitoyliklarnikidek yaxshi.", "ru": "Что вы, она говорит по-китайски так же хорошо, как китайцы.", "tj": "Чӣ мегӯед, вай ба монанди чиниҳо хуб чинӣ ҳарф мезанад."},
                 {"speaker": "A", "zh": "真的吗？你学了多长时间汉语了？", "pinyin": "Zhēn de ma? Nǐ xué le duō cháng shíjiān Hànyǔ le?", "uz": "Chinmi? Siz qancha vaqt xitoy tili o'rgandingiz?", "ru": "Правда? Как долго ты учила китайский?", "tj": "Ростан? Шумо чанд вақт забони чинӣ омӯхтед?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Grammatika va lug'at", "ru": "Грамматика и словарный запас", "tj": "Грамматика ва луғатдон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "汉语语法难不难？", "pinyin": "Hànyǔ yǔfǎ nán bu nán?", "uz": "Xitoy tili grammatikasi qiyinmi?", "ru": "Китайская грамматика сложная?", "tj": "Грамматикаи забони чинӣ душвор аст?"},
                 {"speaker": "B", "zh": "汉语语法没有英语语法那么复杂。", "pinyin": "Hànyǔ yǔfǎ méiyǒu Yīngyǔ yǔfǎ nàme fùzá.", "uz": "Xitoy tili grammatikasi ingliz tili grammatikasi kadar murakkab emas.", "ru": "Китайская грамматика не такая сложная, как английская.", "tj": "Грамматикаи забони чинӣ ба монанди грамматикаи забони англисӣ мураккаб нест."},
                 {"speaker": "A", "zh": "那词汇呢？", "pinyin": "Nà cíhuì ne?", "uz": "Xo'sh, lug'at boyligichi?", "ru": "А словарный запас?", "tj": "Луғатдон чӣ?"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Taqqoslash: ikki o'quvchi", "ru": "Сравнение двух студентов", "tj": "Муқоисаи ду донишҷӯ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你觉得他的汉语怎么样？", "pinyin": "Nǐ juéde tā de Hànyǔ zěnme yàng?", "uz": "Sizningcha, uning xitoy tili qanday?", "ru": "Как ты думаешь, как его китайский?", "tj": "Ба фикри шумо, забони чинии вай чӣ тавр аст?"},
                 {"speaker": "B", "zh": "他的口音跟标准普通话一样标准。", "pinyin": "Tā de kǒuyīn gēn biāozhǔn pǔtōnghuà yīyàng biāozhǔn.", "uz": "Uning talaffuzi standart mandarin tili kabi standart.", "ru": "Его произношение такое же стандартное, как путунхуа.", "tj": "Талаффузи вай ба монанди путунхуаи стандартӣ аст."},
                 {"speaker": "A", "zh": "但是他的进步没有她那么快。", "pinyin": "Dànshì tā de jìnbù méiyǒu tā nàme kuài.", "uz": "Lekin uning rivojlanishi u qiznikidek tez emas.", "ru": "Но его прогресс не такой быстрый, как у неё.", "tj": "Аммо пешрафти вай ба монанди ӯ тез нест."},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "O'rganish maslahatlari", "ru": "Советы по обучению", "tj": "Тавсияҳо оид ба омӯзиш"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你有什么学习汉语的好方法？", "pinyin": "Nǐ yǒu shénme xuéxí Hànyǔ de hǎo fāngfǎ?", "uz": "Xitoy tilini o'rganishning qanday yaxshi usullarini bilasiz?", "ru": "Есть ли у тебя хорошие методы изучения китайского?", "tj": "Оё усулҳои хуби омӯзиши забони чинӣ доред?"},
                 {"speaker": "B", "zh": "每天都跟中国人练习，越练越地道！", "pinyin": "Měitiān dōu gēn Zhōngguórén liànxí, yuè liàn yuè dìdao!", "uz": "Har kuni xitoyliklar bilan mashq qiling, qanchalik mashq qilsangiz, shunchalik natural bo'ladi!", "ru": "Каждый день практикуйся с китайцами, чем больше практики, тем естественнее!", "tj": "Ҳар рӯз бо чиниҳо машқ кунед, ҳар чӣ бештар машқ кунӣ, ҳамон қадар табиӣтар мешавад!"},
                 {"speaker": "A", "zh": "我的汉语没有你那么流利，怎么办？", "pinyin": "Wǒ de Hànyǔ méiyǒu nǐ nàme liúlì, zěnme bàn?", "uz": "Mening xitoyim siznikidek ravon emas, nima qilishim kerak?", "ru": "Мой китайский не такой свободный, как твой, что делать?", "tj": "Забони чинии ман ба монанди шумо равон нест, чӣ кор кунам?"},
