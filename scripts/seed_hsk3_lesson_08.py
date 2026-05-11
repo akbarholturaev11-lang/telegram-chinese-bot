@@ -1,156 +1,214 @@
 import asyncio
 import json
+import os
+import sys
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
+from app.models import CourseLesson, Base
 
-from app.db.session import async_session_maker as SessionLocal
-from app.db.models.course_lessons import CourseLesson
-
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bot.db")
 
 LESSON = {
     "level": "hsk3",
     "lesson_order": 8,
     "lesson_code": "HSK3-L08",
-    "title": "你去哪儿我就去哪儿",
-    "goal": json.dumps({"uz": "So'roq olmoshlarini erkin ishlatish va yo'nalishni ifodalashni o'rganish.", "ru": "Изучение свободного использования вопросительных местоимений и выражения направления.", "tj": "Омӯзиши озодона истифодаи асмои пурсишӣ ва ифодаи самт."}, ensure_ascii=False),
-    "intro_text": json.dumps({"uz": "Bu dars so'roq olmoshlarini erkin ishlatish va yo'nalishni ifodalashga bag'ishlangan. 5 ta asosiy so'z o'rganiladi va '又' hamda '再' farqi hamda so'roq olmoshlarining umumiy ishlatilishi (疑问代词活用 1) grammatik shakllar o'zlashtiriladi.", "ru": "Этот урок посвящён свободному использованию вопросительных местоимений и выражению направления. Изучаются 5 ключевых слов и грамматические конструкции: разница между '又' и '再', а также обобщённое использование вопросительных местоимений (疑问代词活用 1).", "tj": "Ин дарс ба озодона истифода бурдани асмои пурсишӣ ва ифодаи самт бахшида шудааст. 5 калимаи асосӣ омӯхта мешавад ва сохторҳои грамматикӣ: фарқи '又' ва '再', инчунин истифодаи умумии асмои пурсишӣ (疑问代词活用 1) аз бар карда мешаванд."}, ensure_ascii=False),
+    "title": json.dumps({"zh": "你去哪儿我就去哪儿", "uz": "Siz qayerga borsangiz, men ham boraman", "ru": "Куда ты, туда и я", "tj": "Шумо ба куҷо равед, ман ҳам меравам"}, ensure_ascii=False),
+    "goal": json.dumps({"uz": "Shartli bog'lovchi jumlalar, qayta bajarish va umumlashtirish iboralarini o'rganish", "ru": "Изучить условные предложения, повторное действие и обобщение", "tj": "Омӯхтани ҷумлаҳои шартӣ, такрори амал ва умумикунонӣ"}, ensure_ascii=False),
+    "intro_text": json.dumps({"uz": "Bu darsda '……就……' shartli bog'lovchisi, '又' va '再' farqi hamda '谁/什么+都/也' umumlashtiruvchi iboralarini o'rganamiz.", "ru": "В этом уроке мы изучим условное союзное слово '……就……', разницу между '又' и '再', а также обобщающее выражение '谁/什么+都/也'.", "tj": "Дар ин дарс мо пайвандаки шартии '……就……', фарқи '又' ва '再' ва ибораҳои умумикунандаи '谁/什么+都/也'-ро меомӯзем."}, ensure_ascii=False),
     "vocabulary_json": json.dumps([
-        {"no": 1, "zh": "熊猫", "pinyin": "xióngmāo", "pos": "n.", "uz": "panda", "ru": "панда", "tj": "панда"},
-        {"no": 2, "zh": "电梯", "pinyin": "diàntī", "pos": "n.", "uz": "lift, eskalator", "ru": "лифт, подъёмник", "tj": "лифт"},
-        {"no": 3, "zh": "洗手间", "pinyin": "xǐshǒujiān", "pos": "n.", "uz": "hojatxona, tualet", "ru": "туалет, санузел", "tj": "ҳоҷатхона, туалет"},
-        {"no": 4, "zh": "马上", "pinyin": "mǎshàng", "pos": "adv.", "uz": "darhol, zudlik bilan", "ru": "сейчас же, немедленно", "tj": "дарҳол, фавран"},
-        {"no": 5, "zh": "健康", "pinyin": "jiànkāng", "pos": "adj./n.", "uz": "sog'lom; sog'liq", "ru": "здоровый; здоровье", "tj": "солим; саломатӣ"}
+        {"no": 1, "zh": "护照", "pinyin": "hùzhào", "pos": "n", "uz": "pasport", "ru": "паспорт", "tj": "шиноснома"},
+        {"no": 2, "zh": "签证", "pinyin": "qiānzhèng", "pos": "n", "uz": "viza", "ru": "виза", "tj": "виза"},
+        {"no": 3, "zh": "行李", "pinyin": "xíngli", "pos": "n", "uz": "bagaj", "ru": "багаж", "tj": "бор"},
+        {"no": 4, "zh": "机场", "pinyin": "jīchǎng", "pos": "n", "uz": "aeroport", "ru": "аэропорт", "tj": "фурудгоҳ"},
+        {"no": 5, "zh": "航班", "pinyin": "hángbān", "pos": "n", "uz": "reys", "ru": "рейс", "tj": "парвоз"},
+        {"no": 6, "zh": "再", "pinyin": "zài", "pos": "adv", "uz": "yana (kelgusida)", "ru": "ещё раз (в будущем)", "tj": "боз (оянда)"},
+        {"no": 7, "zh": "又", "pinyin": "yòu", "pos": "adv", "uz": "yana (o'tganda/takroran)", "ru": "снова (в прошлом/повторно)", "tj": "боз (гузашта)"},
+        {"no": 8, "zh": "谁", "pinyin": "shéi", "pos": "pron", "uz": "kim (umumlashtiruvchi)", "ru": "кто (обобщающее)", "tj": "кӣ (умумикунанда)"},
+        {"no": 9, "zh": "随便", "pinyin": "suíbiàn", "pos": "adj/adv", "uz": "ixtiyoriy; bemalol", "ru": "любой; как угодно", "tj": "ихтиёрӣ; ба хоҳиш"},
+        {"no": 10, "zh": "打折", "pinyin": "dǎzhé", "pos": "v", "uz": "chegirma bermoq", "ru": "делать скидку", "tj": "тахфиф додан"},
+        {"no": 11, "zh": "附近", "pinyin": "fùjìn", "pos": "n", "uz": "atrofida, yaqinida", "ru": "поблизости, рядом", "tj": "наздикӣ, атроф"},
+        {"no": 12, "zh": "方便", "pinyin": "fāngbiàn", "pos": "adj", "uz": "qulay, oson", "ru": "удобно, легко", "tj": "қулай, осон"},
+        {"no": 13, "zh": "直接", "pinyin": "zhíjiē", "pos": "adv", "uz": "to'g'ridan-to'g'ri", "ru": "прямо, напрямую", "tj": "мустақиман"}
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block_no": 1,
-            "section_label": "课文 1",
-            "scene_uz": "Birga borish",
-            "scene_ru": "Идти вместе",
-            "scene_tj": "Якҷоя рафтан",
-            "dialogue": [
-                {"speaker": "A", "zh": "你去哪儿我就去哪儿。", "pinyin": "Nǐ qù nǎr wǒ jiù qù nǎr.", "uz": "Siz qayerga borsangiz, men ham boraman.", "ru": "Куда ты пойдёшь, туда и я пойду.", "tj": "Ту ба куҷо равӣ, ман ҳам ба ҳамон ҷо мераваm."},
-                {"speaker": "B", "zh": "那我们先去看熊猫吧。", "pinyin": "Nà wǒmen xiān qù kàn xióngmāo ba.", "uz": "Unda avval pandalarni ko'rish boraylik.", "ru": "Тогда давай сначала пойдём посмотрим на панд.", "tj": "Пас биёед аввал ба тамошои пандаҳо биравем."}
+            "block": 1,
+            "title": {"uz": "Sayohat rejalari", "ru": "Планы на поездку", "tj": "Нақшаҳои сафар"},
+            "exchanges": [
+                {"speaker": "A", "zh": "你打算去哪儿旅游？", "pinyin": "Nǐ dǎsuàn qù nǎr lǚyóu?", "uz": "Siz qayerga sayohat qilmoqchi?", "ru": "Куда ты планируешь поехать?", "tj": "Шумо ба куҷо сафар карданӣ ҳастед?"},
+                {"speaker": "B", "zh": "你去哪儿我就去哪儿，一起走吧！", "pinyin": "Nǐ qù nǎr wǒ jiù qù nǎr, yīqǐ zǒu ba!", "uz": "Siz qayerga borsangiz, men ham boraman, birga ketaylik!", "ru": "Куда ты, туда и я, пойдём вместе!", "tj": "Шумо ба куҷо равед, ман ҳам меравам, якҷо меравем!"},
+                {"speaker": "A", "zh": "好的！那你把护照和签证准备好。", "pinyin": "Hǎo de! Nà nǐ bǎ hùzhào hé qiānzhèng zhǔnbèi hǎo.", "uz": "Yaxshi! Unda pasport va vizangizni tayyorlab qo'ying.", "ru": "Хорошо! Тогда приготовь паспорт и визу.", "tj": "Хуб! Пас шиноснома ва визаатонро тайёр кунед."},
+                {"speaker": "B", "zh": "没问题，我去哪儿都会带着护照的。", "pinyin": "Méi wèntí, wǒ qù nǎr dōu huì dàizhe hùzhào de.", "uz": "Muammo yo'q, men qayerga borsam ham pasport olib boraman.", "ru": "Без проблем, куда бы я ни пошёл, я всегда беру паспорт.", "tj": "Мушкиле нест, ба куҷо равам, ҳамеша шиноснома мебарам."}
             ]
         },
         {
-            "block_no": 2,
-            "section_label": "课文 2",
-            "scene_uz": "Binoda",
-            "scene_ru": "В здании",
-            "scene_tj": "Дар бино",
-            "dialogue": [
-                {"speaker": "A", "zh": "你害怕坐电梯吗？", "pinyin": "Nǐ hàipà zuò diàntī ma?", "uz": "Siz liftda yurishdan qo'rqasizmi?", "ru": "Ты боишься ездить на лифте?", "tj": "Шумо аз лифт тарс доред?"},
-                {"speaker": "B", "zh": "不害怕，我马上就上去。", "pinyin": "Bù hàipà, wǒ mǎshàng jiù shàngqù.", "uz": "Yo'q, darhol chiqib ketaman.", "ru": "Нет, я сейчас же поднимусь.", "tj": "Не, ман дарҳол мебароям."}
+            "block": 2,
+            "title": {"uz": "Aeroportda bagaj", "ru": "Багаж в аэропорту", "tj": "Бор дар фурудгоҳ"},
+            "exchanges": [
+                {"speaker": "A", "zh": "我们什么时候去机场？", "pinyin": "Wǒmen shénme shíhou qù jīchǎng?", "uz": "Biz aeroportga qachon boramiz?", "ru": "Когда мы поедем в аэропорт?", "tj": "Мо кай ба фурудгоҳ меравем?"},
+                {"speaker": "B", "zh": "航班八点，我们七点就出发吧。", "pinyin": "Hángbān bā diǎn, wǒmen qī diǎn jiù chūfā ba.", "uz": "Reys soat sakkizda, biz soat yettida jo'naraylik.", "ru": "Рейс в восемь, давай выедем в семь.", "tj": "Парвоз соати ҳашт, биё соати ҳафт рафт кунем."},
+                {"speaker": "A", "zh": "行李太重了，你又带了那么多东西！", "pinyin": "Xíngli tài zhòng le, nǐ yòu dài le nàme duō dōngxi!", "uz": "Bagaj juda og'ir, siz yana shuncha narsa oldingiz!", "ru": "Багаж слишком тяжёлый, ты снова взял столько вещей!", "tj": "Бор хеле вазнин аст, шумо боз инқадар чиз гирифтед!"},
+                {"speaker": "B", "zh": "好，下次我再也不带这么多了。", "pinyin": "Hǎo, xià cì wǒ zài yě bú dài zhème duō le.", "uz": "Yaxshi, keyingi safar men boshqa buncha narsani olmayman.", "ru": "Ладно, в следующий раз я больше не возьму столько.", "tj": "Хуб, дафъаи дигар ман дигар ин қадар намегирам."}
+            ]
+        },
+        {
+            "block": 3,
+            "title": {"uz": "Bozorda xarid qilish", "ru": "Покупки на рынке", "tj": "Харид дар бозор"},
+            "exchanges": [
+                {"speaker": "A", "zh": "这件衣服怎么样？随便看看吧。", "pinyin": "Zhè jiàn yīfu zěnme yàng? Suíbiàn kànkan ba.", "uz": "Bu kiyim qanday? Bemalol qarang.", "ru": "Как тебе эта одежда? Смотри свободно.", "tj": "Ин либос чӣ тавр аст? Озодона бинед."},
+                {"speaker": "B", "zh": "什么都行，你买哪件我就买哪件。", "pinyin": "Shénme dōu xíng, nǐ mǎi nǎ jiàn wǒ jiù mǎi nǎ jiàn.", "uz": "Hammasi bo'ladi, siz qaysi birini olsangiz, men ham o'shani olaman.", "ru": "Всё подходит, какую ты купишь, такую же и я куплю.", "tj": "Ҳама мешавад, кадомро шумо харед, манҳам ҳамонро мехарам."},
+                {"speaker": "A", "zh": "这件打折吗？", "pinyin": "Zhè jiàn dǎzhé ma?", "uz": "Bu chegirmami?", "ru": "На это есть скидка?", "tj": "Ин тахфиф дорад?"},
+                {"speaker": "B", "zh": "打八折，买两件更便宜！", "pinyin": "Dǎ bā zhé, mǎi liǎng jiàn gèng piányí!", "uz": "20% chegirma, ikkita olsangiz yanada arzonroq!", "ru": "Скидка 20%, если купите два — ещё дешевле!", "tj": "Тахфифи 20%, ду адад харед — арзонтар мешавад!"}
+            ]
+        },
+        {
+            "block": 4,
+            "title": {"uz": "Yo'l so'rash", "ru": "Уточнение дороги", "tj": "Пурсидани роҳ"},
+            "exchanges": [
+                {"speaker": "A", "zh": "请问，附近有地铁站吗？", "pinyin": "Qǐngwèn, fùjìn yǒu dìtiě zhàn ma?", "uz": "Kechirasiz, yaqin atrofda metro stantsiyasi bormi?", "ru": "Извините, есть ли поблизости станция метро?", "tj": "Бубахшед, дар наздикӣ истгоҳи метро ҳаст?"},
+                {"speaker": "B", "zh": "有，谁都知道那个地方，很方便。", "pinyin": "Yǒu, shéi dōu zhīdào nà ge dìfāng, hěn fāngbiàn.", "uz": "Bor, u joyni hamma biladi, juda qulay.", "ru": "Есть, это место знают все, очень удобно.", "tj": "Ҳаст, ҳама он ҷоро медонад, хеле қулай."},
+                {"speaker": "A", "zh": "怎么走比较方便？", "pinyin": "Zěnme zǒu bǐjiào fāngbiàn?", "uz": "Qanday yo'l borish qulayroq?", "ru": "Как удобнее добраться?", "tj": "Кадом роҳ қулайтар аст?"},
+                {"speaker": "B", "zh": "直接往前走，五分钟就到了。", "pinyin": "Zhíjiē wǎng qián zǒu, wǔ fēnzhōng jiù dào le.", "uz": "To'g'ri oldinga yuring, besh daqiqada yetasiz.", "ru": "Идите прямо, через пять минут будете на месте.", "tj": "Мустақиман пеш равед, дар панҷ дақиқа мерасед."}
             ]
         }
     ], ensure_ascii=False),
     "grammar_json": json.dumps([
         {
             "no": 1,
-            "title_zh": "“又”和“再”",
-            "title_uz": "'Yòu' va 'zài' farqi",
-            "title_ru": "Разница между '又' и '再'",
-            "title_tj": "Фарқи '又' ва '再'",
-            "rule_uz": "'Yòu' — allaqachon takrorlangan harakat uchun ishlatiladi (o'tmishda yoki hozirda): 他又来了 (u yana keldi). '再' — kelajakda takrorlanadigan harakat uchun: 明天再来 (ertaga yana keling). Qisqacha: 又 = takrorlandi (o'tgan/hozir), 再 = takrorlanadi (kelajak).",
-            "rule_ru": "'又' используется для уже повторившегося действия (в прошлом или настоящем): 他又来了 (он снова пришёл). '再' — для действия, которое повторится в будущем: 明天再来 (приходи снова завтра). Кратко: 又 = снова (прошлое/настоящее), 再 = снова (будущее).",
-            "rule_tj": "'又' барои амали аллакай такроршуда (дар гузашта ё ҳозир) истифода мешавад: 他又来了 (вай боз омад). '再' — барои амале ки дар оянда такрор мешавад: 明天再来 (фардо боз биё). Хулоса: 又 = боз (гузашта/ҳозир), 再 = боз (оянда).",
+            "title_zh": "\"又\"和\"再\"的区别",
+            "title_uz": "\"又\" va \"再\" farqi",
+            "title_ru": "Разница между \"又\" и \"再\"",
+            "title_tj": "Фарқи \"又\" ва \"再\"",
+            "rule_uz": "'又' o'tgan vaqtdagi takroran bajarilgan harakatni bildiradi (u yana kechikdi — o'tgan zamonda). '再' kelajakdagi takroran bajariladigan harakatni bildiradi (keyingi safar yana borayman).",
+            "rule_ru": "'又' обозначает повторное действие в прошлом (он снова опоздал). '再' обозначает повторное действие в будущем (в следующий раз поеду ещё раз).",
+            "rule_tj": "'又' амали такроршавандаи гузаштаро ифода мекунад (вай боз дер омад). '再' амали такроршавандаи оянда мебошад (дафъаи дигар боз меравам).",
             "examples": [
-                {"zh": "他又迟到了。", "pinyin": "Tā yòu chídào le.", "uz": "U yana kechikdi.", "ru": "Он снова опоздал.", "tj": "Вай боз дер монд."},
-                {"zh": "你明天再来吧。", "pinyin": "Nǐ míngtiān zài lái ba.", "uz": "Siz ertaga yana keling.", "ru": "Приходи снова завтра.", "tj": "Ту фардо боз биё."}
+                {"zh": "他又迟到了！", "pinyin": "Tā yòu chídào le!", "uz": "U yana kechikdi! (o'tgan)", "ru": "Он снова опоздал! (прошлое)", "tj": "Вай боз дер омад! (гузашта)"},
+                {"zh": "下次再来吧。", "pinyin": "Xià cì zài lái ba.", "uz": "Keyingi safar yana keling. (kelajak)", "ru": "В следующий раз приходи ещё раз. (будущее)", "tj": "Дафъаи дигар боз биё. (оянда)"}
             ]
         },
         {
             "no": 2,
-            "title_zh": "疑问代词活用 1",
-            "title_uz": "So'roq olmoshlarining umumiy ishlatilishi 1",
-            "title_ru": "Обобщённое использование вопросительных местоимений 1",
-            "title_tj": "Истифодаи умумии асмои пурсишӣ 1",
-            "rule_uz": "Xitoy tilida so'roq olmoshlari (谁, 哪儿, 什么 va h.k.) savol bildirmasdan umumiy yoki noaniq ma'noda ham ishlatilishi mumkin. Bu 'kim bo'lsa ham', 'qayerda bo'lsa ham' ma'nolarini beradi. Masalan: 你去哪儿我就去哪儿 (Siz qayerga borsangiz, men ham boraman).",
-            "rule_ru": "В китайском языке вопросительные местоимения (谁, 哪儿, 什么 и т.д.) могут использоваться не для вопроса, а в обобщённом или неопределённом значении. Это выражает 'кто бы ни', 'где бы ни'. Например: 你去哪儿我就去哪儿 (Куда ты пойдёшь, туда и я).",
-            "rule_tj": "Дар забони чинӣ асмои пурсишӣ (谁, 哪儿, 什么 ва ғ.) метавонанд на барои пурсиш, балки дар маъноии умумӣ ё номуайян истифода шаванд. Ин 'ҳар кӣ бошад', 'ҳар куҷо бошад' маъноҳоро медиҳад. Масалан: 你去哪儿我就去哪儿 (Ту ба куҷо равӣ, ман ҳам ба ҳамон ҷо мераваm).",
+            "title_zh": "疑问代词活用①：谁/什么+都/也+V",
+            "title_uz": "So'roq olmoshlarining maxsus qo'llanishi: kim/nima + ham + F",
+            "title_ru": "Особое употребление вопросительных местоимений: кто/что + тоже/все + Гл",
+            "title_tj": "Истифодаи хоси зомирҳои саволӣ: кӣ/чӣ + ҳам + Ф",
+            "rule_uz": "So'roq olmoshlari (谁、什么、哪儿) umumlashtiruvchi ma'noda ishlatilganda '都' yoki '也' bilan keladi va 'hamma / hech kim emas' ma'nosini bildiradi.",
+            "rule_ru": "Вопросительные местоимения (谁、什么、哪儿) в обобщающем значении используются с '都' или '也' и означают 'все / никто'.",
+            "rule_tj": "Зомирҳои саволӣ (谁、什么、哪儿) дар маънои умумикунанда бо '都' ё '也' меоянд ва маънои 'ҳама / ҳеҷ кас нест'-ро доранд.",
             "examples": [
-                {"zh": "你去哪儿我就去哪儿。", "pinyin": "Nǐ qù nǎr wǒ jiù qù nǎr.", "uz": "Siz qayerga borsangiz, men ham boraman.", "ru": "Куда ты пойдёшь, туда и я пойду.", "tj": "Ту ба куҷо равӣ, ман ҳам ба ҳамон ҷо мераваm."},
-                {"zh": "谁都可以参加。", "pinyin": "Shéi dōu kěyǐ cānjiā.", "uz": "Hamma ishtirok etishi mumkin.", "ru": "Любой может участвовать.", "tj": "Ҳар кас метавонад иштирок кунад."}
+                {"zh": "谁都知道这件事。", "pinyin": "Shéi dōu zhīdào zhè jiàn shì.", "uz": "Bu hodisani hamma biladi.", "ru": "Все знают об этом.", "tj": "Ҳама ин корро медонад."},
+                {"zh": "什么都可以，随便吃吧。", "pinyin": "Shénme dōu kěyǐ, suíbiàn chī ba.", "uz": "Hamma narsa bo'ladi, bemalol yeng.", "ru": "Можно всё, ешь как хочешь.", "tj": "Ҳама чиз мешавад, ба хоҳиш бихӯред."}
+            ]
+        },
+        {
+            "no": 3,
+            "title_zh": "条件句：……就……",
+            "title_uz": "Shartli gap: …… bo'lsa …… bo'ladi",
+            "title_ru": "Условное предложение: если …, то …",
+            "title_tj": "Ҷумлаи шартӣ: агар … пас …",
+            "rule_uz": "'……就……' tuzilmasi shartni bildiradi: shartli qism + 就 + natija. Shartli qismda ko'pincha '如果'、'要是'、'只要' kabi so'zlar ishlatiladi, lekin ba'zan qo'yilmaydi.",
+            "rule_ru": "Конструкция '……就……' выражает условие: условная часть + 就 + результат. В условной части часто используются '如果'、'要是'、'只要', но они могут опускаться.",
+            "rule_tj": "Сохтори '……就……' шартро ифода мекунад: қисми шартӣ + 就 + натиҷа. Дар қисми шартӣ '如果'、'要是'、'只要' зиёд истифода мешаванд, аммо гоҳо ҳазф мешаванд.",
+            "examples": [
+                {"zh": "你去哪儿我就去哪儿。", "pinyin": "Nǐ qù nǎr wǒ jiù qù nǎr.", "uz": "Siz qayerga borsangiz, men ham boraman.", "ru": "Куда ты, туда и я.", "tj": "Шумо ба куҷо равед, ман ҳам меравам."},
+                {"zh": "你买哪件我就买哪件。", "pinyin": "Nǐ mǎi nǎ jiàn wǒ jiù mǎi nǎ jiàn.", "uz": "Siz qaysi birini olsangiz, men ham o'shani olaman.", "ru": "Какую ты купишь, такую же и я.", "tj": "Кадомро шумо харед, манҳам ҳамонро мехарам."}
             ]
         }
     ], ensure_ascii=False),
     "exercise_json": json.dumps([
         {
-            "no": 1,
             "type": "translate_to_chinese",
-            "instruction_uz": "Quyidagi so'zlarning xitoychasini yozing:",
-            "instruction_ru": "Напишите китайские эквиваленты следующих слов:",
-            "instruction_tj": "Тарҷумаи чинии калимаҳои зеринро нависед:",
+            "title": {"uz": "Xitoy tiliga tarjima qiling", "ru": "Переведите на китайский", "tj": "Ба забони чинӣ тарҷума кунед"},
             "items": [
-                {"prompt_uz": "panda", "prompt_ru": "панда", "prompt_tj": "панда", "answer": "熊猫", "pinyin": "xióngmāo"},
-                {"prompt_uz": "lift", "prompt_ru": "лифт", "prompt_tj": "лифт", "answer": "电梯", "pinyin": "diàntī"},
-                {"prompt_uz": "hojatxona", "prompt_ru": "туалет", "prompt_tj": "ҳоҷатхона", "answer": "洗手间", "pinyin": "xǐshǒujiān"},
-                {"prompt_uz": "darhol", "prompt_ru": "немедленно", "prompt_tj": "дарҳол", "answer": "马上", "pinyin": "mǎshàng"}
+                {"no": 1, "uz": "Siz qayerga borsangiz, men ham boraman.", "ru": "Куда ты, туда и я.", "tj": "Шумо ба куҷо равед, ман ҳам меравам."},
+                {"no": 2, "uz": "Bu hodisani hamma biladi.", "ru": "Все знают об этом.", "tj": "Ҳама ин корро медонад."},
+                {"no": 3, "uz": "U yana kechikdi!", "ru": "Он снова опоздал!", "tj": "Вай боз дер омад!"},
+                {"no": 4, "uz": "Keyingi safar yana keling.", "ru": "В следующий раз приходи ещё раз.", "tj": "Дафъаи дигар боз биё."},
+                {"no": 5, "uz": "Hamma narsa bo'ladi, bemalol yeng.", "ru": "Можно всё, ешь как хочешь.", "tj": "Ҳама чиз мешавад, ба хоҳиш бихӯред."}
             ]
         },
         {
-            "no": 2,
             "type": "fill_blank",
-            "instruction_uz": "Bo'sh joyni to'ldiring:",
-            "instruction_ru": "Заполните пропуск:",
-            "instruction_tj": "Ҷойи холиро пур кунед:",
+            "title": {"uz": "Bo'sh joyni to'ldiring", "ru": "Заполните пропуск", "tj": "Ҷойи холиро пур кунед"},
             "items": [
-                {"prompt_uz": "Siz qayerga borsangiz, men ___ boraman. (就)", "prompt_ru": "Куда ты пойдёшь, я ___ пойду. (就)", "prompt_tj": "Ту ба куҷо равӣ, ман ___ мераваm. (就)", "answer": "就", "pinyin": "jiù"},
-                {"prompt_uz": "U ___ kechikdi. (又)", "prompt_ru": "Он ___ опоздал. (又)", "prompt_tj": "Вай ___ дер монд. (又)", "answer": "又", "pinyin": "yòu"},
-                {"prompt_uz": "Ertaga ___ keling. (再)", "prompt_ru": "Приходите ___ завтра. (再)", "prompt_tj": "Фардо ___ биёед. (再)", "answer": "再", "pinyin": "zài"},
-                {"prompt_uz": "Men ___ chiqib ketaman. (马上)", "prompt_ru": "Я ___ выйду. (马上)", "prompt_tj": "Ман ___ мебароям. (马上)", "answer": "马上", "pinyin": "mǎshàng"}
+                {"no": 1, "sentence_zh": "他___迟到了！（表示过去重复）", "sentence_uz": "U ___ kechikdi! (o'tgan)", "sentence_ru": "Он ___ опоздал! (прошлое)", "sentence_tj": "Вай ___ дер омад! (гузашта)", "hint": "又"},
+                {"no": 2, "sentence_zh": "下次___来看我。（表示将来）", "sentence_uz": "Keyingi safar ___ keling. (kelajak)", "sentence_ru": "В следующий раз ___ приходи. (будущее)", "sentence_tj": "Дафъаи дигар ___ биё. (оянда)", "hint": "再"},
+                {"no": 3, "sentence_zh": "谁___知道这件事。", "sentence_uz": "Bu hodisani hamma ___.", "sentence_ru": "Все ___ знают об этом.", "sentence_tj": "Ҳама ин корро ___.", "hint": "都"},
+                {"no": 4, "sentence_zh": "你去哪儿我___去哪儿。", "sentence_uz": "Siz qayerga borsangiz, men ham ___.", "sentence_ru": "Куда ты, туда ___ и я.", "sentence_tj": "Шумо ба куҷо равед, ман ҳам ___.", "hint": "就"}
+            ]
+        },
+        {
+            "type": "translate_to_native",
+            "title": {"uz": "Ona tiliga tarjima qiling", "ru": "Переведите на родной язык", "tj": "Ба забони модарӣ тарҷума кунед"},
+            "items": [
+                {"no": 1, "zh": "你买什么我就买什么。", "pinyin": "Nǐ mǎi shénme wǒ jiù mǎi shénme."},
+                {"no": 2, "zh": "谁都不知道他去哪儿了。", "pinyin": "Shéi dōu bù zhīdào tā qù nǎr le."}
             ]
         }
     ], ensure_ascii=False),
     "answers_json": json.dumps([
-        {"no": 1, "answers": ["熊猫", "电梯", "洗手间", "马上"]},
-        {"no": 2, "answers": ["就", "又", "再", "马上"]}
-    ], ensure_ascii=False),
-    "homework_json": json.dumps([
         {
-            "no": 1,
-            "instruction_uz": "Quyidagi so'zlardan foydalanib 3 ta jumla tuzing:",
-            "instruction_ru": "Напишите 3 предложения, используя следующие слова:",
-            "instruction_tj": "Бо истифодаи калимаҳои зерин 3 ҷумла нависед:",
-            "words": ["熊猫", "电梯", "洗手间"],
-            "example": "我们坐电梯去看熊猫，洗手间在左边。",
-            "topic_uz": "Yo'nalish va harakat",
-            "topic_ru": "Направление и движение",
-            "topic_tj": "Самт ва ҳаракат"
+            "type": "translate_to_chinese",
+            "answers": [
+                {"no": 1, "zh": "你去哪儿我就去哪儿。"},
+                {"no": 2, "zh": "谁都知道这件事。"},
+                {"no": 3, "zh": "他又迟到了！"},
+                {"no": 4, "zh": "下次再来吧。"},
+                {"no": 5, "zh": "什么都可以，随便吃吧。"}
+            ]
         },
         {
-            "no": 2,
-            "instruction_uz": "Dars mavzusi bo'yicha 4-5 jumladan iborat qisqa matn yozing:",
-            "instruction_ru": "Напишите короткий абзац из 4-5 предложений по теме урока:",
-            "instruction_tj": "Дар бораи мавзӯи дарс 4-5 ҷумлаи кӯтоҳ нависед:",
-            "words": ["哪儿", "就", "又", "再"],
-            "example": "你去哪儿我就去哪儿，我们一起去看熊猫吧。",
-            "topic_uz": "你去哪儿我就去哪儿",
-            "topic_ru": "你去哪儿我就去哪儿",
-            "topic_tj": "你去哪儿我就去哪儿"
+            "type": "fill_blank",
+            "answers": [
+                {"no": 1, "answer": "又"},
+                {"no": 2, "answer": "再"},
+                {"no": 3, "answer": "都"},
+                {"no": 4, "answer": "就"}
+            ]
+        },
+        {
+            "type": "translate_to_native",
+            "answers": [
+                {"no": 1, "uz": "Siz nima olsangiz, men ham o'shani olaman.", "ru": "Что ты купишь, то и я куплю.", "tj": "Шумо чӣ харед, манҳам ҳамонро мехарам."},
+                {"no": 2, "uz": "U qayerga ketganini hech kim bilmaydi.", "ru": "Никто не знает, куда он ушёл.", "tj": "Ҳеҷ кас намедонад ки вай ба куҷо рафт."}
+            ]
         }
     ], ensure_ascii=False),
-    "review_json": "[]",
+    "homework_json": json.dumps([
+        {"task_no": 1, "uz": "'……就……' tuzilmasidan foydalanib, 5 ta shartli gap tuzing va o'sha gaplarda '谁/什么+都' iboralarini ham qo'llab ko'ring.", "ru": "Составьте 5 условных предложений с '……就……', попробуйте включить в них '谁/什么+都'.", "tj": "5 ҷумлаи шартӣ бо '……就……' тартиб диҳед ва дар онҳо '谁/什么+都'-ро низ санҷед."},
+        {"task_no": 2, "uz": "'又' va '再' dan foydalanib, 4 ta jumla yozing: 2 tasida o'tgan zamondagi takroriy harakat, 2 tasida kelajakdagi niyat bo'lsin.", "ru": "Напишите 4 предложения с '又' и '再': 2 с повторным действием в прошлом, 2 с намерением в будущем.", "tj": "4 ҷумла бо '又' ва '再' нависед: 2 бо амали такроршаванда дар гузашта, 2 бо нияти оянда."}
+    ], ensure_ascii=False),
     "is_active": True
 }
 
+async def upsert_lesson(session: AsyncSession, data: dict):
+    result = await session.execute(
+        select(CourseLesson).where(CourseLesson.lesson_code == data["lesson_code"])
+    )
+    lesson = result.scalar_one_or_none()
+    if lesson:
+        for k, v in data.items():
+            setattr(lesson, k, v)
+        print(f"Updated: {data['lesson_code']}")
+    else:
+        lesson = CourseLesson(**data)
+        session.add(lesson)
+        print(f"Inserted: {data['lesson_code']}")
 
-async def upsert_lesson():
-    async with SessionLocal() as session:
-        result = await session.execute(
-            select(CourseLesson).where(CourseLesson.lesson_code == LESSON["lesson_code"])
-        )
-        existing = result.scalar_one_or_none()
-        if existing:
-            for key, value in LESSON.items():
-                setattr(existing, key, value)
-            print(f"updated: {LESSON['lesson_code']}")
-        else:
-            session.add(CourseLesson(**LESSON))
-            print(f"inserted: {LESSON['lesson_code']}")
-        await session.commit()
-
+async def main():
+    engine = create_async_engine(DATABASE_URL, echo=False)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+    async with async_session() as session:
+        async with session.begin():
+            await upsert_lesson(session, LESSON)
+    print("Done: HSK3-L08")
 
 if __name__ == "__main__":
-    asyncio.run(upsert_lesson())
+    asyncio.run(main())
