@@ -86,7 +86,7 @@ LESSON = {
     "grammar_json": json.dumps([
         {
             "no": 1,
-            "title_zh": "动作的状态“要……了”",
+            "title_zh": "动作的状态\"要……了\"",
             "title_uz": "'Yào……le' yaqin kelajak konstruktsiyasi",
             "title_ru": "Конструкция '要……了' ближайшего будущего",
             "title_tj": "Конструксияи '要……了' ояндаи наздик",
@@ -100,7 +100,7 @@ LESSON = {
         },
         {
             "no": 2,
-            "title_zh": "“都……了”",
+            "title_zh": "\"都……了\"",
             "title_uz": "'Dōu……le' ta'kid konstruktsiyasi",
             "title_ru": "Конструкция '都……了' для выражения удивления",
             "title_tj": "Конструксияи '都……了' барои таъкид",
@@ -114,7 +114,7 @@ LESSON = {
         },
         {
             "no": 3,
-            "title_zh": "副词"更"的用法",
+            "title_zh": "副词\"更\"的用法",
             "title_uz": "'Gèng' (yanada, bundan ham ko'proq) ravishining ishlatilishi",
             "title_ru": "Использование наречия '更' (ещё более, ещё больше)",
             "title_tj": "Истифодаи зарфи '更' (ҳатто бештар, боз ҳам зиёдтар)",
