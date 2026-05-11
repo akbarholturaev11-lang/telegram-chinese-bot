@@ -3,25 +3,27 @@ set -e
 
 echo "=== Alembic migration check ==="
 
-# alembic current ni xato bo'lsa ham to'xtatmasdan olamiz
+# alembic current xato bo'lsa ham to'xtatmaymiz
 CURRENT=$(alembic current 2>&1 || true)
-echo "Alembic current: '$CURRENT'"
+echo "Alembic current output:"
+echo "$CURRENT"
 
-# alembic_version jadvali yo'q yoki bo'sh bo'lsa — chiqish bo'sh yoki xato xabari
-# Bunday holda: jadvallar allaqachon SQLAlchemy create_all bilan yaratilgan,
-# shunchaki alembic ni head ga stamp qilamiz (hech qanday migration ishlatmasdan)
-STRIPPED=$(echo "$CURRENT" | tr -d '[:space:]')
-if [ -z "$STRIPPED" ] || echo "$CURRENT" | grep -qiE "error|does not exist|no such|can't locate|not found"; then
-    echo "No alembic version detected — stamping at head (skips re-running old migrations)..."
+# Revision ID bor-yo'qligini tekshiramiz (masalan: "0016_add_course_promo_sent (head)")
+# Agar output da hech qanday revision ID bo'lmasa — stamp head
+if echo "$CURRENT" | grep -qE "^[0-9a-f]|[0-9]{4}_"; then
+    echo "Revision found in DB — running upgrade head normally."
+else
+    echo "No revision ID detected (only INFO lines or empty). Stamping at head..."
     alembic stamp head
-    echo "Stamp done."
+    echo "Stamp complete."
 fi
 
 echo "=== Running alembic upgrade head ==="
 alembic upgrade head && echo "Migrations OK." || {
-    echo "Upgrade failed — forcing stamp at head and retrying..."
+    echo "Upgrade still failed — force stamp and retry..."
     alembic stamp head
     alembic upgrade head
+    echo "Done after force stamp."
 }
 
 echo "=== Starting uvicorn ==="
