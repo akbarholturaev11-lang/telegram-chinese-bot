@@ -1,16 +1,10 @@
 import asyncio
 import json
-import os
-import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy import select
-from app.models import CourseLesson, Base
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bot.db")
+from app.db.session import async_session_maker as SessionLocal
+from app.db.models.course_lessons import CourseLesson
 
 LESSON = {
     "level": "hsk3",
@@ -186,29 +180,21 @@ LESSON = {
     "is_active": True
 }
 
-async def upsert_lesson(session: AsyncSession, data: dict):
-    result = await session.execute(
-        select(CourseLesson).where(CourseLesson.lesson_code == data["lesson_code"])
-    )
-    lesson = result.scalar_one_or_none()
-    if lesson:
-        for k, v in data.items():
-            setattr(lesson, k, v)
-        print(f"Updated: {data['lesson_code']}")
-    else:
-        lesson = CourseLesson(**data)
-        session.add(lesson)
-        print(f"Inserted: {data['lesson_code']}")
+async def upsert_lesson():
+    async with SessionLocal() as session:
+        result = await session.execute(
+            select(CourseLesson).where(CourseLesson.lesson_code == LESSON["lesson_code"])
+        )
+        existing = result.scalar_one_or_none()
+        if existing:
+            for key, value in LESSON.items():
+                setattr(existing, key, value)
+            print(f"updated: {LESSON['lesson_code']}")
+        else:
+            session.add(CourseLesson(**LESSON))
+            print(f"inserted: {LESSON['lesson_code']}")
+        await session.commit()
 
-async def main():
-    engine = create_async_engine(DATABASE_URL, echo=False)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-    async with async_session() as session:
-        async with session.begin():
-            await upsert_lesson(session, LESSON)
-    print("Done: HSK3-L10")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(upsert_lesson())
