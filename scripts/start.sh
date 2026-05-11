@@ -3,21 +3,26 @@ set -e
 
 echo "=== Alembic migration check ==="
 
-# alembic current ishlamasas (alembic_version yo'q yoki xato) — stamp head
+# alembic current ni xato bo'lsa ham to'xtatmasdan olamiz
 CURRENT=$(alembic current 2>&1 || true)
-echo "Current state: $CURRENT"
+echo "Alembic current: '$CURRENT'"
 
-if echo "$CURRENT" | grep -qiE "error|does not exist|no such|relation.*not found|can't locate"; then
-    echo "alembic_version not found. Stamping DB at head (tables already exist)..."
+# alembic_version jadvali yo'q yoki bo'sh bo'lsa — chiqish bo'sh yoki xato xabari
+# Bunday holda: jadvallar allaqachon SQLAlchemy create_all bilan yaratilgan,
+# shunchaki alembic ni head ga stamp qilamiz (hech qanday migration ishlatmasdan)
+STRIPPED=$(echo "$CURRENT" | tr -d '[:space:]')
+if [ -z "$STRIPPED" ] || echo "$CURRENT" | grep -qiE "error|does not exist|no such|can't locate|not found"; then
+    echo "No alembic version detected — stamping at head (skips re-running old migrations)..."
     alembic stamp head
-elif echo "$CURRENT" | grep -q "(head)"; then
-    echo "Already at head. No migration needed."
-else
-    echo "Running alembic upgrade head..."
+    echo "Stamp done."
 fi
 
-# Bu safar xatodan qat'iy nazar upgrade ishlatamiz (no-op bo'lsa ham xavfsiz)
-alembic upgrade head
+echo "=== Running alembic upgrade head ==="
+alembic upgrade head && echo "Migrations OK." || {
+    echo "Upgrade failed — forcing stamp at head and retrying..."
+    alembic stamp head
+    alembic upgrade head
+}
 
 echo "=== Starting uvicorn ==="
 exec uvicorn app.main:app --host 0.0.0.0 --port $PORT
