@@ -13,13 +13,28 @@ def _parse(value: Any, default: Any = None):
         return default
 
 
+def _parse_title(raw: str) -> str:
+    """lesson.title oddiy string yoki JSON bo'lishi mumkin.
+    JSON bo'lsa — xitoycha (zh) qismini, yo'q bo'lsa uz ni qaytaradi."""
+    if not raw:
+        return ""
+    if raw.strip().startswith("{"):
+        try:
+            d = json.loads(raw)
+            if isinstance(d, dict):
+                return d.get("zh") or d.get("uz") or raw
+        except Exception:
+            pass
+    return raw
+
+
 # ─── Emoji raqamlar ────────────────────────────────────────────────────────
 _NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
 
 def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     vocab = _parse(lesson.vocabulary_json, [])
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     label = {"uz": "Yangi so'zlar 🇨🇳", "tj": "Калимаҳои нав 🇨🇳", "ru": "Новые слова 🇨🇳"}
     lines = [f"【1/{lesson_total_steps}】 {title} · {label.get(lang, label['ru'])}", ""]
@@ -67,7 +82,7 @@ def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
 def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     dialogues = _parse(lesson.dialogue_json, [])
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     step_label = {"uz": "Jonli dialog 🎭", "tj": "Муколамаи зинда 🎭", "ru": "Живой диалог 🎭"}
     lines = [f"【2/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
@@ -133,7 +148,7 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
 def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     grammar = _parse(lesson.grammar_json, [])
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     step_label = {"uz": "Grammatika 📐", "tj": "Грамматика 📐", "ru": "Грамматика 📐"}
     lines = [f"【3/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
@@ -175,7 +190,7 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
 def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
     exercises = _parse(lesson.exercise_json, [])
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     step_label = {"uz": "Test vaqti! 🧠", "tj": "Вақти санҷиш! 🧠", "ru": "Время теста! 🧠"}
     lines = [f"【5/{lesson_total_steps}】 {title} · {step_label.get(lang, step_label['ru'])}", ""]
@@ -262,7 +277,7 @@ def format_vocab_1(lesson, lang: str) -> str:
     vocab = _parse(lesson.vocabulary_json, [])
     total = len(vocab)
     page  = vocab[:8]
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     hdr = {
         "uz": "📖 Yangi so'zlar 🇨🇳",
@@ -295,7 +310,7 @@ def format_vocab_2(lesson, lang: str) -> str:
     page  = vocab[8:]
     if not page:
         return ""
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
 
     hdr = {
         "uz": "📖 Yangi so'zlar — davomi 🇨🇳",
@@ -324,7 +339,7 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
     if not isinstance(block, dict):
         return ""
 
-    title   = lesson.title or ""
+    title   = _parse_title(lesson.title or "")
     section = block.get("section_label", "") or f"课文 {n}"
     scene   = (
         block.get(f"scene_{lang}")
@@ -423,7 +438,7 @@ def format_grammar_v2(lesson, lang: str) -> str:
     if not grammar:
         return ""
 
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
     hdr = {
         "uz": "📐 Grammatika",
         "tj": "📐 Грамматика",
@@ -504,7 +519,7 @@ def format_step(lesson, lang: str, step: str) -> str | None:
 # ─────────────────────────────────────────────────────────────────────────────
 
 def format_intro(lesson, lang: str, lesson_total_steps: int = 6) -> str:
-    title = lesson.title or ""
+    title = _parse_title(lesson.title or "")
     intro_raw = lesson.intro_text or ""
 
     try:
