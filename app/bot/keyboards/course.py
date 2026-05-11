@@ -1,5 +1,21 @@
+import json
+
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
+
+
+def _parse_title(raw: str) -> str:
+    """lesson.title oddiy string yoki JSON bo'lishi mumkin — xitoycha qismini qaytaradi."""
+    if not raw:
+        return ""
+    if raw.strip().startswith("{"):
+        try:
+            d = json.loads(raw)
+            if isinstance(d, dict):
+                return d.get("zh") or d.get("uz") or raw
+        except Exception:
+            pass
+    return raw
 
 
 # ─── STEP KEYBOARDS (inline) ────────────────────────────────────────────────
@@ -151,7 +167,7 @@ def lesson_selection_keyboard(
     for lesson in page_lessons:
         buttons.append([
             InlineKeyboardButton(
-                text=f"{lesson.lesson_order}. {lesson.title}",
+                text=f"{lesson.lesson_order}. {_parse_title(lesson.title or '')}",
                 callback_data=f"course:pick_lesson:{lesson.id}",
             )
         ])
