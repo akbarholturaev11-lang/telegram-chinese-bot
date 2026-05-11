@@ -31,11 +31,12 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Idorada hamkasb kutmoqda",
             "scene_ru": "В офисе, коллега ждёт",
             "scene_tj": "Дар идора, ҳамкор интизор мешавад",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "请问，王经理什么时候回来？", "pinyin": "Qǐngwèn, Wáng jīnglǐ shénme shíhou huílai?", "uz": "Kechirasiz, Vang menejer qachon qaytib keladi?", "ru": "Извините, когда вернётся менеджер Ван?", "tj": "Бубахшед, мудир Ван кай бармегардад?"},
                 {"speaker": "B", "zh": "他先去三楼办公室拿文件，马上就回来。", "pinyin": "Tā xiān qù sān lóu bàngōngshì ná wénjiàn, mǎshàng jiù huílai.", "uz": "U avval uchinchi qavatdagi idoraga hujjat olishga ketdi, hoziroq qaytadi.", "ru": "Он сначала пошёл в кабинет на третьем этаже за документами, сейчас вернётся.", "tj": "Вай аввал ба кабинети ошёнаи сеюм барои ҳуҷҷат рафт, ҳозир бармегардад."},
                 {"speaker": "A", "zh": "好的，那我在这里等他。", "pinyin": "Hǎo de, nà wǒ zài zhèlǐ děng tā.", "uz": "Xo'p, unda men bu yerda uni kutaman.", "ru": "Хорошо, тогда я подожду его здесь.", "tj": "Хуб, пас ман инҷо интизораш мешавам."},
@@ -43,11 +44,12 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Ko'chada yomg'irli kunda",
             "scene_ru": "На улице в дождливый день",
             "scene_tj": "Дар кӯча дар рӯзи борондор",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "外边下雨了！你有没有带伞？", "pinyin": "Wàibiān xiàyǔ le! Nǐ yǒu méiyǒu dài sǎn?", "uz": "Tashqarida yomg'ir yog'yapti! Soyabon olib chiqdingmi?", "ru": "На улице дождь! Ты взял зонт?", "tj": "Берун борон мебарад! Оё чатр гирифтӣ?"},
                 {"speaker": "B", "zh": "没带，我跑进去拿，你等我一下！", "pinyin": "Méi dài, wǒ pǎo jìnqu ná, nǐ děng wǒ yīxià!", "uz": "Olmadim, men yugurib kirib olib chiqaman, bir oz kutib turing!", "ru": "Не взял, я забегу и возьму, подождите меня!", "tj": "Нагирифтам, ман давида дохил мешавам ва мегирам, каме интизор шав!"},
                 {"speaker": "A", "zh": "好，快点儿！这么多水，我的脚都湿了。", "pinyin": "Hǎo, kuài diǎnr! Zhème duō shuǐ, wǒ de jiǎo dōu shī le.", "uz": "Xo'p, tez bo'l! Shu qadar ko'p suv bor, oyog'im ho'l bo'lib ketdi.", "ru": "Хорошо, побыстрее! Столько воды, у меня уже ноги промокли.", "tj": "Хуб, зудтар! Ин қадар об ҳаст, пои ман ҳама тар шуд."},
@@ -55,11 +57,12 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Bozorda xarid qilayotganda",
             "scene_ru": "На рынке при покупках",
             "scene_tj": "Дар бозор ҳангоми харид",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "这些东西这么多，你一个人能拿得了吗？", "pinyin": "Zhèxiē dōngxi zhème duō, nǐ yī ge rén néng ná de liǎo ma?", "uz": "Bu narsa-buyumlar juda ko'p, sen yolg'iz olib keta olasanmi?", "ru": "Столько вещей, ты один сможешь всё унести?", "tj": "Ин қадар чизҳо, оё ту танҳо ҳама гирифта метавонӣ?"},
                 {"speaker": "B", "zh": "当然能！这有什么难的？你太太呢？", "pinyin": "Dāngrán néng! Zhè yǒu shénme nán de? Nǐ tàitai ne?", "uz": "Albatta, olaman! Buning nesi qiyin? Xotiningiz qani?", "ru": "Конечно, смогу! Что тут сложного? А ваша жена где?", "tj": "Албатта метавонам! Ин чӣ душворист? Ҳамсари шумо куҷост?"},
                 {"speaker": "A", "zh": "她腿有点儿疼，先坐在那边了。", "pinyin": "Tā tuǐ yǒudiǎnr téng, xiān zuò zài nàbiān le.", "uz": "Uning oyog'i biroz og'riyapti, u tomonda o'tirib turdi.", "ru": "У неё немного болит нога, она пока сидит вон там.", "tj": "Пои ӯ каме дард мекунад, вай аввал он тараф нишаст."},
@@ -67,11 +70,12 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Uyda oilaviy suhbat",
             "scene_ru": "Дома, семейный разговор",
             "scene_tj": "Дар хона, суҳбати оилавӣ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你看，我最近是不是瘦了一点儿？", "pinyin": "Nǐ kàn, wǒ zuìjìn shì bu shì shòu le yīdiǎnr?", "uz": "Qara, men so'nggi paytlarda biroz ozibmanmi?", "ru": "Смотри, я в последнее время немного похудел?", "tj": "Бубин, оё ман охирон каме лоғар шудам?"},
                 {"speaker": "B", "zh": "嗯……好像是，但你以前太胖了！", "pinyin": "Ń……hǎoxiàng shì, dàn nǐ yǐqián tài pàng le!", "uz": "Hmm… shunday ko'rinadi, lekin oldin juda semiz bo'lgansiz!", "ru": "Хм… кажется, да, но раньше ты был слишком толстым!", "tj": "Хм... шояд, аммо пеш шумо хеле фарбеҳ будед!"},
                 {"speaker": "A", "zh": "我每天都跑步，从楼上跑到楼下，一共跑十层！", "pinyin": "Wǒ měitiān dōu pǎobù, cóng lóu shàng pǎo dào lóu xià, yīgòng pǎo shí céng!", "uz": "Men har kuni yuguraman, yuqoridan pastga, jami o'n qavat!", "ru": "Я каждый день бегаю — с верхнего этажа до нижнего, всего десять этажей!", "tj": "Ман ҳар рӯз медавам, аз ошёнаи боло то поён, ҷамъ даҳ ошёна!"},

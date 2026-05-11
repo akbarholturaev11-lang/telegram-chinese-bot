@@ -31,11 +31,12 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Sinfxonada dars oxirida",
             "scene_ru": "В классе в конце урока",
             "scene_tj": "Дар синфхона дар охири дарс",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "周末你有什么打算？", "pinyin": "Zhōumò nǐ yǒu shénme dǎsuàn?", "uz": "Dam olish kunlari nima qilmoqchisiz?", "ru": "Какие у тебя планы на выходные?", "tj": "Охири ҳафта чӣ нақша дорӣ?"},
                 {"speaker": "B", "zh": "我打算先复习功课，然后跟朋友出去玩儿。", "pinyin": "Wǒ dǎsuàn xiān fùxí gōngkè, ránhòu gēn péngyou chūqù wánr.", "uz": "Avval darslarni takrorlash, keyin do'stlar bilan chiqib o'ynashni rejalashtirdim.", "ru": "Планирую сначала повторить уроки, потом выйти погулять с друзьями.", "tj": "Нақша дорам аввал дарсҳоро такрор кунам, сипас бо дӯстон берун равам бозӣ кунем."},
                 {"speaker": "A", "zh": "那你星期六有没有时间？我们一起去公园吧。", "pinyin": "Nà nǐ xīngqīliù yǒu méiyǒu shíjiān? Wǒmen yīqǐ qù gōngyuán ba.", "uz": "Unday bo'lsa shanba kuni vaqting bormi? Birgalikda parka boraylik.", "ru": "Тогда у тебя есть время в субботу? Пойдём вместе в парк.", "tj": "Пас шанбе вақт дорӣ? Биёед якҷоя ба боғ равем."},
@@ -43,11 +44,12 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Uyda oilaviy suhbat",
             "scene_ru": "Дома, семейный разговор",
             "scene_tj": "Дар хона, суҳбати оилавӣ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "妈妈，周末我能去朋友家玩儿吗？", "pinyin": "Māma, zhōumò wǒ néng qù péngyou jiā wánr ma?", "uz": "Oyi, dam olish kunlari do'stimnikiga borsammi?", "ru": "Мама, можно я в выходные пойду к другу домой?", "tj": "Модар, охири ҳафта метавонам ба хонаи дӯстам равам?"},
                 {"speaker": "B", "zh": "作业做好了吗？一点儿都没做完，不能去。", "pinyin": "Zuòyè zuò hǎo le ma? Yīdiǎnr dōu méi zuòwán, bù néng qù.", "uz": "Uy vazifasi bajardingmi? Bir oz ham tugatmagan bo'lsang, borolmaysan.", "ru": "Домашнее задание сделано? Если не сделал ни капли, нельзя идти.", "tj": "Оё вазифаи хонагиро тайёр кардӣ? Агар каме ҳам тамом накарда бошӣ, рафта наметавонӣ."},
                 {"speaker": "A", "zh": "都做好了！我一直在做，没玩儿游戏。", "pinyin": "Dōu zuò hǎo le! Wǒ yīzhí zài zuò, méi wánr yóuxì.", "uz": "Hammasini bajardim! Doimo ishlayotgan edim, o'yin o'ynamadim.", "ru": "Всё сделал! Я постоянно делал, не играл в игры.", "tj": "Ҳама тайёр! Ман доимо кор мекардам, бозӣ накардам."},
@@ -55,11 +57,12 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Kafeda ikkita do'st",
             "scene_ru": "В кафе, двое друзей",
             "scene_tj": "Дар қаҳвахона, ду дӯст",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你为什么着急？发生什么事了吗？", "pinyin": "Nǐ wèishénme zháojí? Fāshēng shénme shì le ma?", "uz": "Nima uchun tashvishlanayapsan? Nimadur bo'ldimi?", "ru": "Почему ты нервничаешь? Что-то случилось?", "tj": "Чаро ташвиш мекашӣ? Оё чизе шуд?"},
                 {"speaker": "B", "zh": "我约了朋友在这儿见面，他一个电话也没打。", "pinyin": "Wǒ yuē le péngyou zài zhèr jiànmiàn, tā yī ge diànhuà yě méi dǎ.", "uz": "Do'stimni bu yerda uchrashishga chaqirgan edim, u bitta ham qo'ng'iroq qilmadi.", "ru": "Я договорился встретиться с другом здесь, он не позвонил ни разу.", "tj": "Ман бо дӯстам қарор гузоштам, ки инҷо вохӯрем, вай як занг ҳам назад."},
                 {"speaker": "A", "zh": "别着急，他也许在路上。要不要我帮你准备面包？", "pinyin": "Bié zháojí, tā yěxǔ zài lùshang. Yào bú yào wǒ bāng nǐ zhǔnbèi miànbāo?", "uz": "Xavotir olma, u yo'lda bo'lsa kerak. Non tayyorlashga yordam beraymi?", "ru": "Не нервничай, он, наверное, в дороге. Хочешь, я помогу приготовить хлеб?", "tj": "Ташвиш накаш, вай шояд дар роҳ бошад. Оё мехоҳӣ ман ба тайёр кардани нон кӯмак кунам?"},
@@ -67,11 +70,12 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Parkda yurish paytida",
             "scene_ru": "На прогулке в парке",
             "scene_tj": "Ҳангоми гаштан дар боғ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "这个公园真大！你以前来过吗？", "pinyin": "Zhège gōngyuán zhēn dà! Nǐ yǐqián lái guo ma?", "uz": "Bu park juda katta! Avval kelgan bo'lganmisiz?", "ru": "Этот парк очень большой! Ты раньше приходил сюда?", "tj": "Ин боғ бисёр калон! Оё пеш омада будӣ?"},
                 {"speaker": "B", "zh": "来过一次，但那时候一点儿都不了解这里。", "pinyin": "Lái guo yī cì, dàn nà shíhou yīdiǎnr dōu bù liǎojiě zhèlǐ.", "uz": "Bir marta kelgan edim, lekin o'shanda bu haqda hech nima bilmas edim.", "ru": "Приходил один раз, но тогда совсем ничего не знал об этом месте.", "tj": "Як бор омада будам, аммо он вақт ин ҷоро каме ҳам намешинохтам."},
                 {"speaker": "A", "zh": "那我们带了地图，今天可以好好参观！", "pinyin": "Nà wǒmen dài le dìtú, jīntiān kěyǐ hǎohāo cānguān!", "uz": "Unday bo'lsa xarita oldik, bugun yaxshilab tomosha qilishimiz mumkin!", "ru": "Тогда мы взяли карту, сегодня можем хорошо осмотреться!", "tj": "Пас мо харита гирифтем, имрӯз метавонем хуб тамошо кунем!"},

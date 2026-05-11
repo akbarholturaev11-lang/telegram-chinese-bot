@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Qanday qaytib keldingiz?", "ru": "Как ты вернулся?", "tj": "Чӣ тавр баргаштед?"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你是怎么回来的？", "pinyin": "Nǐ shì zěnme huílái de?", "uz": "Siz qanday qaytib keldingiz?", "ru": "Как ты вернулся?", "tj": "Шумо чӣ тавр баргаштед?"},
                 {"speaker": "B", "zh": "我是走回来的，天气太好了！", "pinyin": "Wǒ shì zǒu huílái de, tiānqì tài hǎo le!", "uz": "Men piyoda qaytib keldim, havo juda yaxshi edi!", "ru": "Я вернулся пешком, погода была такая хорошая!", "tj": "Ман пиёда баргаштам, ҳаво хеле хуб буд!"},
                 {"speaker": "A", "zh": "真的吗？多远啊？", "pinyin": "Zhēn de ma? Duō yuǎn a?", "uz": "Chinmi? Qanchalik uzoq?", "ru": "Правда? Как далеко?", "tj": "Ростан? Чӣ қадар дур?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Transport vositalari haqida", "ru": "О транспорте", "tj": "Дар бораи нақлиёт"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我是坐公共汽车来的，你呢？", "pinyin": "Wǒ shì zuò gōnggòng qìchē lái de, nǐ ne?", "uz": "Men avtobus bilan keldim, siz-chi?", "ru": "Я приехал на автобусе, а ты?", "tj": "Ман бо автобус омадам, шумо чӣ?"},
                 {"speaker": "B", "zh": "我是骑自行车来的，锻炼身体！", "pinyin": "Wǒ shì qí zìxíngchē lái de, duànliàn shēntǐ!", "uz": "Men velosipedda keldim, jismoniy mashqq!", "ru": "Я приехал на велосипеде, упражнение для тела!", "tj": "Ман бо велосипед омадам, варзиш!"},
                 {"speaker": "A", "zh": "太好了！我也想骑自行车来上班。", "pinyin": "Tài hǎo le! Wǒ yě xiǎng qí zìxíngchē lái shàngbān.", "uz": "Zo'r! Men ham velosipedda ishga kelishni xohlardim.", "ru": "Отлично! Я тоже хочу приезжать на работу на велосипеде.", "tj": "Олӣ! Ман ҳам мехоҳам бо велосипед ба кор оям."},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Bir vaqtda ikki ish qilish", "ru": "Делать два дела одновременно", "tj": "Анҷом додани ду кор ҳамзамон"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你喜欢一边做什么一边学习？", "pinyin": "Nǐ xǐhuān yībiān zuò shénme yībiān xuéxí?", "uz": "Siz nima qila turib o'qishni yaxshi ko'rasiz?", "ru": "Что ты любишь делать одновременно с учёбой?", "tj": "Шумо чиро ҳамзамон бо таҳсил карданро дӯст доред?"},
                 {"speaker": "B", "zh": "我喜欢一边听音乐一边做作业。", "pinyin": "Wǒ xǐhuān yībiān tīng yīnyuè yībiān zuò zuòyè.", "uz": "Men musiqa tinglab uy vazifasini yaxshi ko'raman.", "ru": "Мне нравится слушать музыку и одновременно делать домашнюю работу.", "tj": "Ман дӯст медорам ҳамзамон мусиқӣ гӯш кунам ва вазифаи хонагиро анҷом диҳам."},
                 {"speaker": "A", "zh": "我也是！我一边唱歌一边做家务。", "pinyin": "Wǒ yě shì! Wǒ yībiān chànggē yībiān zuò jiāwù.", "uz": "Men ham! Men qo'shiq aytib uy ishlarini qilaman.", "ru": "Я тоже! Я пою и одновременно делаю домашние дела.", "tj": "Ман ҳам! Ман суруд мехонам ва ҳамзамон кори хонаро мекунам."},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Sinfga kirish usuli", "ru": "Способ прихода на урок", "tj": "Усули омадан ба дарс"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你是什么时候进来的？没看见你！", "pinyin": "Nǐ shì shénme shíhou jìnlái de? Méi kànjian nǐ!", "uz": "Siz qachon kirdingiz? Seni ko'rmadim!", "ru": "Когда ты вошёл? Я тебя не видел!", "tj": "Шумо кай даромадед? Ман шуморо надидам!"},
                 {"speaker": "B", "zh": "我是悄悄进来的，不想打扰你们。", "pinyin": "Wǒ shì qiāoqiāo jìnlái de, bù xiǎng dǎrǎo nǐmen.", "uz": "Men jimgina kirdim, sizlarni bezovta qilmoqchi emas edim.", "ru": "Я вошёл тихо, не хотел вас беспокоить.", "tj": "Ман оромона даромадам, намехостам шуморо халал расонам."},
                 {"speaker": "A", "zh": "没关系，下次直接进来就行了！", "pinyin": "Méi guānxi, xià cì zhíjiē jìnlái jiù xíng le!", "uz": "Hech gap emas, keyingi safar to'g'ri kiravering!", "ru": "Ничего, в следующий раз просто заходи!", "tj": "Майлаш, дафъаи дигар мустақиман биё даром!"},

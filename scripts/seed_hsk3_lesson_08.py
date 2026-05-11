@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Sayohat rejalari", "ru": "Планы на поездку", "tj": "Нақшаҳои сафар"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你打算去哪儿旅游？", "pinyin": "Nǐ dǎsuàn qù nǎr lǚyóu?", "uz": "Siz qayerga sayohat qilmoqchi?", "ru": "Куда ты планируешь поехать?", "tj": "Шумо ба куҷо сафар карданӣ ҳастед?"},
                 {"speaker": "B", "zh": "你去哪儿我就去哪儿，一起走吧！", "pinyin": "Nǐ qù nǎr wǒ jiù qù nǎr, yīqǐ zǒu ba!", "uz": "Siz qayerga borsangiz, men ham boraman, birga ketaylik!", "ru": "Куда ты, туда и я, пойдём вместе!", "tj": "Шумо ба куҷо равед, ман ҳам меравам, якҷо меравем!"},
                 {"speaker": "A", "zh": "好的！那你把护照和签证准备好。", "pinyin": "Hǎo de! Nà nǐ bǎ hùzhào hé qiānzhèng zhǔnbèi hǎo.", "uz": "Yaxshi! Unda pasport va vizangizni tayyorlab qo'ying.", "ru": "Хорошо! Тогда приготовь паспорт и визу.", "tj": "Хуб! Пас шиноснома ва визаатонро тайёр кунед."},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Aeroportda bagaj", "ru": "Багаж в аэропорту", "tj": "Бор дар фурудгоҳ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我们什么时候去机场？", "pinyin": "Wǒmen shénme shíhou qù jīchǎng?", "uz": "Biz aeroportga qachon boramiz?", "ru": "Когда мы поедем в аэропорт?", "tj": "Мо кай ба фурудгоҳ меравем?"},
                 {"speaker": "B", "zh": "航班八点，我们七点就出发吧。", "pinyin": "Hángbān bā diǎn, wǒmen qī diǎn jiù chūfā ba.", "uz": "Reys soat sakkizda, biz soat yettida jo'naraylik.", "ru": "Рейс в восемь, давай выедем в семь.", "tj": "Парвоз соати ҳашт, биё соати ҳафт рафт кунем."},
                 {"speaker": "A", "zh": "行李太重了，你又带了那么多东西！", "pinyin": "Xíngli tài zhòng le, nǐ yòu dài le nàme duō dōngxi!", "uz": "Bagaj juda og'ir, siz yana shuncha narsa oldingiz!", "ru": "Багаж слишком тяжёлый, ты снова взял столько вещей!", "tj": "Бор хеле вазнин аст, шумо боз инқадар чиз гирифтед!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Bozorda xarid qilish", "ru": "Покупки на рынке", "tj": "Харид дар бозор"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "这件衣服怎么样？随便看看吧。", "pinyin": "Zhè jiàn yīfu zěnme yàng? Suíbiàn kànkan ba.", "uz": "Bu kiyim qanday? Bemalol qarang.", "ru": "Как тебе эта одежда? Смотри свободно.", "tj": "Ин либос чӣ тавр аст? Озодона бинед."},
                 {"speaker": "B", "zh": "什么都行，你买哪件我就买哪件。", "pinyin": "Shénme dōu xíng, nǐ mǎi nǎ jiàn wǒ jiù mǎi nǎ jiàn.", "uz": "Hammasi bo'ladi, siz qaysi birini olsangiz, men ham o'shani olaman.", "ru": "Всё подходит, какую ты купишь, такую же и я куплю.", "tj": "Ҳама мешавад, кадомро шумо харед, манҳам ҳамонро мехарам."},
                 {"speaker": "A", "zh": "这件打折吗？", "pinyin": "Zhè jiàn dǎzhé ma?", "uz": "Bu chegirmami?", "ru": "На это есть скидка?", "tj": "Ин тахфиф дорад?"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Yo'l so'rash", "ru": "Уточнение дороги", "tj": "Пурсидани роҳ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "请问，附近有地铁站吗？", "pinyin": "Qǐngwèn, fùjìn yǒu dìtiě zhàn ma?", "uz": "Kechirasiz, yaqin atrofda metro stantsiyasi bormi?", "ru": "Извините, есть ли поблизости станция метро?", "tj": "Бубахшед, дар наздикӣ истгоҳи метро ҳаст?"},
                 {"speaker": "B", "zh": "有，谁都知道那个地方，很方便。", "pinyin": "Yǒu, shéi dōu zhīdào nà ge dìfāng, hěn fāngbiàn.", "uz": "Bor, u joyni hamma biladi, juda qulay.", "ru": "Есть, это место знают все, очень удобно.", "tj": "Ҳаст, ҳама он ҷоро медонад, хеле қулай."},
                 {"speaker": "A", "zh": "怎么走比较方便？", "pinyin": "Zěnme zǒu bǐjiào fāngbiàn?", "uz": "Qanday yo'l borish qulayroq?", "ru": "Как удобнее добраться?", "tj": "Кадом роҳ қулайтар аст?"},

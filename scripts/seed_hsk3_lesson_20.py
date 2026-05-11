@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Ta'sir va ilhom haqida", "ru": "О влиянии и вдохновении", "tj": "Дар бораи таъсир ва илҳом"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你为什么开始学音乐的？", "pinyin": "Nǐ wèishénme kāishǐ xué yīnyuè de?", "uz": "Nima uchun musiqa o'rganishni boshladingiz?", "ru": "Почему ты начал учить музыку?", "tj": "Чаро шумо мусиқӣ омӯхтанро оғоз кардед?"},
                 {"speaker": "B", "zh": "我被他影响了！他演奏得多么精彩啊！", "pinyin": "Wǒ bèi tā yǐngxiǎng le! Tā yǎnzòu de duōme jīngcǎi a!", "uz": "U meni ta'sirlantirdi! Uning ijrosi qanchalik ajoyib edi!", "ru": "Он повлиял на меня! Как замечательно он играл!", "tj": "Вай ба ман таъсир кард! Иҷрои вай чӣ қадар зебо буд!"},
                 {"speaker": "A", "zh": "只有像他那样练习，才能弹得那么好！", "pinyin": "Zhǐyǒu xiàng tā nàyàng liànxí, cái néng tán de nàme hǎo!", "uz": "Faqat u kabi mashq qilsangizgina, shunchalik yaxshi chala olasiz!", "ru": "Только тренируясь так, как он, можно играть так хорошо!", "tj": "Танҳо ба монанди вай машқ карданатон, ин қадар хуб навохта метавонед!"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Tanqid va maqtov", "ru": "Критика и похвала", "tj": "Танқид ва мақтов"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你今天被老师表扬了吗？", "pinyin": "Nǐ jīntiān bèi lǎoshī biǎoyáng le ma?", "uz": "Bugun o'qituvchi sizni maqtadimi?", "ru": "Сегодня учитель тебя похвалил?", "tj": "Имрӯз муаллим шуморо мақтод?"},
                 {"speaker": "B", "zh": "没有，反而被批评了！多么难受啊！", "pinyin": "Méiyǒu, fǎn'ér bèi pīpíng le! Duōme nánshòu a!", "uz": "Yo'q, aksincha tanqid qilindi! Qanchalik yomon his etildi!", "ru": "Нет, наоборот, его критиковали! Как неприятно!", "tj": "Не, баракс танқид шуд! Чӣ қадар нохуш!"},
                 {"speaker": "A", "zh": "只有被批评了，才能知道哪里需要改进！", "pinyin": "Zhǐyǒu bèi pīpíng le, cái néng zhīdào nǎlǐ xūyào gǎijìn!", "uz": "Faqat tanqid qilingandagina, qayerda yaxshilash kerakligini bilish mumkin!", "ru": "Только получив критику, можно узнать, где нужно улучшиться!", "tj": "Танҳо вақте танқид шавед, медонед куҷо бояд беҳтар кунед!"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Musobaqa", "ru": "Соревнование", "tj": "Мусобақа"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "比赛结果怎么样？", "pinyin": "Bǐsài jiéguǒ zěnme yàng?", "uz": "Musobaqa natijasi qanday?", "ru": "Каков результат соревнования?", "tj": "Натиҷаи мусобақа чӣ тавр аст?"},
                 {"speaker": "B", "zh": "我们被对方打败了！多么可惜啊！", "pinyin": "Wǒmen bèi duìfāng dǎ bài le! Duōme kěxī a!", "uz": "Biz raqiblar tomonidan yengilib qoldik! Qanchalik achinarlisi!", "ru": "Нас победила другая команда! Как жаль!", "tj": "Мо аз тарафи рақибон шикаст хӯрдем! Чӣ қадар ҳайф!"},
                 {"speaker": "A", "zh": "只有经历失败，才能变得更强！", "pinyin": "Zhǐyǒu jīnglì shībài, cái néng biàn de gèng qiáng!", "uz": "Faqat mag'lubiyatni boshdan kechirganingizda, kuchliroq bo'la olasiz!", "ru": "Только пережив поражение, можно стать сильнее!", "tj": "Танҳо вақте шикастро аз сар гузаронед, метавонед қавитар шавед!"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "O'qituvchiga minnatdorlik", "ru": "Благодарность учителю", "tj": "Миннатдорӣ ба муаллим"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "老师，我被您影响了，多么感谢啊！", "pinyin": "Lǎoshī, wǒ bèi nín yǐngxiǎng le, duōme gǎnxiè a!", "uz": "O'qituvchi, siz meni ta'sirlantirdingiz, qanchalik minnatdorman!", "ru": "Учитель, вы повлияли на меня, как я благодарен!", "tj": "Муаллим, шумо ба ман таъсир кардед, чӣ қадар миннатдорам!"},
                 {"speaker": "B", "zh": "只有你自己努力，才能有今天的成绩！", "pinyin": "Zhǐyǒu nǐ zìjǐ nǔlì, cái néng yǒu jīntiān de chéngjì!", "uz": "Faqat o'zingizning harakat qilishingiz tufaylida bugungi natijangiz bor!", "ru": "Только благодаря твоим собственным усилиям — сегодняшние результаты!", "tj": "Танҳо бо кӯшиши худатон — натиҷаҳои имрӯза мавҷуданд!"},
                 {"speaker": "A", "zh": "我被您的话感动了，多么宝贵的教导啊！", "pinyin": "Wǒ bèi nín de huà gǎndòng le, duōme bǎoguì de jiàodǎo a!", "uz": "Sizning so'zlaringiz meni ta'sirlantirdi, qanchalik qimmatli nasihat!", "ru": "Ваши слова меня тронули, как ценное наставление!", "tj": "Суханони шумо маро мутаассир кард, чӣ қадар дарси гаронбаҳо!"},

@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "O'zgarishni payqash", "ru": "Замечаю изменение", "tj": "Тағйиротро мушоҳида кардан"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你没看出来吗？她变了！", "pinyin": "Nǐ méi kàn chū lái ma? Tā biàn le!", "uz": "Siz sezib qolmadingizmi? U o'zgardi!", "ru": "Ты разве не заметил? Она изменилась!", "tj": "Шумо пай набурдед? Вай тағйир ёфт!"},
                 {"speaker": "B", "zh": "真的吗？我没看出来任何变化。", "pinyin": "Zhēn de ma? Wǒ méi kàn chū lái rènhé biànhuà.", "uz": "Chinmi? Men hech qanday o'zgarishni sezmadim.", "ru": "Правда? Я не заметил никаких изменений.", "tj": "Ростан? Ман ҳеҷ тағйироте надидам."},
                 {"speaker": "A", "zh": "她的样子变化很大，连我都认出来了！", "pinyin": "Tā de yàngzi biànhuà hěn dà, lián wǒ dōu rèn chū lái le!", "uz": "Uning qiyofasi juda o'zgardi, hatto men ham tanib oldim!", "ru": "Её внешность сильно изменилась, даже я её узнал!", "tj": "Қиёфаи вай хеле тағйир ёфт, ҳатто ман ҳам вайро шинохтам!"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Ko'cha orqali o'tish", "ru": "Проход мимо улицы", "tj": "Гузаштан аз кӯча"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你是怎么到这里来的？", "pinyin": "Nǐ shì zěnme dào zhèlǐ lái de?", "uz": "Siz bu yerga qanday keldingiz?", "ru": "Как ты сюда добрался?", "tj": "Шумо чӣ тавр ин ҷо омадед?"},
                 {"speaker": "B", "zh": "我是经过那条街道来的，看到了新的咖啡店！", "pinyin": "Wǒ shì jīngguò nà tiáo jiēdào lái de, kàndào le xīn de kāfēidiàn!", "uz": "Men u ko'cha orqali keldim, yangi qahvaxona ko'rdim!", "ru": "Я прошёл через ту улицу и увидел новую кофейню!", "tj": "Ман аз он кӯча гузашта омадам ва қаҳвахонаи нав дидам!"},
                 {"speaker": "A", "zh": "哦！你经过公园了吗？", "pinyin": "Ó! Nǐ jīngguò gōngyuán le ma?", "uz": "Oh! Siz parkdan o'tdingizmi?", "ru": "О! Ты проходил через парк?", "tj": "О! Шумо аз боғ гузаштед?"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Sirni bilish", "ru": "Узнать тайну", "tj": "Донистани сир"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你看出来他有什么秘密吗？", "pinyin": "Nǐ kàn chū lái tā yǒu shénme mìmì ma?", "uz": "Sizga uning qanday siri borligini payqadingizmi?", "ru": "Ты заметил, что у него есть какая-то тайна?", "tj": "Пай бурдед, ки сири вай чист?"},
                 {"speaker": "B", "zh": "没看出来，但是使我觉得他很奇怪。", "pinyin": "Méi kàn chū lái, dànshì shǐ wǒ juéde tā hěn qíguài.", "uz": "Sezmadim, lekin meni uni g'alati deb o'ylashga majbur qildi.", "ru": "Не заметил, но это заставило меня думать, что он странный.", "tj": "Пай набурдам, аммо ин маро маҷбур кард, ки вайро аҷиб ҳис кунам."},
                 {"speaker": "A", "zh": "他叫你不要告诉别人，对吗？", "pinyin": "Tā jiào nǐ bú yào gàosù biérén, duì ma?", "uz": "U sizga boshqalarga aytmaslikni buyurdimi, to'g'rimi?", "ru": "Он велел тебе никому не говорить, да?", "tj": "Вай ба шумо фармод, ки ба дигарон нагӯед, дуруст аст?"},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Mashq davom ettirish", "ru": "Продолжение тренировки", "tj": "Идомаи машқ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你能坚持下去吗？已经锻炼了一个小时了！", "pinyin": "Nǐ néng jiānchí xià qù ma? Yǐjīng duànliàn le yī gè xiǎoshí le!", "uz": "Davom ettira olasizmi? Allaqachon bir soat mashq qildingiz!", "ru": "Ты можешь продолжать? Уже час тренировался!", "tj": "Идома дода метавонед? Аллакай як соат варзиш кардед!"},
                 {"speaker": "B", "zh": "能！只要坚持下去，就能看出来效果！", "pinyin": "Néng! Zhǐyào jiānchí xià qù, jiù néng kàn chū lái xiàoguǒ!", "uz": "Ha! Faqat davom etsam, natijani ko'raman!", "ru": "Да! Только продолжая, можно заметить результат!", "tj": "Метавонам! Танҳо идома диҳам, натиҷаро мебинам!"},
                 {"speaker": "A", "zh": "这使我很受鼓励！", "pinyin": "Zhè shǐ wǒ hěn shòu gǔlì!", "uz": "Bu meni juda ilhomlantirdi!", "ru": "Это очень меня воодушевляет!", "tj": "Ин маро хеле илҳом бахшид!"},

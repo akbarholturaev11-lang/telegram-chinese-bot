@@ -30,9 +30,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
-            "block": 1,
+            "block_no": 1,
+            "section_label": "课文 1",
             "title": {"uz": "Kasallik uchun maslahat", "ru": "Совет при болезни", "tj": "Маслиҳат ҳангоми беморӣ"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我最近老是头疼，有什么办法吗？", "pinyin": "Wǒ zuìjìn lǎoshi tóuténg, yǒu shénme bànfǎ ma?", "uz": "Yaqinda boshim doimo og'riyapti, biror chora bormi?", "ru": "У меня в последнее время постоянно болит голова, есть какой-нибудь способ?", "tj": "Охирон сари ман ҳамеша дард мекунад, чорае ҳаст?"},
                 {"speaker": "B", "zh": "根据你的情况，建议你好好休息！", "pinyin": "Gēnjù nǐ de qíngkuàng, jiànyì nǐ hǎohǎo xiūxi!", "uz": "Sizning holatingizga ko'ra, yaxshilab dam olishingizni tavsiya etaman!", "ru": "Исходя из вашей ситуации, советую хорошенько отдохнуть!", "tj": "Мувофиқи ҳолати шумо, тавсия медиҳам хуб-хуб истироҳат кунед!"},
                 {"speaker": "A", "zh": "谁都有办法看好你的\"病\"，对吗？", "pinyin": "Shéi dōu yǒu bànfǎ kàn hǎo nǐ de \"bìng\", duì ma?", "uz": "Hammaning sizning \"kasalingizni\" davolashga yo'li bor, to'g'rimi?", "ru": "У каждого есть способ вылечить твою \"болезнь\", правда?", "tj": "Ҳар кас усул дорад \"бемориатонро\" табобат кунад, дуруст аст?"},
@@ -40,9 +41,10 @@ LESSON = {
             ]
         },
         {
-            "block": 2,
+            "block_no": 2,
+            "section_label": "课文 2",
             "title": {"uz": "Shifokor bilan muhokama", "ru": "Обсуждение с врачом", "tj": "Муҳокима бо духтур"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "根据检查结果，我的身体怎么样？", "pinyin": "Gēnjù jiǎnchá jiéguǒ, wǒ de shēntǐ zěnme yàng?", "uz": "Tekshiruv natijalariga ko'ra, sog'ligim qanday?", "ru": "По результатам осмотра, как моё здоровье?", "tj": "Мувофиқи натиҷаи муоина, саломатиам чӣ тавр аст?"},
                 {"speaker": "B", "zh": "你的身体还不错，但要注意一些习惯。", "pinyin": "Nǐ de shēntǐ hái bú cuò, dàn yào zhùyì yīxiē xíguàn.", "uz": "Sog'ligingiz yomon emas, lekin ba'zi odatlarga e'tibor bering.", "ru": "Здоровье у тебя ещё ничего, но нужно обратить внимание на привычки.", "tj": "Саломатиатон бад нест, аммо ба баъзе одатҳо диққат диҳед."},
                 {"speaker": "A", "zh": "我每天都锻炼锻炼，这样可以吗？", "pinyin": "Wǒ měitiān dōu duànliàn duànliàn, zhèyàng kěyǐ ma?", "uz": "Men har kuni mashq qilib-qilib ko'raman, bu yaxshimi?", "ru": "Я каждый день немного занимаюсь физкультурой, это нормально?", "tj": "Ман ҳар рӯз каме варзиш мекунам, ин хуб аст?"},
@@ -50,9 +52,10 @@ LESSON = {
             ]
         },
         {
-            "block": 3,
+            "block_no": 3,
+            "section_label": "课文 3",
             "title": {"uz": "Loyiha haqida muhokama", "ru": "Обсуждение проекта", "tj": "Муҳокимаи лоиҳа"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我们来讨论讨论这个项目吧！", "pinyin": "Wǒmen lái tǎolùn tǎolùn zhège xiàngmù ba!", "uz": "Keling, bu loyihani bir oz muhokama qilaylik!", "ru": "Давайте немного обсудим этот проект!", "tj": "Биё ин лоиҳаро каме муҳокима кунем!"},
                 {"speaker": "B", "zh": "好，根据上次的结果，我有一些新建议。", "pinyin": "Hǎo, gēnjù shàng cì de jiéguǒ, wǒ yǒu yīxiē xīn jiànyì.", "uz": "Yaxshi, o'tgan safar natijalariga ko'ra, bir necha yangi takliflarim bor.", "ru": "Хорошо, на основании прошлых результатов, у меня есть несколько новых предложений.", "tj": "Хуб, дар асоси натиҷаҳои дафъаи гузашта, ман чанд пешниҳоди нав дорам."},
                 {"speaker": "A", "zh": "好，我们研究研究这些建议。", "pinyin": "Hǎo, wǒmen yánjiū yánjiū zhèxiē jiànyì.", "uz": "Yaxshi, keling bu takliflarni bir oz tadqiq qilaylik.", "ru": "Ладно, давайте немного изучим эти предложения.", "tj": "Хуб, биё ин пешниҳодҳоро каме таҳқиқ кунем."},
@@ -60,9 +63,10 @@ LESSON = {
             ]
         },
         {
-            "block": 4,
+            "block_no": 4,
+            "section_label": "课文 4",
             "title": {"uz": "Yangi tanishuv", "ru": "Новое знакомство", "tj": "Шиносоии нав"},
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "我来介绍介绍，这是我的朋友李明。", "pinyin": "Wǒ lái jièshào jièshào, zhè shì wǒ de péngyou Lǐ Míng.", "uz": "Men tanishtirib qo'yay, bu mening do'stim Li Min.", "ru": "Позвольте представить, это мой друг Ли Мин.", "tj": "Биё муаррифӣ кунам, ин дӯстам Ли Мин аст."},
                 {"speaker": "B", "zh": "你好，根据你朋友的介绍，你是医生？", "pinyin": "Nǐ hǎo, gēnjù nǐ péngyou de jièshào, nǐ shì yīshēng?", "uz": "Salom, do'stingizning tanishtirishiga ko'ra, siz shifokormiсiz?", "ru": "Привет, по представлению вашего друга, вы врач?", "tj": "Салом, мувофиқи муаррифии дӯстатон, шумо духтур ҳастед?"},
                 {"speaker": "A", "zh": "是的！需要的话，随时可以来解释解释病情。", "pinyin": "Shì de! Xūyào de huà, suíshí kěyǐ lái jiěshì jiěshì bìngqíng.", "uz": "Ha! Kerak bo'lsa, har doim kelib kasallik holatini tushuntirish mumkin.", "ru": "Да! Если нужно, в любое время приходите, немного объясню состояние болезни.", "tj": "Ҳа! Лозим бошад, ҳар вақт биёед, каме вазъи бемориро шарҳ медиҳам."},

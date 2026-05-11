@@ -31,8 +31,10 @@ LESSON = {
     ], ensure_ascii=False),
     "dialogue_json": json.dumps([
         {
+            "block_no": 1,
+            "section_label": "课文 1",
             "scene_uz": "Do'stlar ko'rishganda", "scene_ru": "Встреча друзей", "scene_tj": "Вохӯрии дӯстон",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "哎，你最近是不是越来越胖了？", "pinyin": "Āi, nǐ zuìjìn shì bu shì yuèláiyuè pàng le?", "uz": "Hay, so'nggi paytlarda tobora semirmaydapsanmi?", "ru": "Эй, ты в последнее время всё толстеешь, да?", "tj": "Ҳай, оё шумо охирон рӯ ба рӯ фарбеҳ мешавед?"},
                 {"speaker": "B", "zh": "唉，是啊！我最近体重越来越重了，不知道怎么办。", "pinyin": "Āi, shì a! Wǒ zuìjìn tǐzhòng yuèláiyuè zhòng le, bù zhīdào zěnme bàn.", "uz": "Ah, ha! So'nggi paytlarda vaznm tobora og'irlashyapti, nima qilishni bilmayapman.", "ru": "Да, увы! В последнее время мой вес всё растёт — не знаю, что делать.", "tj": "Ҳа, мутаассифона! Охирон вазнам рӯ ба рӯ вазнинтар мешавад, намедонам чӣ кунам."},
                 {"speaker": "A", "zh": "你最近锻炼了吗？为了健康，应该多运动！", "pinyin": "Nǐ zuìjìn duànliàn le ma? Wèile jiànkāng, yīnggāi duō yùndòng!", "uz": "So'nggi paytlarda mashq qildingmi? Sog'liq uchun ko'proq sport qilish kerak!", "ru": "Ты в последнее время тренировался? Ради здоровья нужно больше двигаться!", "tj": "Охирон машқ кардед? Барои саломатӣ бояд бештар варзиш кард!"},
@@ -40,8 +42,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 2,
+            "section_label": "课文 2",
             "scene_uz": "Bahor mavsumida kasallik", "scene_ru": "Болезнь весной", "scene_tj": "Беморӣ дар фасли баҳор",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "春天天气变化多，你最近有没有感冒？", "pinyin": "Chūntiān tiānqì biànhuà duō, nǐ zuìjìn yǒu méiyǒu gǎnmào?", "uz": "Bahorda havo ko'p o'zgaradi, so'nggi paytlarda shamolladingizmi?", "ru": "Весной погода часто меняется — ты в последнее время не простужался?", "tj": "Баҳор ҳаво зиёд тағйир меёбад, оё охирон шамол нахӯрдед?"},
                 {"speaker": "B", "zh": "发烧了，身体越来越不舒服，都怪这个季节！", "pinyin": "Fāshāo le, shēntǐ yuèláiyuè bù shūfu, dōu guài zhège jìjié!", "uz": "Isitma chiqdi, tanasim tobora yomonlashmoqda, barchasi shu faslning aybida!", "ru": "Поднялась температура, самочувствие всё хуже — всё из-за этого сезона!", "tj": "Таб баромад, ҳолатам рӯ ба рӯ бадтар мешавад, ҳама айби ин фасл аст!"},
                 {"speaker": "A", "zh": "我来照顾你吧！需要什么药吗？", "pinyin": "Wǒ lái zhàogù nǐ ba! Xūyào shénme yào ma?", "uz": "Men sizga g'amxo'rlik qilay! Qandaydir dori kerakmi?", "ru": "Давай я за тобой поухаживаю! Тебе нужны лекарства?", "tj": "Биёед ман аз шумо ғамхорӣ кунам! Ягон дору лозим аст?"},
@@ -49,8 +53,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 3,
+            "section_label": "课文 3",
             "scene_uz": "Parkdagi o'tloqda", "scene_ru": "На лужайке в парке", "scene_tj": "Дар чамани боғ",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "草地上的人越来越多了，大家都来锻炼了！", "pinyin": "Cǎodì shàng de rén yuèláiyuè duō le, dàjiā dōu lái duànliàn le!", "uz": "O'tloqdagi odamlar tobora ko'paymoqda, hamma mashq qilgani keldi!", "ru": "На лужайке людей всё больше — все пришли тренироваться!", "tj": "Одамони дар чаман рӯ ба рӯ зиёд мешаванд, ҳама барои машқ омадаанд!"},
                 {"speaker": "B", "zh": "是啊，天气越来越暖和了，夏天快来了！", "pinyin": "Shì a, tiānqì yuèláiyuè nuǎnhuo le, xiàtiān kuài lái le!", "uz": "Ha, havo tobora iliymoqda, yoz tez kelib qoladi!", "ru": "Точно, погода всё теплее — лето не за горами!", "tj": "Бале, ҳаво рӯ ба рӯ гармтар мешавад, тобистон зуд меояд!"},
                 {"speaker": "A", "zh": "为了减肥，我每天早晨来这里跑步。", "pinyin": "Wèile jiǎnféi, wǒ měitiān zǎochén lái zhèlǐ pǎobù.", "uz": "Ozish uchun men har kuni ertalab bu yerga yugurgani kelaman.", "ru": "Чтобы похудеть, я каждое утро прихожу сюда бегать.", "tj": "Барои лоғар шудан ман ҳар рӯз субҳидам инҷо барои давидан меоям."},
@@ -58,8 +64,10 @@ LESSON = {
             ]
         },
         {
+            "block_no": 4,
+            "section_label": "课文 4",
             "scene_uz": "Yil fasllarini taqqoslash", "scene_ru": "Сравнение времён года", "scene_tj": "Муқоисаи фаслҳои сол",
-            "exchanges": [
+            "dialogue": [
                 {"speaker": "A", "zh": "你喜欢哪个季节？春天还是夏天？", "pinyin": "Nǐ xǐhuan nǎge jìjié? Chūntiān háishi xiàtiān?", "uz": "Qaysi faslni yaxshi ko'rasiz? Bahor yoki yoz?", "ru": "Какое время года вам нравится — весна или лето?", "tj": "Шумо кадом фаслро дӯст медоред? Баҳор ё тобистон?"},
                 {"speaker": "B", "zh": "我最喜欢春天，天气越来越暖，花越来越漂亮！", "pinyin": "Wǒ zuì xǐhuan chūntiān, tiānqì yuèláiyuè nuǎn, huā yuèláiyuè piàoliang!", "uz": "Men bahorna ko'proq yoqtiraman, havo tobora iliydi, gullar tobora chiroylashadi!", "ru": "Мне больше всего нравится весна — погода всё теплее, цветы всё красивее!", "tj": "Ман баҳорро бештар дӯст медорам, ҳаво рӯ ба рӯ гарм мешавад, гулҳо рӯ ба рӯ зеботар мешаванд!"},
                 {"speaker": "A", "zh": "当然！春天是锻炼的好季节，对健康很好。", "pinyin": "Dāngrán! Chūntiān shì duànliàn de hǎo jìjié, duì jiànkāng hěn hǎo.", "uz": "Albatta! Bahor mashq qilish uchun yaxshi fasl, sog'liq uchun juda foydali.", "ru": "Конечно! Весна — хорошее время для тренировок, очень полезно для здоровья.", "tj": "Албатта! Баҳор фасли хуби машқ кардан аст, барои саломатӣ бисёр муфид аст."},
