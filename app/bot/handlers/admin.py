@@ -9,6 +9,8 @@ from app.repositories.user_repo import UserRepository
 from app.repositories.course_audio_repo import CourseAudioRepository
 from app.db.models.user import User
 from app.db.models.payment import Payment
+from app.db.models.course_progress import CourseProgress
+from app.db.models.referral import Referral
 
 router = Router()
 
@@ -45,65 +47,169 @@ async def admin_stats_callback(callback: CallbackQuery, session):
         await callback.answer()
         return
 
-    result = await session.execute(
-        select(User.status, func.count().label("cnt")).group_by(User.status)
-    )
-    status_counts = {row.status: row.cnt for row in result.fetchall()}
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_ago = now - timedelta(days=7)
+    month_ago = now - timedelta(days=30)
 
-    result = await session.execute(
-        select(User.language, func.count().label("cnt")).group_by(User.language)
-    )
-    lang_counts = {row.language: row.cnt for row in result.fetchall()}
+    # --- Foydalanuvchilar ---
+    total = (await session.execute(select(func.count()).select_from(User))).scalar() or 0
 
-    result = await session.execute(select(func.count()).select_from(User))
-    total = result.scalar() or 0
+    status_counts = {
+        r.status: r.cnt
+        for r in (await session.execute(
+            select(User.status, func.count().label("cnt")).group_by(User.status)
+        )).fetchall()
+    }
+    lang_counts = {
+        r.language: r.cnt
+        for r in (await session.execute(
+            select(User.language, func.count().label("cnt")).group_by(User.language)
+        )).fetchall()
+    }
+    level_counts = {
+        r.level: r.cnt
+        for r in (await session.execute(
+            select(User.level, func.count().label("cnt")).group_by(User.level)
+        )).fetchall()
+    }
+    mode_counts = {
+        r.learning_mode: r.cnt
+        for r in (await session.execute(
+            select(User.learning_mode, func.count().label("cnt")).group_by(User.learning_mode)
+        )).fetchall()
+    }
 
-    result = await session.execute(
-        select(func.count()).select_from(User).where(User.questions_used > 0)
-    )
-    active_users = result.scalar() or 0
-
-    week_ago = datetime.now(timezone.utc) - timedelta(days=7)
-    result = await session.execute(
+    # --- Faollik ---
+    new_today = (await session.execute(
+        select(func.count()).select_from(User).where(User.created_at >= today_start)
+    )).scalar() or 0
+    new_week = (await session.execute(
         select(func.count()).select_from(User).where(User.created_at >= week_ago)
+    )).scalar() or 0
+    new_month = (await session.execute(
+        select(func.count()).select_from(User).where(User.created_at >= month_ago)
+    )).scalar() or 0
+    active_today = (await session.execute(
+        select(func.count()).select_from(User).where(User.last_active_at >= today_start)
+    )).scalar() or 0
+    active_week = (await session.execute(
+        select(func.count()).select_from(User).where(User.last_active_at >= week_ago)
+    )).scalar() or 0
+
+    # --- To'lovlar ---
+    pay_rows = (await session.execute(
+        select(
+            Payment.payment_status,
+            func.count().label("cnt"),
+            func.sum(Payment.amount).label("total_sum"),
+        ).group_by(Payment.payment_status)
+    )).fetchall()
+    pay_by_status = {r.payment_status: (r.cnt, int(r.total_sum or 0)) for r in pay_rows}
+
+    pay_plan_rows = (await session.execute(
+        select(Payment.plan_type, func.count().label("cnt"))
+        .where(Payment.payment_status == "approved")
+        .group_by(Payment.plan_type)
+    )).fetchall()
+    pay_by_plan = {r.plan_type: r.cnt for r in pay_plan_rows}
+
+    # --- Kurs ---
+    course_total = (await session.execute(
+        select(func.count()).select_from(CourseProgress)
+    )).scalar() or 0
+    course_with_lessons = (await session.execute(
+        select(func.count()).select_from(CourseProgress)
+        .where(CourseProgress.completed_lessons_count > 0)
+    )).scalar() or 0
+    course_lessons_sum = (await session.execute(
+        select(func.sum(CourseProgress.completed_lessons_count)).select_from(CourseProgress)
+    )).scalar() or 0
+    course_reminders = (await session.execute(
+        select(func.count()).select_from(CourseProgress)
+        .where(CourseProgress.reminder_enabled == True)  # noqa: E712
+    )).scalar() or 0
+
+    # --- Referallar ---
+    ref_total = (await session.execute(
+        select(func.count()).select_from(Referral)
+    )).scalar() or 0
+    ref_activated = (await session.execute(
+        select(func.count()).select_from(Referral).where(Referral.status == "activated")
+    )).scalar() or 0
+    ref_bonus = (await session.execute(
+        select(func.count()).select_from(Referral).where(Referral.bonus_granted == True)  # noqa: E712
+    )).scalar() or 0
+    discount_eligible = (await session.execute(
+        select(func.count()).select_from(User).where(User.discount_eligible == True)  # noqa: E712
+    )).scalar() or 0
+    discount_used_cnt = (await session.execute(
+        select(func.count()).select_from(User).where(User.discount_used == True)  # noqa: E712
+    )).scalar() or 0
+
+    # --- Hisob ---
+    free_cnt    = status_counts.get("free", 0)
+    trial_cnt   = status_counts.get("trial", 0)
+    active_cnt  = status_counts.get("active", 0)
+    expired_cnt = status_counts.get("expired", 0)
+    blocked_cnt = status_counts.get("blocked", 0)
+
+    pending_cnt,  _            = pay_by_status.get("pending",  (0, 0))
+    approved_cnt, approved_sum = pay_by_status.get("approved", (0, 0))
+    rejected_cnt, _            = pay_by_status.get("rejected", (0, 0))
+
+    conversion  = round(active_cnt / total * 100, 1) if total > 0 else 0
+    qa_users    = (await session.execute(
+        select(func.count()).select_from(User).where(User.questions_used > 0)
+    )).scalar() or 0
+    engagement  = round(qa_users / total * 100, 1) if total > 0 else 0
+    avg_lessons = round(course_lessons_sum / course_with_lessons, 1) if course_with_lessons > 0 else 0
+
+    level_order = ["beginner", "hsk1", "hsk2", "hsk3", "hsk4"]
+    level_str   = "  " + "   ".join(
+        f"{l.upper()}: {level_counts.get(l, 0)}" for l in level_order
     )
-    new_this_week = result.scalar() or 0
-
-    result = await session.execute(
-        select(func.count()).select_from(Payment).where(Payment.payment_status == "pending")
-    )
-    pending_payments = result.scalar() or 0
-
-    result = await session.execute(
-        select(func.count()).select_from(Payment).where(Payment.payment_status == "approved")
-    )
-    total_paid = result.scalar() or 0
-
-    trial = status_counts.get("trial", 0)
-    active = status_counts.get("active", 0)
-    expired = status_counts.get("expired", 0)
-    blocked = status_counts.get("blocked", 0)
-
-    conversion = round(active / total * 100, 1) if total > 0 else 0
-    engagement = round(active_users / total * 100, 1) if total > 0 else 0
-    lang_str = " | ".join(f"{k}: {v}" for k, v in sorted(lang_counts.items()))
+    lang_str = "  " + " | ".join(f"{k}: {v}" for k, v in sorted(lang_counts.items()))
+    now_str  = now.strftime("%d.%m.%Y %H:%M UTC")
 
     text = (
-        f"📊 <b>Statistika</b>\n\n"
-        f"<b>👥 Foydalanuvchilar:</b>\n"
-        f"  Jami: {total}\n"
-        f"  Trial: {trial}\n"
-        f"  Aktiv: {active}\n"
-        f"  Tugagan: {expired}\n"
-        f"  Bloklangan: {blocked}\n\n"
-        f"<b>📈 Konversiya:</b>\n"
-        f"  Trial → Obuna: {conversion}%\n"
-        f"  Savol berganlar: {active_users} ({engagement}%)\n"
-        f"  Bu hafta yangilar: +{new_this_week}\n\n"
-        f"<b>💳 To'lovlar:</b>\n"
-        f"  Kutilmoqda: {pending_payments}\n"
-        f"  Tasdiqlangan: {total_paid}\n\n"
-        f"<b>🌐 Tillar:</b> {lang_str}"
+        f"📊 <b>Statistika</b>  <i>{now_str}</i>\n"
+        f"{'─' * 32}\n\n"
+
+        f"<b>👥 FOYDALANUVCHILAR  [{total}]</b>\n"
+        f"  Free: <b>{free_cnt}</b>   Trial: <b>{trial_cnt}</b>\n"
+        f"  Aktiv: <b>{active_cnt}</b>   Tugagan: <b>{expired_cnt}</b>   Bloklangan: <b>{blocked_cnt}</b>\n\n"
+
+        f"<b>📅 FAOLLIK</b>\n"
+        f"  Yangi:  bugun <b>+{new_today}</b>  |  hafta <b>+{new_week}</b>  |  oy <b>+{new_month}</b>\n"
+        f"  Aktiv:  bugun <b>{active_today}</b>  |  hafta <b>{active_week}</b>\n\n"
+
+        f"<b>📊 DARAJALAR</b>\n"
+        f"{level_str}\n\n"
+
+        f"<b>🌐 TIL</b>\n"
+        f"{lang_str}\n\n"
+
+        f"<b>🎯 O'QISH REJIMI</b>\n"
+        f"  QA: <b>{mode_counts.get('qa', 0)}</b>   Kurs: <b>{mode_counts.get('course', 0)}</b>\n\n"
+
+        f"<b>💳 TO'LOVLAR</b>\n"
+        f"  Kutilmoqda: <b>{pending_cnt}</b>   Tasdiqlangan: <b>{approved_cnt}</b>   Rad: <b>{rejected_cnt}</b>\n"
+        f"  10 kun: <b>{pay_by_plan.get('10_days', 0)}</b>   1 oy: <b>{pay_by_plan.get('1_month', 0)}</b>\n"
+        f"  Jami daromad: <b>{approved_sum:,}</b> so'm\n\n"
+
+        f"<b>📚 KURS</b>\n"
+        f"  Yozilgan: <b>{course_total}</b>   Dars tugatganlar: <b>{course_with_lessons}</b>\n"
+        f"  Jami tugatilgan darslar: <b>{course_lessons_sum}</b>   O'rtacha: <b>{avg_lessons}</b>\n"
+        f"  Eslatma yoqilgan: <b>{course_reminders}</b>\n\n"
+
+        f"<b>🎁 REFERALLAR</b>\n"
+        f"  Jami: <b>{ref_total}</b>   Faollashgan: <b>{ref_activated}</b>   Bonus: <b>{ref_bonus}</b>\n"
+        f"  Chegirma eligible: <b>{discount_eligible}</b>   Ishlatilgan: <b>{discount_used_cnt}</b>\n\n"
+
+        f"<b>📈 KONVERSIYA</b>\n"
+        f"  Free → Aktiv: <b>{conversion}%</b>\n"
+        f"  Savol berganlar: <b>{qa_users}</b> (<b>{engagement}%</b>)"
     )
 
     await callback.answer()
