@@ -8,6 +8,7 @@ TEXTS = {
         "level_saved_explained": "✅ Сатҳи шумо сабт шуд. Ин ба мо кӯмак мекунад, ки дарсҳоро ба шумо мувофиқ кунем.",
         "trial_started_info": "🎁 Ба шумо дастрасии ройгон кушода шуд.",
         "onboarding_special_welcome": "🌟 Шумо корбари <b>'{level}'</b> мо шудед!\n\n<blockquote>🎁 Ба хотири ин, шумо 24 соат ба тамоми имкониятҳои бот бе ягон маҳдудият дастрасӣ доред!</blockquote>",
+        "trial_24h_info": "🎁 <b>24 соат дастрасии пурра кушода шуд!</b>\n\n<blockquote>Шумо метавонед ҳам режими савол-ҷавоб, ҳам режими курсро бе ягон маҳдудият истифода баред.\n\n⏰ 24 соат баъд лимити рӯзона фаъол мешавад.</blockquote>",
         "send_first_message": "Акнун калима, ҷумла ё саволи хитоии худро фиристед — дарсро аз ҳамон ҷо оғоз мекунем.",
         "level_beginner": "Аз 0",
 
@@ -115,6 +116,7 @@ TEXTS = {
         "level_saved_explained": "✅ Ваш уровень сохранён. Это поможет нам подстроить уроки под вас.",
         "trial_started_info": "🎁 Вам открыт бесплатный доступ.",
         "onboarding_special_welcome": "🌟 Вы стали нашим пользователем <b>'{level}'</b>!\n\n<blockquote>🎁 В честь этого вам открыт полный доступ на <b>24 часа</b> без каких-либо ограничений!</blockquote>",
+        "trial_24h_info": "🎁 <b>24 часа полного доступа активированы!</b>\n\n<blockquote>Вы можете использовать режим вопрос-ответ и режим курса без каких-либо ограничений.\n\n⏰ Через 24 часа активируется дневной лимит.</blockquote>",
         "send_first_message": "Теперь отправьте китайское слово, фразу или свой вопрос — и начнём урок с этого.",
         "level_beginner": "С нуля",
 
@@ -218,6 +220,7 @@ TEXTS = {
         "level_saved_explained": "✅ Darajangiz saqlandi. Bu darslarni sizga moslashtirishga yordam beradi.",
         "trial_started_info": "🎁 Sizga bepul kirish ochildi.",
         "onboarding_special_welcome": "🌟 Siz bizning <b>’{level}’</b> foydalanuvchimiz bo’ldingiz!\n\n<blockquote>🎁 Buning sharofati bilan to’liq <b>24 soat</b> botni hech qanday limitlarsiz ishlata olasiz!</blockquote>",
+        "trial_24h_info": "🎁 <b>24 soatlik to’liq kirish faollashtirildi!</b>\n\n<blockquote>Savol-javob rejimi va kurs rejimidan hech qanday cheklovsiz foydalanishingiz mumkin.\n\n⏰ 24 soatdan keyin kunlik limit ishga tushadi.</blockquote>",
         "send_first_message": "Endi xitoycha so’z, gap yoki savolingizni yuboring — darsni o’sha yerdan boshlaymiz.",
         "level_beginner": "0 dan",
 
