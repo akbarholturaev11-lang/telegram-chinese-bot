@@ -278,33 +278,26 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
     data = await state.get_data()
     onboarding_message_id = data.get("onboarding_message_id")
 
-    if level.startswith("hsk"):
-        level_label = level.upper()
-    else:
-        level_label = {"tj": "Аз 0", "uz": "Boshlang'ich", "ru": "С нуля"}.get(user.language, "Beginner")
+    ordinal_suffixes = {"tj": "ум", "uz": "-chi", "ru": "-й"}
+    suffix = ordinal_suffixes.get(user.language, "-chi")
+    user_num = f"{user.id}{suffix}"
 
     try:
         if onboarding_message_id:
-            await callback.bot.edit_message_text(
+            await callback.bot.edit_message_reply_markup(
                 chat_id=callback.message.chat.id,
                 message_id=onboarding_message_id,
-                text=t("level_saved_explained", user.language),
+                reply_markup=None,
             )
     except Exception:
         pass
 
     await callback.message.answer(
-        t("onboarding_special_welcome", user.language, level=level_label),
+        t("onboarding_special_welcome", user.language, user_num=user_num),
         parse_mode="HTML",
     )
 
     display_text, ai_context = _get_demo_lesson(level, user.language)
-
-    await callback.bot.send_message(
-        chat_id=callback.from_user.id,
-        text=t("trial_24h_info", user.language),
-        parse_mode="HTML",
-    )
 
     if display_text:
         await callback.bot.send_message(
