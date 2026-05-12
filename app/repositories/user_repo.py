@@ -200,7 +200,10 @@ class UserRepository:
         target_date: date,
     ) -> list[User]:
         result = await self.session.execute(
-            select(User).where(User.status == "active")
+            select(User).where(
+                User.status == "active",
+                User.payment_status == "approved",
+            )
         )
         users = list(result.scalars().all())
         return [

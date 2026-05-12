@@ -7,6 +7,7 @@ TEXTS = {
         "language_selected": "Забон интихоб шуд ✅",
         "level_saved_explained": "✅ Сатҳи шумо сабт шуд. Ин ба мо кӯмак мекунад, ки дарсҳоро ба шумо мувофиқ кунем.",
         "trial_started_info": "🎁 Ба шумо дастрасии ройгон кушода шуд.",
+        "onboarding_special_welcome": "🌟 Шумо корбари <b>'{level}'</b> мо шудед!\n\n<blockquote>🎁 Ба хотири ин, шумо 24 соат ба тамоми имкониятҳои бот бе ягон маҳдудият дастрасӣ доред!\n\n⏰ Пас аз 24 соат маҳдудияти рӯзона фаъол мешавад.</blockquote>",
         "send_first_message": "Акнун калима, ҷумла ё саволи хитоии худро фиристед — дарсро аз ҳамон ҷо оғоз мекунем.",
         "level_beginner": "Аз 0",
 
@@ -113,6 +114,7 @@ TEXTS = {
         "language_selected": "Язык выбран ✅",
         "level_saved_explained": "✅ Ваш уровень сохранён. Это поможет нам подстроить уроки под вас.",
         "trial_started_info": "🎁 Вам открыт бесплатный доступ.",
+        "onboarding_special_welcome": "🌟 Вы стали нашим пользователем <b>'{level}'</b>!\n\n<blockquote>🎁 В честь этого вам открыт полный доступ на <b>24 часа</b> без каких-либо ограничений!\n\n⏰ Через 24 часа начнёт работать дневной лимит.</blockquote>",
         "send_first_message": "Теперь отправьте китайское слово, фразу или свой вопрос — и начнём урок с этого.",
         "level_beginner": "С нуля",
 
@@ -215,7 +217,8 @@ TEXTS = {
         "language_selected": "Til tanlandi ✅",
         "level_saved_explained": "✅ Darajangiz saqlandi. Bu darslarni sizga moslashtirishga yordam beradi.",
         "trial_started_info": "🎁 Sizga bepul kirish ochildi.",
-        "send_first_message": "Endi xitoycha so‘z, gap yoki savolingizni yuboring — darsni o‘sha yerdan boshlaymiz.",
+        "onboarding_special_welcome": "🌟 Siz bizning <b>’{level}’</b> foydalanuvchimiz bo’ldingiz!\n\n<blockquote>🎁 Buning sharofati bilan to’liq <b>24 soat</b> botni hech qanday limitlarsiz ishlata olasiz!\n\n⏰ 24 soatdan keyin kunlik limit ishga tushadi.</blockquote>",
+        "send_first_message": "Endi xitoycha so’z, gap yoki savolingizni yuboring — darsni o’sha yerdan boshlaymiz.",
         "level_beginner": "0 dan",
 
         "menu_start_lesson": "📘 Darsni boshlash",

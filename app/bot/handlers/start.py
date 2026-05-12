@@ -1,3 +1,5 @@
+from datetime import datetime, timezone, timedelta
+
 from aiogram import Router
 from aiogram.filters import CommandStart, CommandObject
 from aiogram.types import Message, CallbackQuery
@@ -262,14 +264,24 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
         telegram_id=callback.from_user.id,
         full_name=callback.from_user.full_name if callback.from_user else None,
     )
+    now = datetime.now(timezone.utc)
     user.level = level
     user.learning_mode = "qa"
+    user.status = "active"
+    user.start_date = now
+    user.end_date = now + timedelta(hours=24)
+    user.expiry_reminder_sent_at = None
     await session.commit()
 
     await callback.answer()
 
     data = await state.get_data()
     onboarding_message_id = data.get("onboarding_message_id")
+
+    if level.startswith("hsk"):
+        level_label = level.upper()
+    else:
+        level_label = {"tj": "Аз 0", "uz": "Boshlang'ich", "ru": "С нуля"}.get(user.language, "Beginner")
 
     try:
         if onboarding_message_id:
@@ -280,6 +292,11 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
             )
     except Exception:
         pass
+
+    await callback.message.answer(
+        t("onboarding_special_welcome", user.language, level=level_label),
+        parse_mode="HTML",
+    )
 
     display_text, ai_context = _get_demo_lesson(level, user.language)
 
