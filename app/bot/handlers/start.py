@@ -283,8 +283,18 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
 
     display_text, ai_context = _get_demo_lesson(level, user.language)
 
+    await callback.bot.send_message(
+        chat_id=callback.from_user.id,
+        text=t("trial_24h_info", user.language),
+        parse_mode="HTML",
+    )
+
     if display_text:
-        await callback.message.answer(display_text, parse_mode="HTML")
+        await callback.bot.send_message(
+            chat_id=callback.from_user.id,
+            text=display_text,
+            parse_mode="HTML",
+        )
 
     if ai_context:
         from app.repositories.message_repo import MessageRepository
