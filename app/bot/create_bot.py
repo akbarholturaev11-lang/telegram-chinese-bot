@@ -33,14 +33,14 @@ def create_bot(settings):
 
     dp.include_router(start_router)
     dp.include_router(commands_router)
+    dp.include_router(admin_discount_router)
+    dp.include_router(admin_broadcast_router)
+    dp.include_router(admin_audio_router)   # admin FSM flows must stay before generic text/photo handlers
     dp.include_router(referral_router)
     dp.include_router(subscription_router)
     dp.include_router(menu_router)
     dp.include_router(payments_router)
     dp.include_router(admin_payments_router)
-    dp.include_router(admin_broadcast_router)
-    dp.include_router(admin_discount_router)
-    dp.include_router(admin_audio_router)   # ← admin audio — messages_router DAN OLDIN
     dp.include_router(course_router)
     dp.include_router(admin_router)
     dp.include_router(messages_router)

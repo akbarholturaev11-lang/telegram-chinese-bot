@@ -10,7 +10,7 @@ Flow:
 
 import json
 from aiogram import Router, F
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 
@@ -329,7 +329,7 @@ async def ask_for_audio_file(callback: CallbackQuery, session, state: FSMContext
 
 # ─── fayl qabul qilish ───────────────────────────────────────────────────────
 
-@router.message(AdminAudioStates.waiting_for_audio, F.voice | F.audio | F.document)
+@router.message(StateFilter(AdminAudioStates.waiting_for_audio), F.voice | F.audio | F.document)
 async def receive_audio_file(message: Message, session, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -380,7 +380,7 @@ async def receive_audio_file(message: Message, session, state: FSMContext):
     )
 
 
-@router.message(AdminAudioStates.waiting_for_audio)
+@router.message(StateFilter(AdminAudioStates.waiting_for_audio))
 async def wrong_file_type(message: Message):
     if not _is_admin(message.from_user.id):
         return

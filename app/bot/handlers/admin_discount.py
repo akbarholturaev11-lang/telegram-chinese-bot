@@ -3,6 +3,7 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 from aiogram import F, Router
+from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -88,7 +89,7 @@ async def discount_new(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Chegirma nomini yozing. Masalan: <b>May 20%</b>", parse_mode="HTML")
 
 
-@router.message(DiscountStates.waiting_title)
+@router.message(StateFilter(DiscountStates.waiting_title))
 async def discount_title(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -101,7 +102,7 @@ async def discount_title(message: Message, state: FSMContext):
     await message.answer("Chegirma foizini yozing. Masalan: <b>20</b>", parse_mode="HTML")
 
 
-@router.message(DiscountStates.waiting_percent)
+@router.message(StateFilter(DiscountStates.waiting_percent))
 async def discount_percent(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -133,7 +134,7 @@ async def discount_duration(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Kimlarga beriladi? Status tanlang:", reply_markup=discount_status_keyboard())
 
 
-@router.message(DiscountStates.waiting_custom_duration)
+@router.message(StateFilter(DiscountStates.waiting_custom_duration))
 async def discount_custom_duration(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -209,7 +210,7 @@ async def discount_start(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Bir martami yoki takrorlanadimi?", reply_markup=discount_usage_keyboard())
 
 
-@router.message(DiscountStates.waiting_start_at)
+@router.message(StateFilter(DiscountStates.waiting_start_at))
 async def discount_start_at(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -240,7 +241,7 @@ async def discount_usage(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Limit nechta user? 0 yozsangiz limitsiz. Masalan: <b>20</b>", parse_mode="HTML")
 
 
-@router.message(DiscountStates.waiting_repeat_days)
+@router.message(StateFilter(DiscountStates.waiting_repeat_days))
 async def discount_repeat_days(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
@@ -257,7 +258,7 @@ async def discount_repeat_days(message: Message, state: FSMContext):
     await message.answer("Limit nechta user? 0 yozsangiz limitsiz. Masalan: <b>20</b>", parse_mode="HTML")
 
 
-@router.message(DiscountStates.waiting_quota)
+@router.message(StateFilter(DiscountStates.waiting_quota))
 async def discount_quota(message: Message, state: FSMContext):
     if not _is_admin(message.from_user.id):
         return
