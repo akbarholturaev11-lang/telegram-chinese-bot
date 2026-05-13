@@ -24,7 +24,7 @@ def broadcast_panel_keyboard(
         return InlineKeyboardButton(text=label, callback_data=f"bc:section:{key}")
 
     def back_btn() -> InlineKeyboardButton:
-        return InlineKeyboardButton(text="⬅️ Panel", callback_data="bc:section:main")
+        return InlineKeyboardButton(text="⬅️ Panelga qaytish", callback_data="bc:section:main")
 
     def lang_btn(val: Optional[str], label: str) -> InlineKeyboardButton:
         return InlineKeyboardButton(
@@ -90,34 +90,34 @@ def broadcast_panel_keyboard(
         rows = [[lang_btn(None, "Hammasi"), lang_btn("uz", "UZ"), lang_btn("ru", "RU"), lang_btn("tj", "TJ")]]
     elif section == "status":
         rows = [
-            [status_btn(None, "Hammasi"), status_btn("active", "Active"), status_btn("trial", "Trial")],
-            [status_btn("free", "Free"), status_btn("expired", "Expired"), status_btn("blocked", "Blocked")],
+            [status_btn(None, "Hammasi"), status_btn("active", "Faol"), status_btn("trial", "Sinov")],
+            [status_btn("free", "Bepul"), status_btn("expired", "Tugagan"), status_btn("blocked", "Blok")],
         ]
     elif section == "level":
         rows = [
-            [level_btn(None, "Hammasi"), level_btn("beginner", "Beginner"), level_btn("hsk1", "HSK1")],
+            [level_btn(None, "Hammasi"), level_btn("beginner", "Boshlang'ich"), level_btn("hsk1", "HSK1")],
             [level_btn("hsk2", "HSK2"), level_btn("hsk3", "HSK3"), level_btn("hsk4", "HSK4")],
         ]
     elif section == "mode":
-        rows = [[mode_btn(None, "Hammasi"), mode_btn("qa", "QA"), mode_btn("course", "Course")]]
+        rows = [[mode_btn(None, "Hammasi"), mode_btn("qa", "Savol-javob"), mode_btn("course", "Kurs")]]
     elif section == "payment":
         rows = [
-            [pay_status_btn(None, "Status: All"), pay_status_btn("none", "None"), pay_status_btn("pending", "Pending")],
-            [pay_status_btn("approved", "Approved"), pay_status_btn("rejected", "Rejected")],
-            [pay_method_btn(None, "Method: All"), pay_method_btn("visa", "Visa")],
+            [pay_status_btn(None, "Status: Hammasi"), pay_status_btn("none", "Yo'q"), pay_status_btn("pending", "Kutilmoqda")],
+            [pay_status_btn("approved", "Tasdiqlangan"), pay_status_btn("rejected", "Rad etilgan")],
+            [pay_method_btn(None, "Usul: Hammasi"), pay_method_btn("visa", "Visa")],
             [pay_method_btn("alipay", "Alipay"), pay_method_btn("wechat", "WeChat")],
-            [plan_btn(None, "Plan: All"), plan_btn("10_days", "10d"), plan_btn("1_month", "1m")],
+            [plan_btn(None, "Tarif: Hammasi"), plan_btn("10_days", "10 kun"), plan_btn("1_month", "1 oy")],
         ]
     elif section == "discount":
         rows = [
-            [discount_btn(None, "Hammasi"), discount_btn("eligible", "Eligible"), discount_btn("used", "Used")],
-            [discount_btn("none", "No discount")],
-            [promo_btn(None, "Promo: All"), promo_btn("sent", "Sent"), promo_btn("not_sent", "No")],
+            [discount_btn(None, "Hammasi"), discount_btn("eligible", "Chegirma bor"), discount_btn("used", "Ishlatilgan")],
+            [discount_btn("none", "Chegirma yo'q")],
+            [promo_btn(None, "Promo: Hammasi"), promo_btn("sent", "Yuborilgan"), promo_btn("not_sent", "Yuborilmagan")],
         ]
     elif section == "activity":
         rows = [
-            [activity_btn(None, "Hammasi"), activity_btn("active_7d", "Active 7d")],
-            [activity_btn("inactive_7d", "Cold 7d"), activity_btn("new_7d", "New 7d")],
+            [activity_btn(None, "Hammasi"), activity_btn("active_7d", "7 kun faol")],
+            [activity_btn("inactive_7d", "7 kun sovuq"), activity_btn("new_7d", "7 kun yangi")],
         ]
     else:
         return InlineKeyboardMarkup(inline_keyboard=[
