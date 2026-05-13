@@ -1,7 +1,7 @@
 # Graph Report - telegram_chinese_bot_clean  (2026-05-13)
 
 ## Corpus Check
-- 266 files · ~530,376 words
+- 266 files · ~530,472 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary

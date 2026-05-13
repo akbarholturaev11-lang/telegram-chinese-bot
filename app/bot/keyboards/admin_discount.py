@@ -29,12 +29,12 @@ def discount_status_keyboard() -> InlineKeyboardMarkup:
         inline_keyboard=[
             [
                 InlineKeyboardButton(text="Hamma", callback_data="disc:status:all"),
-                InlineKeyboardButton(text="Free", callback_data="disc:status:free"),
-                InlineKeyboardButton(text="Trial", callback_data="disc:status:trial"),
+                InlineKeyboardButton(text="Bepul", callback_data="disc:status:free"),
+                InlineKeyboardButton(text="Sinov", callback_data="disc:status:trial"),
             ],
             [
-                InlineKeyboardButton(text="Active", callback_data="disc:status:active"),
-                InlineKeyboardButton(text="Expired", callback_data="disc:status:expired"),
+                InlineKeyboardButton(text="Faol", callback_data="disc:status:active"),
+                InlineKeyboardButton(text="Tugagan", callback_data="disc:status:expired"),
             ],
             [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="disc:cancel")],
         ]
