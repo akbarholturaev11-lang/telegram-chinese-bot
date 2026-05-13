@@ -4,6 +4,7 @@ import asyncio
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+from sqlalchemy import inspect, text
 from alembic import context
 
 from app.config import settings
@@ -20,6 +21,20 @@ config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
 target_metadata = Base.metadata
 
 
+def ensure_version_column_width(connection: Connection) -> None:
+    if connection.dialect.name != "postgresql":
+        return
+
+    with connection.begin():
+        inspector = inspect(connection)
+        if not inspector.has_table("alembic_version"):
+            return
+
+        connection.execute(
+            text("ALTER TABLE alembic_version ALTER COLUMN version_num TYPE VARCHAR(255)")
+        )
+
+
 def run_migrations_offline():
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
@@ -34,6 +49,7 @@ def run_migrations_offline():
 
 
 def do_run_migrations(connection: Connection):
+    ensure_version_column_width(connection)
     context.configure(connection=connection, target_metadata=target_metadata)
 
     with context.begin_transaction():
