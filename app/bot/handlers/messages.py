@@ -3,8 +3,12 @@ import os
 from datetime import datetime, timezone, time
 
 from aiogram import F, Router
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton, FSInputFile
 
+from app.bot.fsm.admin_audio import AdminAudioStates
+from app.bot.fsm.admin_broadcast import BroadcastStates
+from app.bot.fsm.admin_discount import DiscountStates
 from app.bot.utils.response_effect import ResponseEffect
 from app.bot.handlers.course import (
     get_course_keyboard_for_step,
@@ -42,6 +46,21 @@ from app.bot.utils.i18n import t
 
 router = Router()
 
+_ADMIN_FSM_STATES = {
+    AdminAudioStates.waiting_for_audio.state,
+    BroadcastStates.waiting_for_text.state,
+    DiscountStates.waiting_title.state,
+    DiscountStates.waiting_percent.state,
+    DiscountStates.waiting_custom_duration.state,
+    DiscountStates.waiting_start_at.state,
+    DiscountStates.waiting_repeat_days.state,
+    DiscountStates.waiting_quota.state,
+}
+
+
+async def _is_admin_flow_message(state: FSMContext) -> bool:
+    return await state.get_state() in _ADMIN_FSM_STATES
+
 
 def _parse_reminder_time(text: str):
     text = (text or "").strip()
@@ -58,7 +77,14 @@ def _parse_reminder_time(text: str):
 
 
 @router.message(F.text & ~F.text.startswith("/"))
-async def handle_text_message(message: Message, session):
+async def handle_text_message(message: Message, state: FSMContext, session):
+    if await _is_admin_flow_message(state):
+        await message.answer(
+            "Admin sozlash jarayoni davom etyapti. "
+            "Yuqoridagi savolga mos javob yuboring yoki ❌ Bekor qilish tugmasini bosing."
+        )
+        return
+
     user_repo = UserRepository(session)
     access_service = AccessService(session)
 
@@ -523,7 +549,11 @@ async def handle_course_promo_start(callback: CallbackQuery, session):
 
 
 @router.message(F.photo)
-async def handle_image_message(message: Message, session):
+async def handle_image_message(message: Message, state: FSMContext, session):
+    if await _is_admin_flow_message(state):
+        await message.answer("Admin sozlash jarayoni davom etyapti. Bu xabar AI'ga yuborilmadi.")
+        return
+
     user_repo = UserRepository(session)
     access_service = AccessService(session)
     image_input_service = ImageInputService()
@@ -577,7 +607,11 @@ async def handle_image_message(message: Message, session):
 
 
 @router.message(F.document)
-async def handle_unsupported_document(message: Message, session):
+async def handle_unsupported_document(message: Message, state: FSMContext, session):
+    if await _is_admin_flow_message(state):
+        await message.answer("Admin sozlash jarayoni davom etyapti. Bu fayl AI'ga yuborilmadi.")
+        return
+
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     user_lang = user.language if user and user.language else "ru"

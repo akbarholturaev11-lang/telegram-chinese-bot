@@ -4,7 +4,7 @@ from html import escape
 from typing import Optional
 
 from aiogram import Router, F
-from aiogram.filters import Command
+from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 
@@ -272,7 +272,7 @@ async def bc_enter_text(callback: CallbackQuery, state: FSMContext):
     )
 
 
-@router.message(BroadcastStates.waiting_for_text)
+@router.message(StateFilter(BroadcastStates.waiting_for_text))
 async def bc_receive_text(message: Message, state: FSMContext, session):
     if not _is_admin(message.from_user.id):
         return
