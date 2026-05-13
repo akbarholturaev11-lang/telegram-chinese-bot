@@ -2,6 +2,7 @@ import asyncio
 import contextlib
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta, timezone
 
 from aiogram import Bot
 from fastapi import FastAPI
@@ -10,13 +11,16 @@ from app.config import settings
 from app.bot.create_bot import create_bot
 from app.db.session import async_session_maker, init_db
 from app.services.course_seed_service import CourseSeedService
+from app.services.access_service import AccessService
 from app.services.daily_reset_service import DailyResetService
 from app.services.expiry_reminder_service import ExpiryReminderService
 from app.services.course_reminder_service import CourseReminderService
+from app.services.bot_feedback_service import BotFeedbackService
 
 logger = logging.getLogger(__name__)
 
 bot, dp = create_bot(settings)
+_last_feedback_check_at = None
 
 
 async def _seed_lessons() -> None:
@@ -31,9 +35,13 @@ async def _seed_lessons() -> None:
 
 
 async def _background_scheduler(bot: Bot) -> None:
+    global _last_feedback_check_at
+
     while True:
         await asyncio.sleep(60)
         try:
+            async with async_session_maker() as session:
+                await AccessService(session).downgrade_expired_active_users()
             async with async_session_maker() as session:
                 await DailyResetService(session).send_daily_reset_notifications(bot)
             async with async_session_maker() as session:
@@ -42,6 +50,14 @@ async def _background_scheduler(bot: Bot) -> None:
                 await CourseReminderService(session).send_due_reminders(bot)
             async with async_session_maker() as session:
                 await CourseReminderService(session).send_weekly_progress_reports(bot)
+            now = datetime.now(timezone.utc)
+            if (
+                _last_feedback_check_at is None
+                or now - _last_feedback_check_at >= timedelta(hours=24)
+            ):
+                async with async_session_maker() as session:
+                    await BotFeedbackService(session).send_due_feedback_requests(bot)
+                _last_feedback_check_at = now
         except Exception as e:
             print("Scheduler error:", e)
 

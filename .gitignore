@@ -4,3 +4,9 @@ __pycache__
 *.pyc
 .env
 venv_311/
+
+.env
+.env.*
+!.env.example
+graphify-out/
+memory/

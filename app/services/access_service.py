@@ -1,6 +1,9 @@
 from datetime import datetime, timezone
 from typing import Tuple
 
+from sqlalchemy import select
+
+from app.db.models.user import User
 from app.repositories.user_repo import UserRepository
 from app.repositories.message_repo import MessageRepository
 from app.repositories.payment_repo import PaymentRepository
@@ -12,20 +15,44 @@ class AccessService:
         self.message_repo = MessageRepository(session)
         self.payment_repo = PaymentRepository(session)
 
-    def _today_utc_date(self):
-        return datetime.now(timezone.utc).date()
+    def _as_utc(self, dt: datetime) -> datetime:
+        if dt.tzinfo is None:
+            return dt.replace(tzinfo=timezone.utc)
+        return dt.astimezone(timezone.utc)
 
     def _is_date_expired(self, dt) -> bool:
         if not dt:
             return False
-        if hasattr(dt, "date"):
-            return dt.date() < self._today_utc_date()
-        return dt < self._today_utc_date()
+        now = datetime.now(timezone.utc)
+        if isinstance(dt, datetime):
+            return self._as_utc(dt) <= now
+        return dt < now.date()
 
     async def _downgrade_expired_user(self, user) -> None:
         user.status = "trial"
         user.end_date = None
         await self.session.flush()
+
+    async def downgrade_expired_active_users(self) -> int:
+        result = await self.session.execute(
+            select(User).where(
+                User.status == "active",
+                User.end_date.is_not(None),
+            )
+        )
+        users = list(result.scalars().all())
+        changed = 0
+
+        for user in users:
+            if not self._is_date_expired(user.end_date):
+                continue
+            await self._downgrade_expired_user(user)
+            changed += 1
+
+        if changed:
+            await self.session.commit()
+
+        return changed
 
     async def can_use_text_ai(self, telegram_id: int) -> Tuple[bool, str]:
         user = await self.user_repo.get_by_telegram_id(telegram_id)

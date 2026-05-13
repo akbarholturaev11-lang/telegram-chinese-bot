@@ -2,6 +2,7 @@ from .user import User
 from .referral import Referral
 from .payment import Payment
 from .discount_campaign import DiscountCampaign
+from .bot_feedback import BotFeedback
 from .message import Message
 
 from .course_lessons import CourseLesson

@@ -1,3 +1,6 @@
+from datetime import datetime, timezone
+from html import escape
+
 from aiogram import Bot
 
 from app.config import settings
@@ -164,5 +167,56 @@ class AdminNotifyService:
                         text=text,
                         reply_markup=keyboard,
                     )
+            except Exception:
+                pass
+
+    def _feedback_user_age(self, user) -> str:
+        created_at = getattr(user, "created_at", None)
+        if not created_at:
+            return "-"
+        if created_at.tzinfo is None:
+            created_at = created_at.replace(tzinfo=timezone.utc)
+        days = max(0, (datetime.now(timezone.utc) - created_at).days)
+        if days == 0:
+            return "1 kundan kam"
+        return f"{days} kun"
+
+    def build_bot_feedback_text(self, feedback, user) -> str:
+        liked = escape(str(getattr(feedback, "liked_text", None) or "-"))
+        disliked = escape(str(getattr(feedback, "disliked_text", None) or "-"))
+        full_name = escape(str(getattr(user, "full_name", None) or "-"))
+        language = escape(str(getattr(user, "language", None) or "-"))
+        reward = "berildi" if getattr(feedback, "reward_granted_at", None) else "berilmadi"
+
+        return "\n".join(
+            [
+                "📝 <b>Yangi bot otzivi</b>",
+                "",
+                f"👤 User: <b>{full_name}</b>",
+                f"🆔 Telegram ID: <code>{user.telegram_id}</code>",
+                f"🌐 Til: <b>{language}</b>",
+                f"⏱ Botda: <b>{self._feedback_user_age(user)}</b>",
+                "",
+                f"👍 <b>Yoqdi:</b>\n{liked}",
+                "",
+                f"👎 <b>Yoqmadi:</b>\n{disliked}",
+                "",
+                f"🎁 1 kunlik bonus: <b>{reward}</b>",
+            ]
+        )
+
+    async def notify_bot_feedback(
+        self,
+        bot: Bot,
+        feedback,
+        user,
+    ) -> None:
+        if not self.admin_ids:
+            return
+
+        text = self.build_bot_feedback_text(feedback, user)
+        for admin_id in self.admin_ids:
+            try:
+                await bot.send_message(chat_id=admin_id, text=text, parse_mode="HTML")
             except Exception:
                 pass

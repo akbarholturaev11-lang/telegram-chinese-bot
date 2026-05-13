@@ -750,3 +750,109 @@ COURSE_I18N = {
         "course_ai_followup_blocked": "Siz hozir kurs rejimidasiz. Savolingiz joriy dars doirasida qayta ishlanadi."
     },
 }
+
+
+FEEDBACK_I18N = {
+    "tj": {
+        "feedback_like_question": (
+            "<b>1 дақиқа фикри шумо лозим 🙏</b>\n\n"
+            "<blockquote>Ба шумо дар бот кадом ҷиҳат бештар писанд омад?\n"
+            "Ҷавоб диҳед — ба шумо 1 рӯз дастрасии бе лимит медиҳем.</blockquote>"
+        ),
+        "feedback_dislike_question": (
+            "<b>Акнун росташро гӯед:</b>\n\n"
+            "<blockquote>Кадом ҷиҳати бот ба шумо ноқулай ё камтар писанд шуд?</blockquote>"
+        ),
+        "feedback_other_like_prompt": "Чӣ чиз ба шумо писанд омад? Лутфан бо як паём нависед.",
+        "feedback_other_dislike_prompt": "Кадом камбудиро дидед? Лутфан бо як паём нависед.",
+        "feedback_cancel_button": "❌ Бекор кардан",
+        "feedback_not_found": "Одзив ёфт нашуд. Баъдтар аз нав кӯшиш кунед.",
+        "feedback_already_completed": "Шумо аллакай одзив фиристодед ✅",
+        "feedback_other_empty": "Матн холӣ аст. Лутфан фикратонро нависед.",
+        "feedback_other_text_only": "Лутфан ҷавобро матнӣ фиристед.",
+        "feedback_thanks": (
+            "<b>Раҳмат барои одзив ✅</b>\n\n"
+            "<blockquote>Мо албатта камбудиҳоро ислоҳ мекунем.\n"
+            "Ба шумо 1 рӯз дастрасии бе лимит фаъол шуд.</blockquote>"
+        ),
+        "feedback_like_course": "📚 Режими курс қулай аст",
+        "feedback_like_answers": "💬 Ҷавобҳо зуд ва фаҳмоанд",
+        "feedback_like_photo": "📸 Кор бо сурат/иероглиф қулай аст",
+        "feedback_like_practice": "🎯 Ҳар рӯз машқ кардан осон мешавад",
+        "feedback_like_other": "✍️ Дигар",
+        "feedback_dislike_price": "💳 Нархи обуна баланд аст",
+        "feedback_dislike_limits": "📊 Лимитҳо каманд",
+        "feedback_dislike_unclear": "🧠 Баъзе ҷавобҳо нофаҳмоанд",
+        "feedback_dislike_pace": "📚 Тартиб ё суръати курс ноқулай аст",
+        "feedback_dislike_other": "✍️ Дигар",
+    },
+    "ru": {
+        "feedback_like_question": (
+            "<b>Нужна 1 минута вашего мнения 🙏</b>\n\n"
+            "<blockquote>Что в боте вам понравилось больше всего?\n"
+            "Ответьте — мы дадим вам 1 день доступа без лимитов.</blockquote>"
+        ),
+        "feedback_dislike_question": (
+            "<b>Теперь честно:</b>\n\n"
+            "<blockquote>Что в боте было неудобным или понравилось меньше?</blockquote>"
+        ),
+        "feedback_other_like_prompt": "Что именно вам понравилось? Напишите одним сообщением.",
+        "feedback_other_dislike_prompt": "Какой недостаток вы заметили? Напишите одним сообщением.",
+        "feedback_cancel_button": "❌ Отмена",
+        "feedback_not_found": "Отзыв не найден. Попробуйте позже.",
+        "feedback_already_completed": "Вы уже отправили отзыв ✅",
+        "feedback_other_empty": "Текст пустой. Напишите ваше мнение.",
+        "feedback_other_text_only": "Пожалуйста, отправьте ответ текстом.",
+        "feedback_thanks": (
+            "<b>Спасибо за отзыв ✅</b>\n\n"
+            "<blockquote>Мы обязательно постараемся убрать недочёты.\n"
+            "Вам активирован 1 день доступа без лимитов.</blockquote>"
+        ),
+        "feedback_like_course": "📚 Удобный режим курса",
+        "feedback_like_answers": "💬 Быстрые и понятные ответы",
+        "feedback_like_photo": "📸 Удобная работа с фото/иероглифами",
+        "feedback_like_practice": "🎯 Легко заниматься каждый день",
+        "feedback_like_other": "✍️ Другое",
+        "feedback_dislike_price": "💳 Цена подписки высокая",
+        "feedback_dislike_limits": "📊 Слишком мало лимитов",
+        "feedback_dislike_unclear": "🧠 Некоторые ответы непонятные",
+        "feedback_dislike_pace": "📚 Темп или порядок курса неудобен",
+        "feedback_dislike_other": "✍️ Другое",
+    },
+    "uz": {
+        "feedback_like_question": (
+            "<b>1 daqiqa fikringiz kerak 🙏</b>\n\n"
+            "<blockquote>Botda sizga qaysi jihat eng ko'p yoqdi?\n"
+            "Javob bersangiz, sizga 1 kunlik limitsiz kirish beramiz.</blockquote>"
+        ),
+        "feedback_dislike_question": (
+            "<b>Endi rostini ayting:</b>\n\n"
+            "<blockquote>Botning qaysi jihati noqulay yoki kamroq yoqdi?</blockquote>"
+        ),
+        "feedback_other_like_prompt": "Nimasi yoqdi? Iltimos, bitta xabar qilib yozing.",
+        "feedback_other_dislike_prompt": "Qaysi kamchilikni ko'rdingiz? Iltimos, bitta xabar qilib yozing.",
+        "feedback_cancel_button": "❌ Bekor qilish",
+        "feedback_not_found": "Otziv topilmadi. Keyinroq qayta urinib ko'ring.",
+        "feedback_already_completed": "Siz allaqachon otziv yuborgansiz ✅",
+        "feedback_other_empty": "Matn bo'sh. Iltimos, fikringizni yozing.",
+        "feedback_other_text_only": "Iltimos, javobni matn ko'rinishida yuboring.",
+        "feedback_thanks": (
+            "<b>Otziv uchun rahmat ✅</b>\n\n"
+            "<blockquote>Biz albatta kamchiliklarni yo'qotishga harakat qilamiz.\n"
+            "Sizga 1 kunlik limitsiz kirish faollashtirildi.</blockquote>"
+        ),
+        "feedback_like_course": "📚 Kurs rejimi qulay",
+        "feedback_like_answers": "💬 Javoblar tez va tushunarli",
+        "feedback_like_photo": "📸 Foto/ieroglif bilan ishlash qulay",
+        "feedback_like_practice": "🎯 Har kuni mashq qilish osonlashadi",
+        "feedback_like_other": "✍️ Boshqa",
+        "feedback_dislike_price": "💳 Obuna narxi baland",
+        "feedback_dislike_limits": "📊 Limitlar kam",
+        "feedback_dislike_unclear": "🧠 Ba'zi javoblar tushunarsiz",
+        "feedback_dislike_pace": "📚 Kurs tempi yoki tartibi noqulay",
+        "feedback_dislike_other": "✍️ Boshqa",
+    },
+}
+
+for _lang, _texts in FEEDBACK_I18N.items():
+    TEXTS.setdefault(_lang, {}).update(_texts)
