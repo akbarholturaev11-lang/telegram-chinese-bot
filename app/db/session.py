@@ -40,6 +40,10 @@ _BOOTSTRAP_COLUMNS: dict[str, dict[str, str]] = {
         "title_tj": "VARCHAR(180)",
         "title_ru": "VARCHAR(180)",
         "title_uz": "VARCHAR(180)",
+        "reason": "VARCHAR(500)",
+        "reason_tj": "VARCHAR(700)",
+        "reason_ru": "VARCHAR(700)",
+        "reason_uz": "VARCHAR(700)",
     },
 }
 

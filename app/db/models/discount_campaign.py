@@ -15,6 +15,10 @@ class DiscountCampaign(Base):
     title_tj: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
     title_ru: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
     title_uz: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    reason: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    reason_tj: Mapped[Optional[str]] = mapped_column(String(700), nullable=True)
+    reason_ru: Mapped[Optional[str]] = mapped_column(String(700), nullable=True)
+    reason_uz: Mapped[Optional[str]] = mapped_column(String(700), nullable=True)
     percent: Mapped[int] = mapped_column(Integer, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

@@ -17,6 +17,14 @@ def discount_title_for_lang(discount: Any, lang: str) -> str:
     return escape(str(title or "Chegirma"))
 
 
+def discount_reason_for_lang(discount: Any, lang: str) -> str:
+    if isinstance(discount, dict):
+        reason = discount.get(f"reason_{lang}") or discount.get("reason")
+    else:
+        reason = getattr(discount, f"reason_{lang}", None) or getattr(discount, "reason", None)
+    return escape(str(reason or ""))
+
+
 def plan_label(plan_type: str, lang: str) -> str:
     if plan_type == "10_days":
         return t("subscription_button_10_days", lang)
@@ -108,6 +116,7 @@ def build_admin_discount_block(
     quota_total: Optional[int],
     repeat_interval_days: Optional[int],
     plan_lines: str,
+    discount_button_hint: bool = True,
     now: Optional[datetime] = None,
 ) -> str:
     now = now or datetime.now(timezone.utc)
@@ -118,6 +127,7 @@ def build_admin_discount_block(
         "subscription_admin_discount_block",
         lang,
         title=discount_title_for_lang(discount, lang),
+        reason=discount_reason_for_lang(discount, lang),
         percent=percent,
         duration=format_discount_duration(duration_seconds, lang),
         remaining=format_discount_duration(remaining_seconds, lang),
@@ -125,4 +135,5 @@ def build_admin_discount_block(
         plan_lines=plan_lines,
         quota=format_discount_quota(quota_total, lang),
         rule=format_discount_rule(repeat_interval_days, lang),
+        button_hint=t("subscription_admin_discount_button_hint", lang) if discount_button_hint else "",
     )

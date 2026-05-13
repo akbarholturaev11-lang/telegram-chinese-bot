@@ -54,19 +54,26 @@ TEXTS = {
         "subscription_button_1_month": "1 моҳ",
         "subscription_referral_hint": "3 дӯсти нав даъват кунед ва 20% тахфиф гиред.",
         "subscription_admin_discount_block": (
-            "🎁 <b>{title}</b>\n\n"
+            "🔥 <b>Тахфифи махсус фаъол аст!</b>\n\n"
+            "<b>{title}</b>\n"
+            "{reason}\n\n"
             "<blockquote>"
-            "Ҳоло тахфифи махсуси админ фаъол аст.\n\n"
-            "💎 Тахфиф: <b>{percent}%</b>\n"
-            "⏳ Давомнокӣ: <b>{duration}</b>\n"
+            "Ҳозир тавассути роҳи махсуси тахфиф обуна гиред ва <b>{percent}%</b> арзонтар пардохт кунед.\n\n"
+            "⏳ Муддат: <b>{duration}</b>\n"
             "⌛ То анҷом: <b>{remaining}</b>\n"
-            "🕒 Анҷом: <b>{ends_at}</b>\n\n"
-            "{plan_lines}\n\n"
+            "🕒 Анҷом: <b>{ends_at}</b>\n"
             "👥 Лимит: <b>{quota}</b>\n"
-            "🔁 Қоида: <b>{rule}</b>"
+            "🔁 Қоида: <b>{rule}</b>\n\n"
+            "{plan_lines}\n\n"
+            "Ин тахфиф танҳо тавассути тугмаи поён кор мекунад."
             "</blockquote>\n\n"
-            "Фурсатро аз даст надиҳед — обунаро интихоб кунед."
+            "{button_hint}"
         ),
+        "subscription_admin_discount_window": "🔥 <b>Роҳи тахфифӣ</b>\n\n{block}",
+        "subscription_admin_discount_button": "🔥 Бо тахфиф обуна гирифтан",
+        "subscription_admin_discount_button_hint": "👇 Барои истифода бурдан тугмаи поёнро пахш кунед.",
+        "subscription_admin_discount_payment_choose": "💳 Барои гирифтани тахфиф усули пардохтро интихоб кунед:",
+        "subscription_admin_discount_expired": "Ин тахфиф ба анҷом расид ё дигар дастрас нест.",
         "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
         "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
         "subscription_admin_discount_quota_unlimited": "бе маҳдудият",
@@ -181,19 +188,26 @@ TEXTS = {
         "subscription_button_1_month": "1 месяц",
         "subscription_referral_hint": "Пригласите 3 новых друзей и получите скидку 20%.",
         "subscription_admin_discount_block": (
-            "🎁 <b>{title}</b>\n\n"
+            "🔥 <b>Специальная скидка активна!</b>\n\n"
+            "<b>{title}</b>\n"
+            "{reason}\n\n"
             "<blockquote>"
-            "Сейчас активна специальная скидка от администратора.\n\n"
-            "💎 Скидка: <b>{percent}%</b>\n"
-            "⏳ Длительность: <b>{duration}</b>\n"
+            "Оформите подписку через специальный путь и заплатите на <b>{percent}%</b> дешевле.\n\n"
+            "⏳ Срок: <b>{duration}</b>\n"
             "⌛ До конца: <b>{remaining}</b>\n"
-            "🕒 Закончится: <b>{ends_at}</b>\n\n"
-            "{plan_lines}\n\n"
+            "🕒 Закончится: <b>{ends_at}</b>\n"
             "👥 Лимит: <b>{quota}</b>\n"
-            "🔁 Правило: <b>{rule}</b>"
+            "🔁 Правило: <b>{rule}</b>\n\n"
+            "{plan_lines}\n\n"
+            "Эта скидка работает только через кнопку ниже."
             "</blockquote>\n\n"
-            "Не упустите возможность — выберите подписку."
+            "{button_hint}"
         ),
+        "subscription_admin_discount_window": "🔥 <b>Скидочный путь</b>\n\n{block}",
+        "subscription_admin_discount_button": "🔥 Оформить со скидкой",
+        "subscription_admin_discount_button_hint": "👇 Чтобы воспользоваться скидкой, нажмите кнопку ниже.",
+        "subscription_admin_discount_payment_choose": "💳 Выберите способ оплаты для скидочной подписки:",
+        "subscription_admin_discount_expired": "Эта скидка закончилась или больше недоступна.",
         "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
         "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
         "subscription_admin_discount_quota_unlimited": "без лимита",
@@ -301,19 +315,26 @@ TEXTS = {
         "subscription_button_1_month": "1 oylik",
         "subscription_referral_hint": "3 ta yangi do‘st taklif qiling va 20% chegirma oling.",
         "subscription_admin_discount_block": (
-            "🎁 <b>{title}</b>\n\n"
+            "🔥 <b>Maxsus chegirma ketmoqda!</b>\n\n"
+            "<b>{title}</b>\n"
+            "{reason}\n\n"
             "<blockquote>"
-            "Hozir admin tomonidan maxsus chegirma ketmoqda.\n\n"
-            "💎 Chegirma: <b>{percent}%</b>\n"
-            "⏳ Davomiylik: <b>{duration}</b>\n"
+            "Hozir chegirma yo'lakchasi orqali obuna olsangiz <b>{percent}%</b> arzonroq to'laysiz.\n\n"
+            "⏳ Chegirma muddati: <b>{duration}</b>\n"
             "⌛ Tugashigacha: <b>{remaining}</b>\n"
-            "🕒 Tugash vaqti: <b>{ends_at}</b>\n\n"
+            "🕒 Tugaydi: <b>{ends_at}</b>\n"
+            "👥 Joylar soni: <b>{quota}</b>\n"
+            "🔁 Foydalanish: <b>{rule}</b>\n\n"
             "{plan_lines}\n\n"
-            "👥 Limit: <b>{quota}</b>\n"
-            "🔁 Qoida: <b>{rule}</b>"
+            "Bu chegirma faqat shu tugma orqali ishlaydi."
             "</blockquote>\n\n"
-            "Fursatni o'tkazib yubormang — obunani tanlang."
+            "{button_hint}"
         ),
+        "subscription_admin_discount_window": "🔥 <b>Chegirmali obuna oynasi</b>\n\n{block}",
+        "subscription_admin_discount_button": "🔥 Chegirma bilan obuna olish",
+        "subscription_admin_discount_button_hint": "👇 Chegirmadan foydalanish uchun pastdagi tugmani bosing.",
+        "subscription_admin_discount_payment_choose": "💳 Chegirmali obuna uchun to'lov usulini tanlang:",
+        "subscription_admin_discount_expired": "Bu chegirma tugagan yoki hozir sizga mos emas.",
         "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
         "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
         "subscription_admin_discount_quota_unlimited": "limitsiz",

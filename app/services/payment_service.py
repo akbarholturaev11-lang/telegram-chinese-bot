@@ -34,6 +34,7 @@ class PaymentService:
         self,
         user,
         plan_type: str,
+        force_admin_discount: bool = False,
     ):
         base_amount = self.get_plan_price(plan_type)
         if base_amount is None:
@@ -54,11 +55,19 @@ class PaymentService:
 
             currency = "somoni"
 
-        discount = await DiscountService(self.session).get_best_discount(
-            user=user,
-            plan_type=plan_type,
-            payment_method=user.payment_method,
-        )
+        discount_service = DiscountService(self.session)
+        if force_admin_discount:
+            discount = await discount_service.get_best_admin_discount(
+                user=user,
+                plan_type=plan_type,
+                payment_method=user.payment_method,
+            )
+        else:
+            discount = await discount_service.get_best_discount(
+                user=user,
+                plan_type=plan_type,
+                payment_method=user.payment_method,
+            )
         discount_applied = discount.percent > 0
         final_amount = self.calculate_percent_discounted_price(base_amount, discount.percent) if discount_applied else base_amount
 
@@ -79,6 +88,7 @@ class PaymentService:
         self,
         telegram_id: int,
         plan_type: str,
+        force_admin_discount: bool = False,
     ):
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -87,6 +97,7 @@ class PaymentService:
         checkout_info = await self.get_checkout_info(
             user=user,
             plan_type=plan_type,
+            force_admin_discount=force_admin_discount,
         )
         if not checkout_info:
             return None, None, "payment_invalid_plan"
@@ -132,6 +143,7 @@ class PaymentService:
         telegram_id: int,
         plan_type: str,
         screenshot_file_id: Optional[str] = None,
+        force_admin_discount: bool = False,
     ):
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -140,6 +152,7 @@ class PaymentService:
         checkout_info = await self.get_checkout_info(
             user=user,
             plan_type=plan_type,
+            force_admin_discount=force_admin_discount,
         )
         if not checkout_info:
             return None, "payment_invalid_plan"

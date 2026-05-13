@@ -87,3 +87,56 @@ def payment_method_keyboard(lang: str):
             InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
         ]
     ])
+
+
+def discount_payment_method_keyboard(lang: str):
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="💳 VISA card", callback_data="discount_offer:method:visa"),
+        ],
+        [
+            InlineKeyboardButton(text="🇨🇳 Alipay", callback_data="discount_offer:method:alipay"),
+        ],
+        [
+            InlineKeyboardButton(text="🇨🇳 WeChat Pay", callback_data="discount_offer:method:wechat"),
+        ],
+        [
+            InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
+        ],
+    ])
+
+
+def admin_discount_entry_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("subscription_admin_discount_button", lang),
+                    callback_data="discount_offer:open",
+                )
+            ]
+        ]
+    )
+
+
+def admin_discount_plan_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("subscription_button_10_days", lang),
+                    callback_data="discount_offer:plan:10_days",
+                ),
+                InlineKeyboardButton(
+                    text=t("subscription_button_1_month", lang),
+                    callback_data="discount_offer:plan:1_month",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("payment_back", lang),
+                    callback_data="discount_offer:change_payment",
+                )
+            ],
+        ]
+    )

@@ -15,6 +15,10 @@ class DiscountChoice:
     title_tj: Optional[str] = None
     title_ru: Optional[str] = None
     title_uz: Optional[str] = None
+    reason: Optional[str] = None
+    reason_tj: Optional[str] = None
+    reason_ru: Optional[str] = None
+    reason_uz: Optional[str] = None
     starts_at: Optional[datetime] = None
     ends_at: Optional[datetime] = None
     plan_type: Optional[str] = None
@@ -34,6 +38,7 @@ class DiscountService:
         user,
         plan_type: str,
         payment_method: Optional[str],
+        include_admin_campaigns: bool = False,
     ) -> DiscountChoice:
         choices: list[DiscountChoice] = []
 
@@ -47,13 +52,14 @@ class DiscountService:
                 )
             )
 
-        now = datetime.now(timezone.utc)
-        for campaign in await self.repo.list_current(now):
-            if not self._matches_campaign(campaign, user, plan_type, payment_method):
-                continue
-            choice = await self._campaign_choice(campaign, user, now)
-            if choice:
-                choices.append(choice)
+        if include_admin_campaigns:
+            now = datetime.now(timezone.utc)
+            for campaign in await self.repo.list_current(now):
+                if not self._matches_campaign(campaign, user, plan_type, payment_method):
+                    continue
+                choice = await self._campaign_choice(campaign, user, now)
+                if choice:
+                    choices.append(choice)
 
         if not choices:
             return DiscountChoice()
@@ -133,6 +139,7 @@ class DiscountService:
 
         details = (
             f"Admin kampaniya #{campaign.id}: {campaign.title}; "
+            f"sabab: {campaign.reason or '-'}; "
             f"limit: {quota_text}; qoida: {usage_rule}; "
             f"amal qiladi: {campaign.starts_at:%Y-%m-%d %H:%M} - {campaign.ends_at:%Y-%m-%d %H:%M} UTC."
         )
@@ -144,6 +151,10 @@ class DiscountService:
             title_tj=campaign.title_tj,
             title_ru=campaign.title_ru,
             title_uz=campaign.title_uz,
+            reason=campaign.reason,
+            reason_tj=campaign.reason_tj,
+            reason_ru=campaign.reason_ru,
+            reason_uz=campaign.reason_uz,
             starts_at=campaign.starts_at,
             ends_at=campaign.ends_at,
             plan_type=campaign.plan_type,

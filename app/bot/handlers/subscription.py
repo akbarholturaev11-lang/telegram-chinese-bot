@@ -11,6 +11,8 @@ from app.services.payment_service import PaymentService
 from app.bot.utils.discount_formatter import build_admin_discount_block, build_discount_plan_line
 from app.bot.utils.i18n import t
 from app.bot.keyboards.subscription import (
+    admin_discount_plan_keyboard,
+    discount_payment_method_keyboard,
     subscription_discount_progress_keyboard,
     subscription_discount_ready_keyboard,
     payment_method_keyboard,
@@ -43,7 +45,7 @@ def _plan_price(plan_type: str, payment_method: str | None) -> tuple[int, str]:
     return (89 if plan_type == "1_month" else 29), "somoni"
 
 
-async def _admin_discount_offer(session, user, lang: str) -> str | None:
+async def _admin_discount_choices(session, user):
     service = DiscountService(session)
     plan_choices = {}
     for plan in ("10_days", "1_month"):
@@ -54,7 +56,11 @@ async def _admin_discount_offer(session, user, lang: str) -> str | None:
         )
         if choice.source == "admin_campaign" and choice.ends_at and choice.starts_at:
             plan_choices[plan] = choice
+    return plan_choices
 
+
+async def _admin_discount_offer(session, user, lang: str, *, as_window: bool = False) -> str | None:
+    plan_choices = await _admin_discount_choices(session, user)
     if not plan_choices:
         return None
 
@@ -83,14 +89,12 @@ async def _admin_discount_offer(session, user, lang: str) -> str | None:
         quota_total=main_choice.quota_total,
         repeat_interval_days=main_choice.repeat_interval_days,
         plan_lines="\n".join(lines),
+        discount_button_hint=not as_window,
         now=datetime.now(timezone.utc),
     )
 
 
-def build_subscription_main_text_for_user(user, lang: str, admin_discount_block: str | None = None) -> str:
-    if admin_discount_block:
-        return admin_discount_block
-
+def build_subscription_main_text_for_user(user, lang: str) -> str:
     use_yuan = getattr(user, "payment_method", None) in ("alipay", "wechat")
 
     plan_10_key = "subscription_plan_10_days_yuan" if use_yuan else "subscription_plan_10_days"
@@ -169,10 +173,19 @@ def build_subscription_main_keyboard_for_user(user, lang: str, show_referral: bo
 
 
 async def build_subscription_main_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup]:
-    admin_discount_block = await _admin_discount_offer(session, user, lang)
     return (
-        build_subscription_main_text_for_user(user, lang, admin_discount_block),
-        build_subscription_main_keyboard_for_user(user, lang, show_referral=not bool(admin_discount_block)),
+        build_subscription_main_text_for_user(user, lang),
+        build_subscription_main_keyboard_for_user(user, lang),
+    )
+
+
+async def build_admin_discount_offer_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup] | None:
+    block = await _admin_discount_offer(session, user, lang, as_window=True)
+    if not block:
+        return None
+    return (
+        t("subscription_admin_discount_window", lang, block=block),
+        admin_discount_plan_keyboard(lang),
     )
 
 
@@ -241,6 +254,86 @@ async def subscription_open_handler(callback: CallbackQuery, session):
         reply_markup=payment_method_keyboard(lang),
         parse_mode="HTML"
     )
+
+
+@router.callback_query(F.data == "discount_offer:open")
+async def discount_offer_open_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language or "ru"
+    await callback.answer()
+
+    if not user.payment_method:
+        await callback.message.edit_text(
+            t("subscription_admin_discount_payment_choose", lang),
+            reply_markup=discount_payment_method_keyboard(lang),
+            parse_mode="HTML",
+        )
+        return
+
+    view = await build_admin_discount_offer_view(session, user, lang)
+    if not view:
+        await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+        return
+
+    text, keyboard = view
+    await callback.message.edit_text(
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+
+
+@router.callback_query(F.data.startswith("discount_offer:method:"))
+async def discount_offer_method_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    user.payment_method = callback.data.split(":")[2]
+    await session.commit()
+
+    lang = user.language or "ru"
+    view = await build_admin_discount_offer_view(session, user, lang)
+    await callback.answer()
+    if not view:
+        await callback.message.edit_text(
+            t("subscription_admin_discount_expired", lang),
+            parse_mode="HTML",
+        )
+        return
+
+    text, keyboard = view
+    await callback.message.edit_text(
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+
+
+@router.callback_query(F.data == "discount_offer:change_payment")
+async def discount_offer_change_payment_handler(callback: CallbackQuery, session):
+    user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+    lang = user.language or "ru"
+    await callback.answer()
+    await callback.message.edit_text(
+        t("subscription_admin_discount_payment_choose", lang),
+        reply_markup=discount_payment_method_keyboard(lang),
+        parse_mode="HTML",
+    )
+
 
 @router.callback_query(F.data == "subscription:referral_discount")
 async def subscription_referral_discount_handler(callback: CallbackQuery, session):
@@ -425,6 +518,94 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
     await callback.answer()
 
 
+async def _show_checkout(callback: CallbackQuery, user_repo: UserRepository, user, lang: str, plan: str, checkout_info: dict):
+    text = build_checkout_text(lang, checkout_info)
+    keyboard = checkout_keyboard(lang)
+
+    checkout_msg_id: int | None = None
+
+    if checkout_info["currency"] == "¥":
+        if checkout_info.get("discount_source") == "admin_campaign":
+            qr_key = f"{user.payment_method}_admin_discount"
+        else:
+            qr_key = f"{user.payment_method}_{plan}"
+            if checkout_info.get("discount_applied"):
+                qr_key += "_discount"
+        photo_path = QR_PHOTO_PATHS.get(qr_key)
+        if photo_path:
+            photo = FSInputFile(photo_path)
+            try:
+                await callback.message.delete()
+            except Exception:
+                pass
+            sent = await callback.message.answer_photo(
+                photo,
+                caption=text,
+                reply_markup=keyboard,
+            )
+            checkout_msg_id = sent.message_id
+        else:
+            sent = await callback.message.edit_text(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+            checkout_msg_id = callback.message.message_id
+    else:
+        try:
+            await callback.message.edit_text(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+            checkout_msg_id = callback.message.message_id
+        except Exception:
+            await callback.message.delete()
+            sent = await callback.message.answer(
+                text,
+                reply_markup=keyboard,
+                disable_web_page_preview=True,
+            )
+            checkout_msg_id = sent.message_id
+
+    await user_repo.set_pending_checkout_msg_id(user, checkout_msg_id)
+
+
+@router.callback_query(F.data.startswith("discount_offer:plan:"))
+async def discount_offer_plan_handler(callback: CallbackQuery, session):
+    await callback.answer()
+
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        return
+
+    lang = user.language or "ru"
+    if not user.payment_method:
+        await callback.message.edit_text(
+            t("subscription_admin_discount_payment_choose", lang),
+            reply_markup=discount_payment_method_keyboard(lang),
+            parse_mode="HTML",
+        )
+        return
+
+    plan = callback.data.split(":")[-1]
+    payment_service = PaymentService(session)
+    payment, checkout_info, error_key = await payment_service.create_checkout_draft(
+        telegram_id=callback.from_user.id,
+        plan_type=plan,
+        force_admin_discount=True,
+    )
+
+    if not payment or not checkout_info or checkout_info.get("discount_source") != "admin_campaign":
+        await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+        return
+
+    await user_repo.set_selected_plan_type(user, plan)
+    await _show_checkout(callback, user_repo, user, lang, plan, checkout_info)
+    await session.commit()
+
+
 @router.callback_query(F.data.startswith("subscription:plan:"))
 async def subscription_plan_handler(callback: CallbackQuery, session):
     await callback.answer()
@@ -459,60 +640,7 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
         return
 
     await user_repo.set_selected_plan_type(user, plan)
-    await session.commit()
-
-    text = build_checkout_text(lang, checkout_info)
-    keyboard = checkout_keyboard(lang)
-
-    checkout_msg_id: int | None = None
-
-    if checkout_info["currency"] == "¥":
-        # Send QR photo for Alipay / WeChat — pick correct image by method + plan + discount
-        if checkout_info.get("discount_source") == "admin_campaign":
-            qr_key = f"{user.payment_method}_admin_discount"
-        else:
-            qr_key = f"{user.payment_method}_{plan}"
-            if checkout_info.get("discount_applied"):
-                qr_key += "_discount"
-        photo_path = QR_PHOTO_PATHS.get(qr_key)
-        if photo_path:
-            photo = FSInputFile(photo_path)
-            try:
-                await callback.message.delete()
-            except Exception:
-                pass
-            sent = await callback.message.answer_photo(
-                photo,
-                caption=text,
-                reply_markup=keyboard,
-            )
-            checkout_msg_id = sent.message_id
-        else:
-            sent = await callback.message.edit_text(
-                text,
-                reply_markup=keyboard,
-                disable_web_page_preview=True,
-            )
-            checkout_msg_id = callback.message.message_id
-    else:
-        # VISA — text message
-        try:
-            await callback.message.edit_text(
-                text,
-                reply_markup=keyboard,
-                disable_web_page_preview=True,
-            )
-            checkout_msg_id = callback.message.message_id
-        except Exception:
-            await callback.message.delete()
-            sent = await callback.message.answer(
-                text,
-                reply_markup=keyboard,
-                disable_web_page_preview=True,
-            )
-            checkout_msg_id = sent.message_id
-
-    await user_repo.set_pending_checkout_msg_id(user, checkout_msg_id)
+    await _show_checkout(callback, user_repo, user, lang, plan, checkout_info)
     await session.commit()
 
 

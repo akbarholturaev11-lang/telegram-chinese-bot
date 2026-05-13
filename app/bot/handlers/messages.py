@@ -50,6 +50,7 @@ _ADMIN_FSM_STATES = {
     AdminAudioStates.waiting_for_audio.state,
     BroadcastStates.waiting_for_text.state,
     DiscountStates.waiting_title.state,
+    DiscountStates.waiting_reason.state,
     DiscountStates.waiting_percent.state,
     DiscountStates.waiting_custom_duration.state,
     DiscountStates.waiting_start_at.state,
