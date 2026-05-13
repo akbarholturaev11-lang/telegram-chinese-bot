@@ -36,6 +36,11 @@ _BOOTSTRAP_COLUMNS: dict[str, dict[str, str]] = {
         "discount_title": "VARCHAR(120)",
         "discount_details": "TEXT",
     },
+    "discount_campaigns": {
+        "title_tj": "VARCHAR(180)",
+        "title_ru": "VARCHAR(180)",
+        "title_uz": "VARCHAR(180)",
+    },
 }
 
 

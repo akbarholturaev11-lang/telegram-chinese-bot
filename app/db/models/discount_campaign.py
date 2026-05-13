@@ -12,6 +12,9 @@ class DiscountCampaign(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
+    title_tj: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    title_ru: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
+    title_uz: Mapped[Optional[str]] = mapped_column(String(180), nullable=True)
     percent: Mapped[int] = mapped_column(Integer, nullable=False)
 
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

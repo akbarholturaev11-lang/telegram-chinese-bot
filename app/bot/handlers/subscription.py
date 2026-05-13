@@ -1,14 +1,16 @@
 from pathlib import Path
+from datetime import datetime, timezone
 
 from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
+from app.services.discount_service import DiscountService
 from app.services.payment_service import PaymentService
+from app.bot.utils.discount_formatter import build_admin_discount_block, build_discount_plan_line
 from app.bot.utils.i18n import t
 from app.bot.keyboards.subscription import (
-    subscription_main_keyboard,
     subscription_discount_progress_keyboard,
     subscription_discount_ready_keyboard,
     payment_method_keyboard,
@@ -35,7 +37,60 @@ QR_PHOTO_PATHS = {
 }
 
 
-def build_subscription_main_text_for_user(user, lang: str) -> str:
+def _plan_price(plan_type: str, payment_method: str | None) -> tuple[int, str]:
+    if payment_method in ("alipay", "wechat"):
+        return (66 if plan_type == "1_month" else 29), "¥"
+    return (89 if plan_type == "1_month" else 29), "somoni"
+
+
+async def _admin_discount_offer(session, user, lang: str) -> str | None:
+    service = DiscountService(session)
+    plan_choices = {}
+    for plan in ("10_days", "1_month"):
+        choice = await service.get_best_admin_discount(
+            user=user,
+            plan_type=plan,
+            payment_method=user.payment_method,
+        )
+        if choice.source == "admin_campaign" and choice.ends_at and choice.starts_at:
+            plan_choices[plan] = choice
+
+    if not plan_choices:
+        return None
+
+    main_choice = max(plan_choices.values(), key=lambda item: item.percent)
+    lines = []
+    for plan in ("10_days", "1_month"):
+        base, currency = _plan_price(plan, user.payment_method)
+        choice = plan_choices.get(plan)
+        percent = choice.percent if choice else 0
+        lines.append(
+            build_discount_plan_line(
+                lang=lang,
+                plan=plan,
+                base=base,
+                currency=currency,
+                percent=percent,
+            )
+        )
+
+    return build_admin_discount_block(
+        lang=lang,
+        discount=main_choice,
+        percent=main_choice.percent,
+        starts_at=main_choice.starts_at,
+        ends_at=main_choice.ends_at,
+        quota_total=main_choice.quota_total,
+        repeat_interval_days=main_choice.repeat_interval_days,
+        plan_lines="\n".join(lines),
+        now=datetime.now(timezone.utc),
+    )
+
+
+def build_subscription_main_text_for_user(user, lang: str, admin_discount_block: str | None = None) -> str:
+    if admin_discount_block:
+        return admin_discount_block
+
     use_yuan = getattr(user, "payment_method", None) in ("alipay", "wechat")
 
     plan_10_key = "subscription_plan_10_days_yuan" if use_yuan else "subscription_plan_10_days"
@@ -84,7 +139,7 @@ def build_subscription_discount_progress_text(
     return base
 
 
-def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboardMarkup:
+def build_subscription_main_keyboard_for_user(user, lang: str, show_referral: bool = True) -> InlineKeyboardMarkup:
     rows = [
         [
             InlineKeyboardButton(
@@ -97,7 +152,7 @@ def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboard
             ),
         ],
     ]
-    if not user.discount_used:
+    if show_referral and not user.discount_used:
         rows.append([
             InlineKeyboardButton(
                 text=t("subscription_referral_discount_button", lang),
@@ -111,6 +166,14 @@ def build_subscription_main_keyboard_for_user(user, lang: str) -> InlineKeyboard
         ),
     ])
     return InlineKeyboardMarkup(inline_keyboard=rows)
+
+
+async def build_subscription_main_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup]:
+    admin_discount_block = await _admin_discount_offer(session, user, lang)
+    return (
+        build_subscription_main_text_for_user(user, lang, admin_discount_block),
+        build_subscription_main_keyboard_for_user(user, lang, show_referral=not bool(admin_discount_block)),
+    )
 
 
 def build_checkout_text(lang: str, checkout_info: dict) -> str:
@@ -244,10 +307,12 @@ async def subscription_back_to_main_handler(callback: CallbackQuery, session):
         return
 
     lang = user.language if user.language else "ru"
+    text, keyboard = await build_subscription_main_view(session, user, lang)
 
     await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
         disable_web_page_preview=True,
     )
 
@@ -269,10 +334,12 @@ async def payment_visa_handler(callback: CallbackQuery, session):
     await session.commit()
 
     lang = user.language if user.language else "ru"
+    text, keyboard = await build_subscription_main_view(session, user, lang)
 
     await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
     )
 
 
@@ -290,10 +357,12 @@ async def payment_alipay_handler(callback: CallbackQuery, session):
     await session.commit()
 
     lang = user.language if user.language else "ru"
+    text, keyboard = await build_subscription_main_view(session, user, lang)
 
     await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
     )
 
 
@@ -311,10 +380,12 @@ async def payment_wechat_handler(callback: CallbackQuery, session):
     await session.commit()
 
     lang = user.language if user.language else "ru"
+    text, keyboard = await build_subscription_main_view(session, user, lang)
 
     await callback.message.edit_text(
-        build_subscription_main_text_for_user(user, lang),
-        reply_markup=build_subscription_main_keyboard_for_user(user, lang),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
     )
 
 
@@ -332,13 +403,13 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
     await user_repo.set_selected_plan_type(user, None)
     await session.commit()
 
-    text = build_subscription_main_text_for_user(user, lang)
-    keyboard = build_subscription_main_keyboard_for_user(user, lang)
+    text, keyboard = await build_subscription_main_view(session, user, lang)
 
     try:
         await callback.message.edit_text(
             text,
             reply_markup=keyboard,
+            parse_mode="HTML",
             disable_web_page_preview=True,
         )
     except Exception:
@@ -347,6 +418,7 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
         await callback.message.answer(
             text,
             reply_markup=keyboard,
+            parse_mode="HTML",
             disable_web_page_preview=True,
         )
 
@@ -456,7 +528,6 @@ async def payment_back_handler(callback: CallbackQuery, session):
 @router.callback_query(F.data == "payment:retry")
 async def payment_retry_handler(callback: CallbackQuery, session):
     from app.repositories.user_repo import UserRepository
-    from app.bot.keyboards.subscription import subscription_main_keyboard
 
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
@@ -465,10 +536,12 @@ async def payment_retry_handler(callback: CallbackQuery, session):
         return
 
     lang = user.language if user.language else "ru"
+    text, keyboard = await build_subscription_main_view(session, user, lang)
     await callback.answer()
     await callback.message.answer(
-        t("subscription_main_title", lang),
-        reply_markup=subscription_main_keyboard(lang, show_discount=not user.discount_used),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
     )
 
 

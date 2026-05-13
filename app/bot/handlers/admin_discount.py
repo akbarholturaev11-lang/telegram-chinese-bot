@@ -26,9 +26,11 @@ from app.bot.keyboards.admin_discount import (
     discount_status_keyboard,
     discount_usage_keyboard,
 )
+from app.bot.utils.discount_formatter import build_admin_discount_block, build_discount_plan_line
 from app.bot.utils.i18n import t
 from app.repositories.discount_campaign_repo import DiscountCampaignRepository
 from app.repositories.user_repo import UserRepository
+from app.services.discount_translation_service import DiscountTranslationService
 
 router = Router()
 
@@ -150,78 +152,60 @@ def _discount_notify_keyboard(lang: str) -> InlineKeyboardMarkup:
     )
 
 
-def _discount_notify_text(data: dict, lang: str) -> str:
-    title = escape(str(data["title"]))
-    start_at = data["starts_at"]
-    ends_at = start_at + timedelta(hours=data["duration_hours"])
+def _plan_price(plan_type: str, payment_method: Optional[str]) -> tuple[int, str]:
+    if payment_method in ("alipay", "wechat"):
+        return (66 if plan_type == "1_month" else 29), "¥"
+    return (89 if plan_type == "1_month" else 29), "somoni"
 
-    templates = {
-        "tj": {
-            "title": "🎁 <b>Тахфифи нав фаъол шуд!</b>",
-            "valid": "⏰ Амал мекунад: <b>{start}</b> то <b>{end}</b>",
-            "method": "💳 Намуди пардохт: <b>{method}</b>",
-            "plan": "📦 Тариф: <b>{plan}</b>",
-            "quota": "👥 Лимит: <b>{quota}</b>",
-            "repeat": "🔁 Қоида: <b>{repeat}</b>",
-            "cta": "Барои обуна шудан тугмаи поёнро пахш кунед.",
-            "all": "Ҳама",
-            "unlimited": "бе маҳдудият",
-            "once": "як маротиба",
-            "repeat_days": "ҳар {days} рӯз",
-            "plans": {"10_days": "10 рӯз", "1_month": "1 моҳ"},
-        },
-        "ru": {
-            "title": "🎁 <b>Новая скидка активна!</b>",
-            "valid": "⏰ Действует: с <b>{start}</b> до <b>{end}</b>",
-            "method": "💳 Тип оплаты: <b>{method}</b>",
-            "plan": "📦 Тариф: <b>{plan}</b>",
-            "quota": "👥 Лимит: <b>{quota}</b>",
-            "repeat": "🔁 Правило: <b>{repeat}</b>",
-            "cta": "Чтобы оформить подписку, нажмите кнопку ниже.",
-            "all": "Все",
-            "unlimited": "без лимита",
-            "once": "один раз",
-            "repeat_days": "каждые {days} дней",
-            "plans": {"10_days": "10 дней", "1_month": "1 месяц"},
-        },
-        "uz": {
-            "title": "🎁 <b>Yangi chegirma ochildi!</b>",
-            "valid": "⏰ Amal qiladi: <b>{start}</b> dan <b>{end}</b> gacha",
-            "method": "💳 To'lov turi: <b>{method}</b>",
-            "plan": "📦 Tarif: <b>{plan}</b>",
-            "quota": "👥 Limit: <b>{quota}</b>",
-            "repeat": "🔁 Qoida: <b>{repeat}</b>",
-            "cta": "Obuna olish uchun pastdagi tugmani bosing.",
-            "all": "Hamma",
-            "unlimited": "limitsiz",
-            "once": "bir marta",
-            "repeat_days": "har {days} kunda",
-            "plans": {"10_days": "10 kun", "1_month": "1 oy"},
-        },
+
+def _discount_plan_lines(data: dict, lang: str, payment_method: Optional[str]) -> str:
+    plans = [data["plan_type"]] if data.get("plan_type") else ["10_days", "1_month"]
+    lines = []
+    for plan in plans:
+        base, currency = _plan_price(plan, payment_method)
+        lines.append(
+            build_discount_plan_line(
+                lang=lang,
+                plan=plan,
+                base=base,
+                currency=currency,
+                percent=data["percent"],
+            )
+        )
+    return "\n".join(lines)
+
+
+def _discount_notify_text(data: dict, lang: str, payment_method: Optional[str] = None) -> str:
+    starts_at = data["starts_at"]
+    ends_at = starts_at + timedelta(hours=data["duration_hours"])
+    return build_admin_discount_block(
+        lang=lang,
+        discount=data,
+        percent=data["percent"],
+        starts_at=starts_at,
+        ends_at=ends_at,
+        quota_total=data.get("quota_total"),
+        repeat_interval_days=data.get("repeat_interval_days"),
+        plan_lines=_discount_plan_lines(data, lang, payment_method or data.get("payment_method")),
+    )
+
+
+async def _prepare_title_i18n(data: dict) -> dict:
+    title = str(data["title"])[:120]
+    audience_language = data.get("audience_language")
+    if audience_language in ("tj", "ru", "uz"):
+        return {
+            "title_tj": title if audience_language == "tj" else None,
+            "title_ru": title if audience_language == "ru" else None,
+            "title_uz": title if audience_language == "uz" else None,
+        }
+
+    translated = await DiscountTranslationService().translate_title(title)
+    return {
+        "title_tj": translated["tj"],
+        "title_ru": translated["ru"],
+        "title_uz": translated["uz"],
     }
-    ui = templates.get(lang, templates["uz"])
-    method = _LABELS["payment"].get(data.get("payment_method"), ui["all"])
-    plan = ui["plans"].get(data.get("plan_type"), ui["all"])
-    quota = str(data["quota_total"]) if data.get("quota_total") else ui["unlimited"]
-    repeat = (
-        ui["repeat_days"].format(days=data["repeat_interval_days"])
-        if data.get("repeat_interval_days")
-        else ui["once"]
-    )
-    return "\n".join(
-        [
-            ui["title"],
-            "",
-            f"<b>{title}</b> — <b>{data['percent']}%</b>",
-            ui["valid"].format(start=_fmt_time(start_at), end=_fmt_time(ends_at)),
-            ui["method"].format(method=method),
-            ui["plan"].format(plan=plan),
-            ui["quota"].format(quota=quota),
-            ui["repeat"].format(repeat=repeat),
-            "",
-            ui["cta"],
-        ]
-    )
 
 
 async def _remember_panel(state: FSMContext, callback: CallbackQuery) -> None:
@@ -306,7 +290,7 @@ async def _notify_discount_users(callback: CallbackQuery, session, data: dict) -
         if user.telegram_id in admin_ids:
             continue
         lang = user.language or "uz"
-        text = _discount_notify_text(data, lang)
+        text = _discount_notify_text(data, lang, user.payment_method)
         try:
             if data.get("notify_media_type") == "photo" and data.get("notify_media_file_id"):
                 await callback.bot.send_photo(
@@ -872,9 +856,16 @@ async def discount_confirm(callback: CallbackQuery, state: FSMContext, session):
 
     starts_at = data["starts_at"]
     ends_at = starts_at + timedelta(hours=data["duration_hours"])
+    title_i18n = await _prepare_title_i18n(data)
+    data.update(title_i18n)
+    await state.update_data(**title_i18n)
+
     repo = DiscountCampaignRepository(session)
     campaign = await repo.create(
         title=data["title"],
+        title_tj=title_i18n["title_tj"],
+        title_ru=title_i18n["title_ru"],
+        title_uz=title_i18n["title_uz"],
         percent=data["percent"],
         starts_at=starts_at,
         ends_at=ends_at,

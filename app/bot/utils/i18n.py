@@ -53,6 +53,26 @@ TEXTS = {
         "subscription_button_10_days": "10 рӯз",
         "subscription_button_1_month": "1 моҳ",
         "subscription_referral_hint": "3 дӯсти нав даъват кунед ва 20% тахфиф гиред.",
+        "subscription_admin_discount_block": (
+            "🎁 <b>{title}</b>\n\n"
+            "<blockquote>"
+            "Ҳоло тахфифи махсуси админ фаъол аст.\n\n"
+            "💎 Тахфиф: <b>{percent}%</b>\n"
+            "⏳ Давомнокӣ: <b>{duration}</b>\n"
+            "⌛ То анҷом: <b>{remaining}</b>\n"
+            "🕒 Анҷом: <b>{ends_at}</b>\n\n"
+            "{plan_lines}\n\n"
+            "👥 Лимит: <b>{quota}</b>\n"
+            "🔁 Қоида: <b>{rule}</b>"
+            "</blockquote>\n\n"
+            "Фурсатро аз даст надиҳед — обунаро интихоб кунед."
+        ),
+        "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
+        "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
+        "subscription_admin_discount_quota_unlimited": "бе маҳдудият",
+        "subscription_admin_discount_rule_once": "як маротиба",
+        "subscription_admin_discount_rule_repeat": "ҳар {days} рӯз",
+        "subscription_admin_discount_remaining_done": "ба анҷом расид",
         "subscription_invite_button": "👥 Дӯст даъват кардан",
         "subscription_back_to_main": "⬅️ Ба обунаи оддӣ баргаштан",
         "subscription_discount_text_blocked": "Шумо ҳоло дар бахши 20% тахфиф ҳастед. Лутфан истиноди даъватро истифода баред ё ба обунаи оддӣ баргардед.",
@@ -160,6 +180,26 @@ TEXTS = {
         "subscription_button_10_days": "10 дней",
         "subscription_button_1_month": "1 месяц",
         "subscription_referral_hint": "Пригласите 3 новых друзей и получите скидку 20%.",
+        "subscription_admin_discount_block": (
+            "🎁 <b>{title}</b>\n\n"
+            "<blockquote>"
+            "Сейчас активна специальная скидка от администратора.\n\n"
+            "💎 Скидка: <b>{percent}%</b>\n"
+            "⏳ Длительность: <b>{duration}</b>\n"
+            "⌛ До конца: <b>{remaining}</b>\n"
+            "🕒 Закончится: <b>{ends_at}</b>\n\n"
+            "{plan_lines}\n\n"
+            "👥 Лимит: <b>{quota}</b>\n"
+            "🔁 Правило: <b>{rule}</b>"
+            "</blockquote>\n\n"
+            "Не упустите возможность — выберите подписку."
+        ),
+        "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
+        "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
+        "subscription_admin_discount_quota_unlimited": "без лимита",
+        "subscription_admin_discount_rule_once": "один раз",
+        "subscription_admin_discount_rule_repeat": "каждые {days} дней",
+        "subscription_admin_discount_remaining_done": "завершилась",
         "subscription_invite_button": "👥 Пригласить друга",
         "subscription_back_to_main": "⬅️ Вернуться к обычной подписке",
 
@@ -260,6 +300,26 @@ TEXTS = {
         "subscription_button_10_days": "10 kunlik",
         "subscription_button_1_month": "1 oylik",
         "subscription_referral_hint": "3 ta yangi do‘st taklif qiling va 20% chegirma oling.",
+        "subscription_admin_discount_block": (
+            "🎁 <b>{title}</b>\n\n"
+            "<blockquote>"
+            "Hozir admin tomonidan maxsus chegirma ketmoqda.\n\n"
+            "💎 Chegirma: <b>{percent}%</b>\n"
+            "⏳ Davomiylik: <b>{duration}</b>\n"
+            "⌛ Tugashigacha: <b>{remaining}</b>\n"
+            "🕒 Tugash vaqti: <b>{ends_at}</b>\n\n"
+            "{plan_lines}\n\n"
+            "👥 Limit: <b>{quota}</b>\n"
+            "🔁 Qoida: <b>{rule}</b>"
+            "</blockquote>\n\n"
+            "Fursatni o'tkazib yubormang — obunani tanlang."
+        ),
+        "subscription_admin_discount_plan_discounted": "📅 {plan}: <s>{base} {currency}</s> → <b>{final} {currency}</b>",
+        "subscription_admin_discount_plan_regular": "📅 {plan}: <b>{base} {currency}</b>",
+        "subscription_admin_discount_quota_unlimited": "limitsiz",
+        "subscription_admin_discount_rule_once": "bir marta",
+        "subscription_admin_discount_rule_repeat": "har {days} kunda",
+        "subscription_admin_discount_remaining_done": "tugagan",
         "subscription_invite_button": "👥 Do‘st chaqirish",
         "subscription_back_to_main": "⬅️ Oddiy obunaga qaytish",
 

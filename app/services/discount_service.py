@@ -12,6 +12,15 @@ class DiscountChoice:
     percent: int = 0
     campaign_id: Optional[int] = None
     title: Optional[str] = None
+    title_tj: Optional[str] = None
+    title_ru: Optional[str] = None
+    title_uz: Optional[str] = None
+    starts_at: Optional[datetime] = None
+    ends_at: Optional[datetime] = None
+    plan_type: Optional[str] = None
+    payment_method: Optional[str] = None
+    quota_total: Optional[int] = None
+    repeat_interval_days: Optional[int] = None
     details: Optional[str] = None
 
 
@@ -53,6 +62,28 @@ class DiscountService:
             choices,
             key=lambda item: (item.percent, 1 if item.source == "admin_campaign" else 0),
         )
+
+    async def get_best_admin_discount(
+        self,
+        *,
+        user,
+        plan_type: str,
+        payment_method: Optional[str],
+    ) -> DiscountChoice:
+        choices: list[DiscountChoice] = []
+        now = datetime.now(timezone.utc)
+
+        for campaign in await self.repo.list_current(now):
+            if not self._matches_campaign(campaign, user, plan_type, payment_method):
+                continue
+            choice = await self._campaign_choice(campaign, user, now)
+            if choice:
+                choices.append(choice)
+
+        if not choices:
+            return DiscountChoice()
+
+        return max(choices, key=lambda item: item.percent)
 
     def _matches_campaign(
         self,
@@ -110,5 +141,14 @@ class DiscountService:
             percent=campaign.percent,
             campaign_id=campaign.id,
             title=campaign.title,
+            title_tj=campaign.title_tj,
+            title_ru=campaign.title_ru,
+            title_uz=campaign.title_uz,
+            starts_at=campaign.starts_at,
+            ends_at=campaign.ends_at,
+            plan_type=campaign.plan_type,
+            payment_method=campaign.payment_method,
+            quota_total=campaign.quota_total,
+            repeat_interval_days=campaign.repeat_interval_days,
             details=details,
         )

@@ -16,6 +16,9 @@ class DiscountCampaignRepository:
         self,
         *,
         title: str,
+        title_tj: Optional[str] = None,
+        title_ru: Optional[str] = None,
+        title_uz: Optional[str] = None,
         percent: int,
         starts_at: datetime,
         ends_at: datetime,
@@ -30,6 +33,9 @@ class DiscountCampaignRepository:
     ) -> DiscountCampaign:
         campaign = DiscountCampaign(
             title=title,
+            title_tj=title_tj,
+            title_ru=title_ru,
+            title_uz=title_uz,
             percent=percent,
             starts_at=starts_at,
             ends_at=ends_at,
