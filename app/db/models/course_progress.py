@@ -47,6 +47,8 @@ class CourseProgress(Base):
     last_reminder_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     reminder_prompt_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     next_study_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    last_weekly_progress_sent_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    weekly_progress_baseline_lessons_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

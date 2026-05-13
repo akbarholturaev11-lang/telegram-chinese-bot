@@ -40,6 +40,8 @@ async def _background_scheduler(bot: Bot) -> None:
                 await ExpiryReminderService(session).send_expiry_reminders(bot)
             async with async_session_maker() as session:
                 await CourseReminderService(session).send_due_reminders(bot)
+            async with async_session_maker() as session:
+                await CourseReminderService(session).send_weekly_progress_reports(bot)
         except Exception as e:
             print("Scheduler error:", e)
 

@@ -32,6 +32,7 @@ from app.repositories.message_repo import MessageRepository
 from app.repositories.user_repo import UserRepository
 from app.services.access_service import AccessService
 from app.services.course_engine_service import CourseEngineService
+from app.services.course_progress_summary_service import CourseProgressSummaryService
 from app.services.course_tutor_service import CourseTutorService
 from app.services.image_input_service import ImageInputService
 from app.services.image_qa_service import ImageQAService
@@ -74,6 +75,43 @@ async def handle_text_message(message: Message, session):
         )
         return
 
+    if user:
+        reminder_engine = CourseEngineService(session)
+        reminder_progress = await reminder_engine.progress_repo.get_by_user_id(user.id)
+        if reminder_progress and reminder_progress.waiting_for == "reminder_setup":
+            msg_text = (message.text or "").strip()
+            cancel_map = {"uz": "❌ Bekor qilish", "ru": "❌ Отмена", "tj": "❌ Бекор кардан"}
+            if msg_text == cancel_map.get(user_lang, "❌ Отмена"):
+                await reminder_engine.progress_repo.set_waiting_for(reminder_progress, "none")
+                await session.commit()
+                keyboard = course_menu_keyboard(user_lang) if user.learning_mode == "course" else main_menu_keyboard(user_lang)
+                await message.answer(
+                    t("course_reminder_cancelled", user_lang),
+                    reply_markup=keyboard,
+                )
+                return
+
+            parsed_reminder = _parse_reminder_time(msg_text)
+            if not parsed_reminder:
+                await message.answer(
+                    t("course_invalid_time_format", user_lang),
+                    reply_markup=reminder_time_keyboard(user_lang),
+                )
+                return
+
+            await reminder_engine.progress_repo.set_reminder(
+                reminder_progress,
+                enabled=True,
+                reminder_time=parsed_reminder,
+            )
+            await reminder_engine.progress_repo.set_waiting_for(reminder_progress, "none")
+            await session.commit()
+            await message.answer(
+                t("course_reminder_tz_title", user_lang),
+                reply_markup=course_reminder_timezone_keyboard(),
+            )
+            return
+
     if user and user.learning_mode == "course":
         engine = CourseEngineService(session)
         tutor = CourseTutorService()
@@ -101,17 +139,7 @@ async def handle_text_message(message: Message, session):
                 return
             current_lesson_title = lesson.title if lesson else "—"
             completed_count = getattr(progress, "completed_lessons_count", 0) or 0
-            vocab_count = 0
-            if completed_count > 0:
-                all_lessons = await engine.lesson_repo.list_by_level(user.level)
-                for les in all_lessons:
-                    if les.lesson_order <= completed_count and les.vocabulary_json:
-                        try:
-                            vdata = json.loads(les.vocabulary_json) if isinstance(les.vocabulary_json, str) else les.vocabulary_json
-                            if isinstance(vdata, list):
-                                vocab_count += len(vdata)
-                        except Exception:
-                            pass
+            summary = await CourseProgressSummaryService(session).summarize_completed_range(progress)
             days_studying = 1
             if progress.created_at:
                 created = progress.created_at
@@ -121,7 +149,8 @@ async def handle_text_message(message: Message, session):
             await message.answer(
                 t("course_progress_full_text", user_lang,
                   lessons=completed_count,
-                  vocab=vocab_count,
+                  vocab=summary["vocab"],
+                  dialogues=summary["dialogues"],
                   days=days_studying,
                   current=current_lesson_title),
                 parse_mode="HTML",

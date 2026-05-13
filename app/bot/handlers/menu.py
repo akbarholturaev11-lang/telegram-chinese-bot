@@ -3,7 +3,9 @@ from aiogram.types import Message
 
 from app.config import settings
 from app.repositories.user_repo import UserRepository
+from app.services.course_engine_service import CourseEngineService
 from app.bot.keyboards.subscription import payment_method_keyboard
+from app.bot.keyboards.course import reminder_time_keyboard
 from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.utils.i18n import t
 
@@ -108,6 +110,33 @@ async def handle_help_button(message: Message, session):
         t("help_section_text", lang),
         parse_mode="HTML",
         disable_web_page_preview=True,
+    )
+
+
+@router.message(F.text.in_([
+    "⏰ Вақти ёдраскунак",
+    "⏰ Напоминание",
+    "⏰ Eslatma vaqti",
+]))
+async def handle_reminder_time_button(message: Message, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    if not user:
+        return
+
+    lang = user.language if user.language else "ru"
+    engine = CourseEngineService(session)
+    _, progress, error_key = await engine.get_or_create_progress(message.from_user.id)
+    if error_key or not progress:
+        await message.answer(t(error_key or "course_no_lesson_found", lang))
+        return
+
+    await engine.progress_repo.set_waiting_for(progress, "reminder_setup")
+    await session.commit()
+    await message.answer(
+        t("course_reminder_setup_msg", lang),
+        reply_markup=reminder_time_keyboard(lang),
+        parse_mode="HTML",
     )
 
 
