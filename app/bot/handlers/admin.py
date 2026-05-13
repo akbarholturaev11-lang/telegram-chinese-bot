@@ -265,21 +265,21 @@ async def admin_broadcast_info(callback: CallbackQuery, session):
     await callback.answer()
     await callback.message.answer(
         "📢 <b>Broadcast xabar yuborish</b>\n\n"
-        "Buyruq: <code>/broadcast Xabar matni</code>\n\n"
-        "Misol: <code>/broadcast Yangi daraja qo'shildi!</code>\n\n"
-        "⚠️ Barcha foydalanuvchilarga yuboriladi.",
+        "Panelni ochish: <code>/broadcast</code>\n\n"
+        "Panelda til, status va daraja bo'yicha filtr tanlab yuboring.\n\n"
+        "⚠️ Filtrsiz hammaga yuborish kerak bo'lsa: <code>/broadcast_all Xabar matni</code>",
         parse_mode="HTML",
     )
 
 
-@router.message(Command("broadcast"))
+@router.message(Command("broadcast_all"))
 async def admin_broadcast_handler(message: Message, session):
     if not _is_admin(message.from_user.id):
         return
 
-    text = message.text.strip()[len("/broadcast"):].strip()
+    text = message.text.strip()[len("/broadcast_all"):].strip()
     if not text:
-        await message.answer("Foydalanish: <code>/broadcast Xabar matni</code>", parse_mode="HTML")
+        await message.answer("Foydalanish: <code>/broadcast_all Xabar matni</code>", parse_mode="HTML")
         return
 
     result = await session.execute(select(User.telegram_id))

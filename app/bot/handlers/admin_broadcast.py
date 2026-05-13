@@ -1,5 +1,6 @@
 import asyncio
 import time
+from html import escape
 from typing import Optional
 
 from aiogram import Router, F
@@ -24,16 +25,53 @@ def _panel_text(
     lang_filter: Optional[str],
     status_filter: Optional[str],
     level_filter: Optional[str],
+    mode_filter: Optional[str] = None,
+    payment_status_filter: Optional[str] = None,
+    payment_method_filter: Optional[str] = None,
+    plan_filter: Optional[str] = None,
+    discount_filter: Optional[str] = None,
+    course_promo_filter: Optional[str] = None,
+    activity_filter: Optional[str] = None,
 ) -> str:
-    lang_label = lang_filter.upper() if lang_filter else "Hammasi"
-    status_label = {"active": "Active", "trial": "Trial", "free": "Expired"}.get(
-        status_filter, "Hammasi"
-    )
-    level_label = level_filter.upper() if level_filter else "Hammasi"
+    labels = {
+        "lang": {"uz": "UZ", "ru": "RU", "tj": "TJ"},
+        "status": {
+            "free": "Free",
+            "trial": "Trial",
+            "active": "Active",
+            "expired": "Expired",
+            "blocked": "Blocked",
+        },
+        "level": {"beginner": "Beginner", "hsk1": "HSK1", "hsk2": "HSK2", "hsk3": "HSK3", "hsk4": "HSK4"},
+        "mode": {"qa": "QA", "course": "Course"},
+        "payment_status": {"none": "None", "pending": "Pending", "approved": "Approved", "rejected": "Rejected"},
+        "payment_method": {"visa": "Visa", "alipay": "Alipay", "wechat": "WeChat"},
+        "plan": {"10_days": "10 kun", "1_month": "1 oy"},
+        "discount": {"eligible": "Chegirma bor", "used": "Chegirma ishlatilgan", "none": "Chegirma yo'q"},
+        "promo": {"sent": "Promo yuborilgan", "not_sent": "Promo yuborilmagan"},
+        "activity": {"active_7d": "7 kunda aktiv", "inactive_7d": "7 kunda sovuq", "new_7d": "7 kunda yangi"},
+    }
+
+    def label(group: str, value: Optional[str]) -> str:
+        if not value:
+            return "Hammasi"
+        return labels[group].get(value, value)
+
     return (
         "📢 <b>Broadcast paneli</b>\n\n"
-        f"Til: <b>{lang_label}</b> | Status: <b>{status_label}</b> | Daraja: <b>{level_label}</b>\n\n"
-        "Filtrlarni tanlang, so'ng ✏️ Matn kiritish tugmasini bosing."
+        "<blockquote>"
+        f"🌐 Til: <b>{label('lang', lang_filter)}</b>\n"
+        f"👤 Status: <b>{label('status', status_filter)}</b>\n"
+        f"📚 Daraja: <b>{label('level', level_filter)}</b>\n"
+        f"🎯 Rejim: <b>{label('mode', mode_filter)}</b>\n"
+        f"💳 To'lov statusi: <b>{label('payment_status', payment_status_filter)}</b>\n"
+        f"🏦 To'lov usuli: <b>{label('payment_method', payment_method_filter)}</b>\n"
+        f"📦 Tarif tanlovi: <b>{label('plan', plan_filter)}</b>\n"
+        f"🎁 Chegirma: <b>{label('discount', discount_filter)}</b>\n"
+        f"📣 Kurs promo: <b>{label('promo', course_promo_filter)}</b>\n"
+        f"⚡ Aktivlik: <b>{label('activity', activity_filter)}</b>"
+        "</blockquote>\n\n"
+        "Kerakli segmentni tanlang, keyin ✏️ Matn kiritish tugmasini bosing."
     )
 
 
@@ -41,10 +79,39 @@ async def _redraw_panel(callback: CallbackQuery, data: dict) -> None:
     lang_filter = data.get("lang_filter")
     status_filter = data.get("status_filter")
     level_filter = data.get("level_filter")
+    mode_filter = data.get("mode_filter")
+    payment_status_filter = data.get("payment_status_filter")
+    payment_method_filter = data.get("payment_method_filter")
+    plan_filter = data.get("plan_filter")
+    discount_filter = data.get("discount_filter")
+    course_promo_filter = data.get("course_promo_filter")
+    activity_filter = data.get("activity_filter")
     try:
         await callback.message.edit_text(
-            _panel_text(lang_filter, status_filter, level_filter),
-            reply_markup=broadcast_panel_keyboard(lang_filter, status_filter, level_filter),
+            _panel_text(
+                lang_filter,
+                status_filter,
+                level_filter,
+                mode_filter,
+                payment_status_filter,
+                payment_method_filter,
+                plan_filter,
+                discount_filter,
+                course_promo_filter,
+                activity_filter,
+            ),
+            reply_markup=broadcast_panel_keyboard(
+                lang_filter,
+                status_filter,
+                level_filter,
+                mode_filter,
+                payment_status_filter,
+                payment_method_filter,
+                plan_filter,
+                discount_filter,
+                course_promo_filter,
+                activity_filter,
+            ),
             parse_mode="HTML",
         )
     except Exception:
@@ -59,7 +126,18 @@ async def broadcast_command(message: Message, state: FSMContext):
         return
 
     await state.clear()
-    await state.update_data(lang_filter=None, status_filter=None, level_filter=None)
+    await state.update_data(
+        lang_filter=None,
+        status_filter=None,
+        level_filter=None,
+        mode_filter=None,
+        payment_status_filter=None,
+        payment_method_filter=None,
+        plan_filter=None,
+        discount_filter=None,
+        course_promo_filter=None,
+        activity_filter=None,
+    )
 
     sent = await message.answer(
         _panel_text(None, None, None),
@@ -113,6 +191,54 @@ async def bc_level_filter(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
+async def _set_filter(callback: CallbackQuery, state: FSMContext, key: str) -> None:
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+
+    val = callback.data.split(":")[2]
+    data = await state.get_data()
+    data[key] = None if val == "all" else val
+    await state.update_data(**{key: data[key]})
+    await _redraw_panel(callback, data)
+    await callback.answer()
+
+
+@router.callback_query(F.data.startswith("bc:mode:"))
+async def bc_mode_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "mode_filter")
+
+
+@router.callback_query(F.data.startswith("bc:paystatus:"))
+async def bc_payment_status_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "payment_status_filter")
+
+
+@router.callback_query(F.data.startswith("bc:paymethod:"))
+async def bc_payment_method_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "payment_method_filter")
+
+
+@router.callback_query(F.data.startswith("bc:plan:"))
+async def bc_plan_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "plan_filter")
+
+
+@router.callback_query(F.data.startswith("bc:discount:"))
+async def bc_discount_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "discount_filter")
+
+
+@router.callback_query(F.data.startswith("bc:promo:"))
+async def bc_promo_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "course_promo_filter")
+
+
+@router.callback_query(F.data.startswith("bc:activity:"))
+async def bc_activity_filter(callback: CallbackQuery, state: FSMContext):
+    await _set_filter(callback, state, "activity_filter")
+
+
 # ── Text entry ───────────────────────────────────────────────────────────────
 
 @router.callback_query(F.data == "bc:enter_text")
@@ -145,14 +271,22 @@ async def bc_receive_text(message: Message, state: FSMContext, session):
         language=data.get("lang_filter"),
         status=data.get("status_filter"),
         level=data.get("level_filter"),
+        learning_mode=data.get("mode_filter"),
+        payment_status=data.get("payment_status_filter"),
+        payment_method=data.get("payment_method_filter"),
+        selected_plan_type=data.get("plan_filter"),
+        discount_filter=data.get("discount_filter"),
+        course_promo_filter=data.get("course_promo_filter"),
+        activity_filter=data.get("activity_filter"),
     )
     count = len(users)
 
-    preview = text[:200] + ("..." if len(text) > 200 else "")
+    preview = escape(text[:200] + ("..." if len(text) > 200 else ""))
     confirm_text = (
-        f"📢 <b>Broadcast tasdiqlash</b>\n\n"
-        f"<i>{preview}</i>\n\n"
-        f"👥 <b>{count} ta</b> userga yuboriladi.\n\n"
+        "📢 <b>Broadcast tasdiqlash</b>\n\n"
+        f"<blockquote>{preview}</blockquote>\n\n"
+        f"👥 Segment: <b>{count} ta user</b>\n"
+        "⚠️ Xabar faqat tanlangan filterlarga mos userlarga yuboriladi.\n\n"
         "Tasdiqlaysizmi?"
     )
 
@@ -203,6 +337,13 @@ async def bc_confirm(callback: CallbackQuery, state: FSMContext, session):
         language=data.get("lang_filter"),
         status=data.get("status_filter"),
         level=data.get("level_filter"),
+        learning_mode=data.get("mode_filter"),
+        payment_status=data.get("payment_status_filter"),
+        payment_method=data.get("payment_method_filter"),
+        selected_plan_type=data.get("plan_filter"),
+        discount_filter=data.get("discount_filter"),
+        course_promo_filter=data.get("course_promo_filter"),
+        activity_filter=data.get("activity_filter"),
     )
     total = len(users)
 

@@ -184,6 +184,13 @@ class UserRepository:
         language: Optional[str] = None,
         status: Optional[str] = None,
         level: Optional[str] = None,
+        learning_mode: Optional[str] = None,
+        payment_status: Optional[str] = None,
+        payment_method: Optional[str] = None,
+        selected_plan_type: Optional[str] = None,
+        discount_filter: Optional[str] = None,
+        course_promo_filter: Optional[str] = None,
+        activity_filter: Optional[str] = None,
     ) -> list[User]:
         query = select(User)
         if language:
@@ -192,6 +199,33 @@ class UserRepository:
             query = query.where(User.status == status)
         if level:
             query = query.where(User.level == level)
+        if learning_mode:
+            query = query.where(User.learning_mode == learning_mode)
+        if payment_status:
+            query = query.where(User.payment_status == payment_status)
+        if payment_method:
+            query = query.where(User.payment_method == payment_method)
+        if selected_plan_type:
+            query = query.where(User.selected_plan_type == selected_plan_type)
+        if discount_filter == "eligible":
+            query = query.where(User.discount_eligible.is_(True))
+        elif discount_filter == "used":
+            query = query.where(User.discount_used.is_(True))
+        elif discount_filter == "none":
+            query = query.where(User.discount_eligible.is_(False), User.discount_used.is_(False))
+        if course_promo_filter == "sent":
+            query = query.where(User.course_promo_sent.is_(True))
+        elif course_promo_filter == "not_sent":
+            query = query.where(User.course_promo_sent.is_(False))
+        if activity_filter:
+            now = datetime.now(timezone.utc)
+            since_7d = now - timedelta(days=7)
+            if activity_filter == "active_7d":
+                query = query.where(User.last_active_at >= since_7d)
+            elif activity_filter == "inactive_7d":
+                query = query.where(User.last_active_at < since_7d)
+            elif activity_filter == "new_7d":
+                query = query.where(User.created_at >= since_7d)
         result = await self.session.execute(query)
         return list(result.scalars().all())
 
