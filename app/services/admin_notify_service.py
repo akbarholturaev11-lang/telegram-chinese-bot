@@ -31,18 +31,45 @@ class AdminNotifyService:
         amount: int,
         currency: str,
         payment_id: int,
+        payment_method: str = None,
+        base_amount: int = None,
+        discount_source: str = "none",
+        discount_percent: int = 0,
+        discount_title: str = None,
+        discount_details: str = None,
         ai_result: dict = None,
         pending_count: int = 0,
     ) -> str:
         plan_label = "10 kunlik" if plan_type == "10_days" else "1 oylik"
+        method_labels = {
+            "visa": "Visa",
+            "alipay": "Alipay",
+            "wechat": "WeChat",
+        }
 
         lines = [
             f"💳 Yangi to'lov so'rovi",
             f"",
             f"👤 {full_name} ({telegram_id})",
             f"📦 Tarif: {plan_label} — {amount} {currency}",
+            f"🏦 To'lov turi: {method_labels.get(payment_method, payment_method or '-')}",
             f"🆔 To'lov ID: #{payment_id}",
         ]
+
+        if discount_percent > 0:
+            source_label = {
+                "referral": "Referral chegirma",
+                "admin_campaign": "Admin kampaniya",
+            }.get(discount_source, "Chegirma")
+            title = f" — {discount_title}" if discount_title else ""
+            lines.append("")
+            lines.append(f"🎁 Chegirma: {discount_percent}% ({source_label}{title})")
+            if base_amount:
+                lines.append(f"  Narx: {base_amount} → {amount} {currency}")
+            if discount_details:
+                lines.append(f"  Qanday olindi: {discount_details}")
+        else:
+            lines.append("🎁 Chegirma: yo'q")
 
         if pending_count > 1:
             lines.append(f"⏳ Navbatda: {pending_count} ta to'lov")
@@ -99,6 +126,12 @@ class AdminNotifyService:
             amount=payment.amount,
             currency=payment.currency,
             payment_id=payment.id,
+            payment_method=payment.payment_method or getattr(user, "payment_method", None),
+            base_amount=payment.base_amount,
+            discount_source=payment.discount_source,
+            discount_percent=payment.discount_percent,
+            discount_title=payment.discount_title,
+            discount_details=payment.discount_details,
             ai_result=ai_result,
             pending_count=pending_count,
         )
@@ -108,12 +141,23 @@ class AdminNotifyService:
         for admin_id in self.admin_ids:
             try:
                 if payment.screenshot_file_id:
-                    await bot.send_photo(
-                        chat_id=admin_id,
-                        photo=payment.screenshot_file_id,
-                        caption=text,
-                        reply_markup=keyboard,
-                    )
+                    if len(text) <= 1000:
+                        await bot.send_photo(
+                            chat_id=admin_id,
+                            photo=payment.screenshot_file_id,
+                            caption=text,
+                            reply_markup=keyboard,
+                        )
+                    else:
+                        await bot.send_photo(
+                            chat_id=admin_id,
+                            photo=payment.screenshot_file_id,
+                        )
+                        await bot.send_message(
+                            chat_id=admin_id,
+                            text=text,
+                            reply_markup=keyboard,
+                        )
                 else:
                     await bot.send_message(
                         chat_id=admin_id,

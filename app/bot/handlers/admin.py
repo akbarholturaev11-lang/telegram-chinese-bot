@@ -25,6 +25,7 @@ def admin_menu_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="📊 Statistika", callback_data="adm:stats")],
         [InlineKeyboardButton(text="🗑 Foydalanuvchini o'chirish", callback_data="adm:deleteuser_info")],
         [InlineKeyboardButton(text="📢 Broadcast xabar", callback_data="adm:broadcast_info")],
+        [InlineKeyboardButton(text="🎁 Chegirma boshqaruv", callback_data="adm:discount_panel")],
         [InlineKeyboardButton(text="✅ Obuna berish", callback_data="adm:giveaccess_info")],
         [InlineKeyboardButton(text="🎵 Audio boshqaruv", callback_data="adm:audio_panel")],
     ])
@@ -266,7 +267,7 @@ async def admin_broadcast_info(callback: CallbackQuery, session):
     await callback.message.answer(
         "📢 <b>Broadcast xabar yuborish</b>\n\n"
         "Panelni ochish: <code>/broadcast</code>\n\n"
-        "Panelda til, status va daraja bo'yicha filtr tanlab yuboring.\n\n"
+        "Panelda segmentni tanlab, matn/foto/video + caption yuboring.\n\n"
         "⚠️ Filtrsiz hammaga yuborish kerak bo'lsa: <code>/broadcast_all Xabar matni</code>",
         parse_mode="HTML",
     )

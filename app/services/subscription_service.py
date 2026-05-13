@@ -1,4 +1,5 @@
 from datetime import datetime, timezone, timedelta
+from typing import Optional
 
 from app.repositories.user_repo import UserRepository
 
@@ -18,6 +19,7 @@ class SubscriptionService:
         self,
         telegram_id: int,
         plan_type: str,
+        discount_source: Optional[str] = None,
     ) -> bool:
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -36,7 +38,7 @@ class SubscriptionService:
         user.selected_plan_type = None
         user.expiry_reminder_sent_at = None
 
-        if user.discount_eligible and not user.discount_used:
+        if discount_source == "referral" and user.discount_eligible and not user.discount_used:
             user.discount_used = True
             user.discount_eligible = False
 
