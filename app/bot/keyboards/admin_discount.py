@@ -10,6 +10,14 @@ def discount_panel_keyboard() -> InlineKeyboardMarkup:
     )
 
 
+def discount_cancel_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="disc:cancel")],
+        ]
+    )
+
+
 def discount_duration_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
@@ -103,6 +111,28 @@ def discount_usage_keyboard() -> InlineKeyboardMarkup:
                 InlineKeyboardButton(text="Bir marta", callback_data="disc:usage:once"),
                 InlineKeyboardButton(text="Takror", callback_data="disc:usage:repeat"),
             ],
+            [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="disc:cancel")],
+        ]
+    )
+
+
+def discount_notify_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Faqat matn", callback_data="disc:notify:text"),
+                InlineKeyboardButton(text="🖼 Foto/video", callback_data="disc:notify:media"),
+            ],
+            [InlineKeyboardButton(text="🚫 Xabar yubormaslik", callback_data="disc:notify:none")],
+            [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="disc:cancel")],
+        ]
+    )
+
+
+def discount_notify_media_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="⏭ Mediasiz davom etish", callback_data="disc:notify_media_skip")],
             [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="disc:cancel")],
         ]
     )

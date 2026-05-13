@@ -55,6 +55,7 @@ _ADMIN_FSM_STATES = {
     DiscountStates.waiting_start_at.state,
     DiscountStates.waiting_repeat_days.state,
     DiscountStates.waiting_quota.state,
+    DiscountStates.waiting_notify_media.state,
 }
 
 

@@ -8,3 +8,4 @@ class DiscountStates(StatesGroup):
     waiting_start_at = State()
     waiting_repeat_days = State()
     waiting_quota = State()
+    waiting_notify_media = State()

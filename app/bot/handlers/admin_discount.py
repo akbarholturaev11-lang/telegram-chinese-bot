@@ -1,19 +1,24 @@
+import asyncio
 from datetime import datetime, timedelta, timezone
+from html import escape
 from typing import Optional
 from zoneinfo import ZoneInfo
 
 from aiogram import F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 from app.config import settings
 from app.bot.fsm.admin_discount import DiscountStates
 from app.bot.keyboards.admin_discount import (
+    discount_cancel_keyboard,
     discount_confirm_keyboard,
     discount_duration_keyboard,
     discount_language_keyboard,
     discount_list_keyboard,
+    discount_notify_keyboard,
+    discount_notify_media_keyboard,
     discount_panel_keyboard,
     discount_payment_method_keyboard,
     discount_plan_keyboard,
@@ -21,16 +26,37 @@ from app.bot.keyboards.admin_discount import (
     discount_status_keyboard,
     discount_usage_keyboard,
 )
+from app.bot.utils.i18n import t
 from app.repositories.discount_campaign_repo import DiscountCampaignRepository
+from app.repositories.user_repo import UserRepository
 
 router = Router()
 
 ADMIN_TZ = ZoneInfo("Asia/Shanghai")
+_PANEL_CHAT_ID = "discount_panel_chat_id"
+_PANEL_MSG_ID = "discount_panel_msg_id"
+
+_LABELS = {
+    "status": {
+        "free": "Bepul",
+        "trial": "Sinov",
+        "active": "Faol",
+        "expired": "Tugagan",
+        "blocked": "Blok",
+    },
+    "language": {"uz": "UZ", "ru": "RU", "tj": "TJ"},
+    "payment": {"visa": "Visa", "alipay": "Alipay", "wechat": "WeChat"},
+    "plan": {"10_days": "10 kun", "1_month": "1 oy"},
+}
 
 
 def _is_admin(user_id: int) -> bool:
     admin_ids = [int(x.strip()) for x in settings.ADMIN_IDS.split(",") if x.strip()]
     return user_id in admin_ids
+
+
+def _admin_ids() -> set[int]:
+    return {int(x.strip()) for x in settings.ADMIN_IDS.split(",") if x.strip()}
 
 
 def _none_if_all(value: Optional[str]) -> Optional[str]:
@@ -41,6 +67,279 @@ def _fmt_filter(value: Optional[str], default: str = "Hamma") -> str:
     return value or default
 
 
+def _label(group: str, value: Optional[str]) -> str:
+    if not value:
+        return "Hamma"
+    return _LABELS.get(group, {}).get(value, value)
+
+
+def _fmt_time(value: Optional[datetime]) -> str:
+    if not value:
+        return "—"
+    return value.astimezone(ADMIN_TZ).strftime("%Y-%m-%d %H:%M")
+
+
+def _fmt_duration(hours: Optional[int]) -> str:
+    if not hours:
+        return "—"
+    if hours % 24 == 0:
+        days = hours // 24
+        return f"{days} kun"
+    return f"{hours} soat"
+
+
+def _fmt_quota(value: Optional[int]) -> str:
+    return str(value) if value else "Limitsiz"
+
+
+def _fmt_repeat(value: Optional[int]) -> str:
+    return f"Har {value} kunda" if value else "Bir marta"
+
+
+def _fmt_notify(data: dict) -> str:
+    if not data.get("notify_enabled"):
+        return "Yuborilmaydi"
+    media_type = data.get("notify_media_type")
+    if media_type == "photo":
+        return "Foto + matn"
+    if media_type == "video":
+        return "Video + matn"
+    return "Faqat matn"
+
+
+def _wizard_text(data: dict, prompt: str, error: Optional[str] = None) -> str:
+    start_at = data.get("starts_at")
+    duration_hours = data.get("duration_hours")
+    ends_at = start_at + timedelta(hours=duration_hours) if start_at and duration_hours else None
+
+    lines = [
+        "🎁 <b>Yangi chegirma sozlash</b>",
+        "",
+        "<blockquote>",
+        f"Nomi: <b>{escape(str(data.get('title') or '—'))}</b>",
+        f"Foiz: <b>{data.get('percent') or '—'}%</b>",
+        f"Davomiylik: <b>{_fmt_duration(duration_hours)}</b>",
+        f"Boshlanish: <b>{_fmt_time(start_at)}</b>",
+        f"Tugash: <b>{_fmt_time(ends_at)}</b>",
+        f"Status: <b>{_label('status', data.get('audience_status'))}</b>",
+        f"Til: <b>{_label('language', data.get('audience_language'))}</b>",
+        f"To'lov turi: <b>{_label('payment', data.get('payment_method'))}</b>",
+        f"Tarif: <b>{_label('plan', data.get('plan_type'))}</b>",
+        f"Limit: <b>{_fmt_quota(data.get('quota_total'))}</b>",
+        f"Qoida: <b>{_fmt_repeat(data.get('repeat_interval_days'))}</b>",
+        f"Xabar: <b>{_fmt_notify(data)}</b>",
+        "</blockquote>",
+        "",
+        f"➡️ <b>{prompt}</b>",
+    ]
+    if error:
+        lines.extend(["", f"⚠️ {escape(error)}"])
+    return "\n".join(lines)
+
+
+def _discount_notify_keyboard(lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("menu_subscription", lang),
+                    callback_data="subscription:open",
+                )
+            ]
+        ]
+    )
+
+
+def _discount_notify_text(data: dict, lang: str) -> str:
+    title = escape(str(data["title"]))
+    start_at = data["starts_at"]
+    ends_at = start_at + timedelta(hours=data["duration_hours"])
+
+    templates = {
+        "tj": {
+            "title": "🎁 <b>Тахфифи нав фаъол шуд!</b>",
+            "valid": "⏰ Амал мекунад: <b>{start}</b> то <b>{end}</b>",
+            "method": "💳 Намуди пардохт: <b>{method}</b>",
+            "plan": "📦 Тариф: <b>{plan}</b>",
+            "quota": "👥 Лимит: <b>{quota}</b>",
+            "repeat": "🔁 Қоида: <b>{repeat}</b>",
+            "cta": "Барои обуна шудан тугмаи поёнро пахш кунед.",
+            "all": "Ҳама",
+            "unlimited": "бе маҳдудият",
+            "once": "як маротиба",
+            "repeat_days": "ҳар {days} рӯз",
+            "plans": {"10_days": "10 рӯз", "1_month": "1 моҳ"},
+        },
+        "ru": {
+            "title": "🎁 <b>Новая скидка активна!</b>",
+            "valid": "⏰ Действует: с <b>{start}</b> до <b>{end}</b>",
+            "method": "💳 Тип оплаты: <b>{method}</b>",
+            "plan": "📦 Тариф: <b>{plan}</b>",
+            "quota": "👥 Лимит: <b>{quota}</b>",
+            "repeat": "🔁 Правило: <b>{repeat}</b>",
+            "cta": "Чтобы оформить подписку, нажмите кнопку ниже.",
+            "all": "Все",
+            "unlimited": "без лимита",
+            "once": "один раз",
+            "repeat_days": "каждые {days} дней",
+            "plans": {"10_days": "10 дней", "1_month": "1 месяц"},
+        },
+        "uz": {
+            "title": "🎁 <b>Yangi chegirma ochildi!</b>",
+            "valid": "⏰ Amal qiladi: <b>{start}</b> dan <b>{end}</b> gacha",
+            "method": "💳 To'lov turi: <b>{method}</b>",
+            "plan": "📦 Tarif: <b>{plan}</b>",
+            "quota": "👥 Limit: <b>{quota}</b>",
+            "repeat": "🔁 Qoida: <b>{repeat}</b>",
+            "cta": "Obuna olish uchun pastdagi tugmani bosing.",
+            "all": "Hamma",
+            "unlimited": "limitsiz",
+            "once": "bir marta",
+            "repeat_days": "har {days} kunda",
+            "plans": {"10_days": "10 kun", "1_month": "1 oy"},
+        },
+    }
+    ui = templates.get(lang, templates["uz"])
+    method = _LABELS["payment"].get(data.get("payment_method"), ui["all"])
+    plan = ui["plans"].get(data.get("plan_type"), ui["all"])
+    quota = str(data["quota_total"]) if data.get("quota_total") else ui["unlimited"]
+    repeat = (
+        ui["repeat_days"].format(days=data["repeat_interval_days"])
+        if data.get("repeat_interval_days")
+        else ui["once"]
+    )
+    return "\n".join(
+        [
+            ui["title"],
+            "",
+            f"<b>{title}</b> — <b>{data['percent']}%</b>",
+            ui["valid"].format(start=_fmt_time(start_at), end=_fmt_time(ends_at)),
+            ui["method"].format(method=method),
+            ui["plan"].format(plan=plan),
+            ui["quota"].format(quota=quota),
+            ui["repeat"].format(repeat=repeat),
+            "",
+            ui["cta"],
+        ]
+    )
+
+
+async def _remember_panel(state: FSMContext, callback: CallbackQuery) -> None:
+    await state.update_data(
+        **{
+            _PANEL_CHAT_ID: callback.message.chat.id,
+            _PANEL_MSG_ID: callback.message.message_id,
+        }
+    )
+
+
+async def _edit_callback_panel(
+    callback: CallbackQuery,
+    state: FSMContext,
+    text: str,
+    reply_markup=None,
+) -> None:
+    await _remember_panel(state, callback)
+    try:
+        await callback.message.edit_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode="HTML",
+            disable_web_page_preview=True,
+        )
+    except Exception:
+        pass
+
+
+async def _edit_stored_panel(
+    message: Message,
+    state: FSMContext,
+    text: str,
+    reply_markup=None,
+) -> None:
+    data = await state.get_data()
+    chat_id = data.get(_PANEL_CHAT_ID)
+    message_id = data.get(_PANEL_MSG_ID)
+    if chat_id and message_id:
+        try:
+            await message.bot.edit_message_text(
+                text=text,
+                chat_id=chat_id,
+                message_id=message_id,
+                reply_markup=reply_markup,
+                parse_mode="HTML",
+                disable_web_page_preview=True,
+            )
+            return
+        except Exception:
+            pass
+
+    sent = await message.answer(
+        text,
+        reply_markup=reply_markup,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+    await state.update_data(**{_PANEL_CHAT_ID: sent.chat.id, _PANEL_MSG_ID: sent.message_id})
+
+
+async def _delete_admin_input(message: Message) -> None:
+    try:
+        await message.delete()
+    except Exception:
+        pass
+
+
+async def _notify_discount_users(callback: CallbackQuery, session, data: dict) -> tuple[int, int, int]:
+    user_repo = UserRepository(session)
+    users = await user_repo.get_filtered_users(
+        language=data.get("audience_language"),
+        status=data.get("audience_status"),
+        level=data.get("audience_level"),
+    )
+
+    sent_count = 0
+    failed_count = 0
+    admin_ids = _admin_ids()
+
+    for user in users:
+        if user.telegram_id in admin_ids:
+            continue
+        lang = user.language or "uz"
+        text = _discount_notify_text(data, lang)
+        try:
+            if data.get("notify_media_type") == "photo" and data.get("notify_media_file_id"):
+                await callback.bot.send_photo(
+                    chat_id=user.telegram_id,
+                    photo=data["notify_media_file_id"],
+                    caption=text,
+                    reply_markup=_discount_notify_keyboard(lang),
+                    parse_mode="HTML",
+                )
+            elif data.get("notify_media_type") == "video" and data.get("notify_media_file_id"):
+                await callback.bot.send_video(
+                    chat_id=user.telegram_id,
+                    video=data["notify_media_file_id"],
+                    caption=text,
+                    reply_markup=_discount_notify_keyboard(lang),
+                    parse_mode="HTML",
+                )
+            else:
+                await callback.bot.send_message(
+                    chat_id=user.telegram_id,
+                    text=text,
+                    reply_markup=_discount_notify_keyboard(lang),
+                    parse_mode="HTML",
+                    disable_web_page_preview=True,
+                )
+            sent_count += 1
+        except Exception:
+            failed_count += 1
+        await asyncio.sleep(0.05)
+
+    return len([user for user in users if user.telegram_id not in admin_ids]), sent_count, failed_count
+
+
 def _preview(data: dict) -> str:
     start_at = data["starts_at"]
     ends_at = start_at + timedelta(hours=data["duration_hours"])
@@ -49,7 +348,7 @@ def _preview(data: dict) -> str:
     usage = f"har {repeat} kunda" if repeat else "bir marta"
     return (
         "🎁 <b>Chegirma tasdiqlash</b>\n\n"
-        f"Nomi: <b>{data['title']}</b>\n"
+        f"Nomi: <b>{escape(str(data['title']))}</b>\n"
         f"Foiz: <b>{data['percent']}%</b>\n"
         f"Muddat: <b>{start_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}</b> dan "
         f"<b>{ends_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}</b> gacha\n"
@@ -58,7 +357,8 @@ def _preview(data: dict) -> str:
         f"To'lov: <b>{_fmt_filter(data.get('payment_method'))}</b>, "
         f"tarif=<b>{_fmt_filter(data.get('plan_type'))}</b>\n"
         f"Limit: <b>{quota}</b>\n"
-        f"Qoida: <b>{usage}</b>\n\n"
+        f"Qoida: <b>{usage}</b>\n"
+        f"Userlarga xabar: <b>{_fmt_notify(data)}</b>\n\n"
         "Tasdiqlaysizmi?"
     )
 
@@ -70,12 +370,23 @@ async def admin_discount_panel(callback: CallbackQuery, state: FSMContext):
         return
     await state.clear()
     await callback.answer()
-    await callback.message.answer(
+    text = (
         "🎁 <b>Chegirma boshqaruvi</b>\n\n"
-        "Admin kampaniya ochadi, checkoutda avtomatik narx tushadi va payment review'da manbasi ko'rinadi.",
-        reply_markup=discount_panel_keyboard(),
-        parse_mode="HTML",
+        "Admin kampaniya ochadi, checkoutda avtomatik narx tushadi va payment review'da manbasi ko'rinadi."
     )
+    try:
+        sent = await callback.message.edit_text(
+            text,
+            reply_markup=discount_panel_keyboard(),
+            parse_mode="HTML",
+        )
+    except Exception:
+        sent = await callback.message.answer(
+            text,
+            reply_markup=discount_panel_keyboard(),
+            parse_mode="HTML",
+        )
+    await state.update_data(**{_PANEL_CHAT_ID: sent.chat.id, _PANEL_MSG_ID: sent.message_id})
 
 
 @router.callback_query(F.data == "disc:new")
@@ -86,7 +397,12 @@ async def discount_new(callback: CallbackQuery, state: FSMContext):
     await state.clear()
     await state.set_state(DiscountStates.waiting_title)
     await callback.answer()
-    await callback.message.answer("Chegirma nomini yozing. Masalan: <b>May 20%</b>", parse_mode="HTML")
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text({}, "Chegirma nomini yozing. Masalan: May 20%"),
+        discount_cancel_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_title))
@@ -95,11 +411,25 @@ async def discount_title(message: Message, state: FSMContext):
         return
     title = (message.text or "").strip()
     if len(title) < 2:
-        await message.answer("Nomi juda qisqa. Qayta yozing.")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Chegirma nomini yozing. Masalan: May 20%", "Nomi juda qisqa. Qayta yozing."),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(title=title[:120])
     await state.set_state(DiscountStates.waiting_percent)
-    await message.answer("Chegirma foizini yozing. Masalan: <b>20</b>", parse_mode="HTML")
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Chegirma foizini yozing. Masalan: 20"),
+        discount_cancel_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_percent))
@@ -109,14 +439,35 @@ async def discount_percent(message: Message, state: FSMContext):
     try:
         percent = int((message.text or "").strip())
     except ValueError:
-        await message.answer("Foiz raqam bo'lishi kerak. Masalan: 20")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Chegirma foizini yozing. Masalan: 20", "Foiz raqam bo'lishi kerak."),
+            discount_cancel_keyboard(),
+        )
         return
     if percent < 1 or percent > 90:
-        await message.answer("Foiz 1 dan 90 gacha bo'lsin.")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Chegirma foizini yozing. Masalan: 20", "Foiz 1 dan 90 gacha bo'lsin."),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(percent=percent)
     await state.set_state(None)
-    await message.answer("Chegirma qancha davom etadi?", reply_markup=discount_duration_keyboard())
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Chegirma qancha davom etadi?"),
+        discount_duration_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:duration:"))
@@ -128,10 +479,22 @@ async def discount_duration(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     if value == "custom":
         await state.set_state(DiscountStates.waiting_custom_duration)
-        await callback.message.answer("Davomiylikni soatda yozing. Masalan: <b>48</b>", parse_mode="HTML")
+        data = await state.get_data()
+        await _edit_callback_panel(
+            callback,
+            state,
+            _wizard_text(data, "Davomiylikni soatda yozing. Masalan: 48"),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(duration_hours=int(value))
-    await callback.message.answer("Kimlarga beriladi? Status tanlang:", reply_markup=discount_status_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Kimlarga beriladi? Status tanlang"),
+        discount_status_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_custom_duration))
@@ -141,14 +504,35 @@ async def discount_custom_duration(message: Message, state: FSMContext):
     try:
         hours = int((message.text or "").strip())
     except ValueError:
-        await message.answer("Soat raqam bo'lishi kerak. Masalan: 48")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Davomiylikni soatda yozing. Masalan: 48", "Soat raqam bo'lishi kerak."),
+            discount_cancel_keyboard(),
+        )
         return
     if hours < 1 or hours > 24 * 365:
-        await message.answer("Muddat 1 soatdan 365 kungacha bo'lsin.")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Davomiylikni soatda yozing. Masalan: 48", "Muddat 1 soatdan 365 kungacha bo'lsin."),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(duration_hours=hours)
     await state.set_state(None)
-    await message.answer("Kimlarga beriladi? Status tanlang:", reply_markup=discount_status_keyboard())
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Kimlarga beriladi? Status tanlang"),
+        discount_status_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:status:"))
@@ -158,7 +542,13 @@ async def discount_status(callback: CallbackQuery, state: FSMContext):
         return
     await state.update_data(audience_status=_none_if_all(callback.data.split(":")[2]))
     await callback.answer()
-    await callback.message.answer("Qaysi til segmentiga?", reply_markup=discount_language_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Qaysi til segmentiga?"),
+        discount_language_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:lang:"))
@@ -168,7 +558,13 @@ async def discount_language(callback: CallbackQuery, state: FSMContext):
         return
     await state.update_data(audience_language=_none_if_all(callback.data.split(":")[2]))
     await callback.answer()
-    await callback.message.answer("Qaysi to'lov turiga?", reply_markup=discount_payment_method_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Qaysi to'lov turiga?"),
+        discount_payment_method_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:method:"))
@@ -178,7 +574,13 @@ async def discount_payment_method(callback: CallbackQuery, state: FSMContext):
         return
     await state.update_data(payment_method=_none_if_all(callback.data.split(":")[2]))
     await callback.answer()
-    await callback.message.answer("Qaysi tarifga?", reply_markup=discount_plan_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Qaysi tarifga?"),
+        discount_plan_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:plan:"))
@@ -188,7 +590,13 @@ async def discount_plan(callback: CallbackQuery, state: FSMContext):
         return
     await state.update_data(plan_type=_none_if_all(callback.data.split(":")[2]))
     await callback.answer()
-    await callback.message.answer("Qachon ishga tushsin?", reply_markup=discount_start_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Qachon ishga tushsin?"),
+        discount_start_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:start:"))
@@ -200,14 +608,22 @@ async def discount_start(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     if mode == "scheduled":
         await state.set_state(DiscountStates.waiting_start_at)
-        await callback.message.answer(
-            "Boshlanish vaqtini yozing: <code>YYYY-MM-DD HH:MM</code>\n"
-            "Vaqt zonasi: Asia/Shanghai",
-            parse_mode="HTML",
+        data = await state.get_data()
+        await _edit_callback_panel(
+            callback,
+            state,
+            _wizard_text(data, "Boshlanish vaqtini yozing: YYYY-MM-DD HH:MM. Vaqt zonasi: Asia/Shanghai"),
+            discount_cancel_keyboard(),
         )
         return
     await state.update_data(starts_at=datetime.now(timezone.utc))
-    await callback.message.answer("Bir martami yoki takrorlanadimi?", reply_markup=discount_usage_keyboard())
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Bir martami yoki takrorlanadimi?"),
+        discount_usage_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_start_at))
@@ -218,11 +634,29 @@ async def discount_start_at(message: Message, state: FSMContext):
     try:
         local_dt = datetime.strptime(raw, "%Y-%m-%d %H:%M").replace(tzinfo=ADMIN_TZ)
     except ValueError:
-        await message.answer("Format noto'g'ri. Masalan: <code>2026-05-13 21:30</code>", parse_mode="HTML")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(
+                data,
+                "Boshlanish vaqtini yozing: YYYY-MM-DD HH:MM. Vaqt zonasi: Asia/Shanghai",
+                "Format noto'g'ri. Masalan: 2026-05-13 21:30",
+            ),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(starts_at=local_dt.astimezone(timezone.utc))
     await state.set_state(None)
-    await message.answer("Bir martami yoki takrorlanadimi?", reply_markup=discount_usage_keyboard())
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Bir martami yoki takrorlanadimi?"),
+        discount_usage_keyboard(),
+    )
 
 
 @router.callback_query(F.data.startswith("disc:usage:"))
@@ -234,11 +668,23 @@ async def discount_usage(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
     if value == "repeat":
         await state.set_state(DiscountStates.waiting_repeat_days)
-        await callback.message.answer("Necha kunda qayta olish mumkin? Masalan: <b>7</b>", parse_mode="HTML")
+        data = await state.get_data()
+        await _edit_callback_panel(
+            callback,
+            state,
+            _wizard_text(data, "Necha kunda qayta olish mumkin? Masalan: 7"),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(repeat_interval_days=None)
     await state.set_state(DiscountStates.waiting_quota)
-    await callback.message.answer("Limit nechta user? 0 yozsangiz limitsiz. Masalan: <b>20</b>", parse_mode="HTML")
+    data = await state.get_data()
+    await _edit_callback_panel(
+        callback,
+        state,
+        _wizard_text(data, "Limit nechta user? 0 yozsangiz limitsiz. Masalan: 20"),
+        discount_cancel_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_repeat_days))
@@ -248,14 +694,35 @@ async def discount_repeat_days(message: Message, state: FSMContext):
     try:
         days = int((message.text or "").strip())
     except ValueError:
-        await message.answer("Kun raqam bo'lishi kerak. Masalan: 7")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Necha kunda qayta olish mumkin? Masalan: 7", "Kun raqam bo'lishi kerak."),
+            discount_cancel_keyboard(),
+        )
         return
     if days < 1 or days > 365:
-        await message.answer("Takror oralig'i 1-365 kun bo'lsin.")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Necha kunda qayta olish mumkin? Masalan: 7", "Takror oralig'i 1-365 kun bo'lsin."),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(repeat_interval_days=days)
     await state.set_state(DiscountStates.waiting_quota)
-    await message.answer("Limit nechta user? 0 yozsangiz limitsiz. Masalan: <b>20</b>", parse_mode="HTML")
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Limit nechta user? 0 yozsangiz limitsiz. Masalan: 20"),
+        discount_cancel_keyboard(),
+    )
 
 
 @router.message(StateFilter(DiscountStates.waiting_quota))
@@ -265,15 +732,131 @@ async def discount_quota(message: Message, state: FSMContext):
     try:
         quota = int((message.text or "").strip())
     except ValueError:
-        await message.answer("Limit raqam bo'lishi kerak. Masalan: 20 yoki 0")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Limit nechta user? 0 yozsangiz limitsiz. Masalan: 20", "Limit raqam bo'lishi kerak."),
+            discount_cancel_keyboard(),
+        )
         return
     if quota < 0:
-        await message.answer("Limit manfiy bo'lmaydi.")
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(data, "Limit nechta user? 0 yozsangiz limitsiz. Masalan: 20", "Limit manfiy bo'lmaydi."),
+            discount_cancel_keyboard(),
+        )
         return
     await state.update_data(quota_total=quota or None)
     data = await state.get_data()
     await state.set_state(None)
-    await message.answer(_preview(data), reply_markup=discount_confirm_keyboard(), parse_mode="HTML")
+    await _delete_admin_input(message)
+    await _edit_stored_panel(
+        message,
+        state,
+        _wizard_text(data, "Chegirma xabari userlarga yuborilsinmi?"),
+        discount_notify_keyboard(),
+    )
+
+
+@router.callback_query(F.data.startswith("disc:notify:"))
+async def discount_notify_choice(callback: CallbackQuery, state: FSMContext):
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+
+    value = callback.data.split(":")[2]
+    await callback.answer()
+
+    if value == "none":
+        await state.update_data(
+            notify_enabled=False,
+            notify_media_type=None,
+            notify_media_file_id=None,
+        )
+        data = await state.get_data()
+        await _edit_callback_panel(callback, state, _preview(data), discount_confirm_keyboard())
+        return
+
+    if value == "media":
+        await state.update_data(notify_enabled=True)
+        await state.set_state(DiscountStates.waiting_notify_media)
+        data = await state.get_data()
+        await _edit_callback_panel(
+            callback,
+            state,
+            _wizard_text(data, "Foto yoki video yuboring. Kerak bo'lmasa mediasiz davom eting."),
+            discount_notify_media_keyboard(),
+        )
+        return
+
+    await state.update_data(
+        notify_enabled=True,
+        notify_media_type=None,
+        notify_media_file_id=None,
+    )
+    data = await state.get_data()
+    await _edit_callback_panel(callback, state, _preview(data), discount_confirm_keyboard())
+
+
+@router.callback_query(F.data == "disc:notify_media_skip")
+async def discount_notify_media_skip(callback: CallbackQuery, state: FSMContext):
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+    await state.update_data(
+        notify_enabled=True,
+        notify_media_type=None,
+        notify_media_file_id=None,
+    )
+    await state.set_state(None)
+    data = await state.get_data()
+    await callback.answer()
+    await _edit_callback_panel(callback, state, _preview(data), discount_confirm_keyboard())
+
+
+@router.message(StateFilter(DiscountStates.waiting_notify_media))
+async def discount_notify_media(message: Message, state: FSMContext):
+    if not _is_admin(message.from_user.id):
+        return
+
+    media_type = None
+    media_file_id = None
+    if message.photo:
+        media_type = "photo"
+        media_file_id = message.photo[-1].file_id
+    elif message.video:
+        media_type = "video"
+        media_file_id = message.video.file_id
+
+    if not media_file_id:
+        data = await state.get_data()
+        await _delete_admin_input(message)
+        await _edit_stored_panel(
+            message,
+            state,
+            _wizard_text(
+                data,
+                "Foto yoki video yuboring. Kerak bo'lmasa mediasiz davom eting.",
+                "Faqat foto yoki video qabul qilinadi.",
+            ),
+            discount_notify_media_keyboard(),
+        )
+        return
+
+    await state.update_data(
+        notify_enabled=True,
+        notify_media_type=media_type,
+        notify_media_file_id=media_file_id,
+    )
+    await state.set_state(None)
+    data = await state.get_data()
+    await _delete_admin_input(message)
+    await _edit_stored_panel(message, state, _preview(data), discount_confirm_keyboard())
 
 
 @router.callback_query(F.data == "disc:confirm")
@@ -303,12 +886,28 @@ async def discount_confirm(callback: CallbackQuery, state: FSMContext, session):
         repeat_interval_days=data.get("repeat_interval_days"),
         created_by_telegram_id=callback.from_user.id,
     )
+    campaign_id = campaign.id
     await session.commit()
-    await state.clear()
     await callback.answer("Chegirma saqlandi", show_alert=True)
+
+    notify_total = sent_count = failed_count = 0
+    if data.get("notify_enabled"):
+        await callback.message.edit_text(
+            f"✅ Chegirma #{campaign_id} saqlandi.\n"
+            f"⏳ Xabar userlarga yuborilmoqda...",
+            reply_markup=None,
+        )
+        notify_total, sent_count, failed_count = await _notify_discount_users(callback, session, data)
+
+    await state.clear()
+    notify_line = "📣 Userlarga xabar: yuborilmadi"
+    if data.get("notify_enabled"):
+        notify_line = f"📣 Userlarga xabar: {sent_count}/{notify_total} yuborildi, xato: {failed_count}"
+
     await callback.message.edit_text(
-        f"✅ Chegirma #{campaign.id} saqlandi.\n"
-        f"Ishga tushish: {starts_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}",
+        f"✅ Chegirma #{campaign_id} saqlandi.\n"
+        f"Ishga tushish: {starts_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}\n"
+        f"{notify_line}",
         reply_markup=None,
     )
 
@@ -322,7 +921,10 @@ async def discount_list(callback: CallbackQuery, session):
     campaigns = await repo.list_recent(10)
     if not campaigns:
         await callback.answer()
-        await callback.message.answer("Hozircha chegirma kampaniyasi yo'q.", reply_markup=discount_panel_keyboard())
+        await callback.message.edit_text(
+            "Hozircha chegirma kampaniyasi yo'q.",
+            reply_markup=discount_panel_keyboard(),
+        )
         return
 
     lines = ["📋 <b>Oxirgi chegirmalar</b>\n"]
@@ -332,10 +934,10 @@ async def discount_list(callback: CallbackQuery, session):
         used = await repo.count_used(item.id)
         quota = item.quota_total or "∞"
         lines.append(
-            f"#{item.id} {item.title} — {item.percent}% | {status} | {used}/{quota}"
+            f"#{item.id} {escape(str(item.title))} — {item.percent}% | {status} | {used}/{quota}"
         )
     await callback.answer()
-    await callback.message.answer(
+    await callback.message.edit_text(
         "\n".join(lines),
         reply_markup=discount_list_keyboard(campaigns),
         parse_mode="HTML",
@@ -356,7 +958,10 @@ async def discount_disable(callback: CallbackQuery, session):
     await repo.deactivate(campaign)
     await session.commit()
     await callback.answer("O'chirildi", show_alert=True)
-    await callback.message.answer(f"⛔ Chegirma #{campaign_id} o'chirildi.")
+    await callback.message.edit_text(
+        f"⛔ Chegirma #{campaign_id} o'chirildi.",
+        reply_markup=discount_panel_keyboard(),
+    )
 
 
 @router.callback_query(F.data == "disc:cancel")
@@ -366,4 +971,7 @@ async def discount_cancel(callback: CallbackQuery, state: FSMContext):
         return
     await state.clear()
     await callback.answer()
-    await callback.message.answer("❌ Chegirma yaratish bekor qilindi.", reply_markup=discount_panel_keyboard())
+    await callback.message.edit_text(
+        "❌ Chegirma yaratish bekor qilindi.",
+        reply_markup=discount_panel_keyboard(),
+    )
