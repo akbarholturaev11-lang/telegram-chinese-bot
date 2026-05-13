@@ -2,6 +2,7 @@ from typing import Optional
 
 from app.repositories.payment_repo import PaymentRepository
 from app.repositories.user_repo import UserRepository
+from app.services.discount_service import DiscountService
 
 
 PLAN_PRICES = {
@@ -25,6 +26,10 @@ class PaymentService:
         discounted = amount * (100 - DISCOUNT_PERCENT) / 100
         return int(round(discounted))
 
+    def calculate_percent_discounted_price(self, amount: int, percent: int) -> int:
+        discounted = amount * (100 - percent) / 100
+        return int(round(discounted))
+
     async def get_checkout_info(
         self,
         user,
@@ -33,8 +38,6 @@ class PaymentService:
         base_amount = self.get_plan_price(plan_type)
         if base_amount is None:
             return None
-
-        discount_applied = bool(user.discount_eligible and not user.discount_used)
 
         if user.payment_method in ["alipay", "wechat"]:
             if plan_type == "10_days":
@@ -51,11 +54,13 @@ class PaymentService:
 
             currency = "somoni"
 
-        final_amount = (
-            self.calculate_discounted_price(base_amount)
-            if discount_applied
-            else base_amount
+        discount = await DiscountService(self.session).get_best_discount(
+            user=user,
+            plan_type=plan_type,
+            payment_method=user.payment_method,
         )
+        discount_applied = discount.percent > 0
+        final_amount = self.calculate_percent_discounted_price(base_amount, discount.percent) if discount_applied else base_amount
 
         return {
             "plan_type": plan_type,
@@ -63,7 +68,64 @@ class PaymentService:
             "final_amount": final_amount,
             "currency": currency,
             "discount_applied": discount_applied,
+            "discount_percent": discount.percent,
+            "discount_source": discount.source,
+            "discount_campaign_id": discount.campaign_id,
+            "discount_title": discount.title,
+            "discount_details": discount.details,
         }
+
+    async def create_checkout_draft(
+        self,
+        telegram_id: int,
+        plan_type: str,
+    ):
+        user = await self.user_repo.get_by_telegram_id(telegram_id)
+        if not user:
+            return None, None, "access_start_first"
+
+        checkout_info = await self.get_checkout_info(
+            user=user,
+            plan_type=plan_type,
+        )
+        if not checkout_info:
+            return None, None, "payment_invalid_plan"
+
+        draft = await self.payment_repo.get_latest_draft_by_user(telegram_id)
+        if draft:
+            await self.payment_repo.update_checkout(
+                draft,
+                plan_type=plan_type,
+                amount=checkout_info["final_amount"],
+                currency=checkout_info["currency"],
+                payment_method=user.payment_method,
+                base_amount=checkout_info["base_amount"],
+                payment_status="draft",
+                discount_source=checkout_info["discount_source"],
+                discount_percent=checkout_info["discount_percent"],
+                discount_campaign_id=checkout_info["discount_campaign_id"],
+                discount_title=checkout_info["discount_title"],
+                discount_details=checkout_info["discount_details"],
+            )
+            await self.session.commit()
+            return draft, checkout_info, ""
+
+        payment = await self.payment_repo.create(
+            user_telegram_id=telegram_id,
+            plan_type=plan_type,
+            amount=checkout_info["final_amount"],
+            currency=checkout_info["currency"],
+            payment_status="draft",
+            payment_method=user.payment_method,
+            base_amount=checkout_info["base_amount"],
+            discount_source=checkout_info["discount_source"],
+            discount_percent=checkout_info["discount_percent"],
+            discount_campaign_id=checkout_info["discount_campaign_id"],
+            discount_title=checkout_info["discount_title"],
+            discount_details=checkout_info["discount_details"],
+        )
+        await self.session.commit()
+        return payment, checkout_info, ""
 
     async def create_pending_payment(
         self,
@@ -88,6 +150,14 @@ class PaymentService:
             amount=checkout_info["final_amount"],
             currency=checkout_info["currency"],
             screenshot_file_id=screenshot_file_id,
+            payment_status="pending",
+            payment_method=user.payment_method,
+            base_amount=checkout_info["base_amount"],
+            discount_source=checkout_info["discount_source"],
+            discount_percent=checkout_info["discount_percent"],
+            discount_campaign_id=checkout_info["discount_campaign_id"],
+            discount_title=checkout_info["discount_title"],
+            discount_details=checkout_info["discount_details"],
         )
         await self.session.commit()
         return payment, ""
@@ -104,8 +174,35 @@ class PaymentService:
         plan_type: str,
         screenshot_file_id: str,
     ):
-        pending_payment = await self.payment_repo.get_latest_pending_by_user(telegram_id)
+        draft_payment = await self.payment_repo.get_latest_draft_by_user(telegram_id)
 
+        if draft_payment:
+            if draft_payment.plan_type != plan_type:
+                user = await self.user_repo.get_by_telegram_id(telegram_id)
+                checkout_info = await self.get_checkout_info(user=user, plan_type=plan_type)
+                if not checkout_info:
+                    return None, "payment_invalid_plan"
+                await self.payment_repo.update_checkout(
+                    draft_payment,
+                    plan_type=plan_type,
+                    amount=checkout_info["final_amount"],
+                    currency=checkout_info["currency"],
+                    payment_method=user.payment_method,
+                    base_amount=checkout_info["base_amount"],
+                    payment_status="pending",
+                    screenshot_file_id=screenshot_file_id,
+                    discount_source=checkout_info["discount_source"],
+                    discount_percent=checkout_info["discount_percent"],
+                    discount_campaign_id=checkout_info["discount_campaign_id"],
+                    discount_title=checkout_info["discount_title"],
+                    discount_details=checkout_info["discount_details"],
+                )
+            else:
+                await self.payment_repo.update_screenshot(draft_payment, screenshot_file_id)
+            await self.session.commit()
+            return draft_payment, "updated"
+
+        pending_payment = await self.payment_repo.get_latest_pending_by_user(telegram_id)
         if pending_payment:
             await self.payment_repo.update_screenshot(pending_payment, screenshot_file_id)
             await self.session.commit()

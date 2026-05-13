@@ -40,6 +40,7 @@ async def admin_payment_approve_handler(callback: CallbackQuery, session):
     await subscription_service.activate_plan(
         telegram_id=payment.user_telegram_id,
         plan_type=payment.plan_type,
+        discount_source=payment.discount_source,
     )
 
     user = await user_repo.get_by_telegram_id(payment.user_telegram_id)

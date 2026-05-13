@@ -30,6 +30,8 @@ QR_PHOTO_PATHS = {
     "wechat_10_days_discount": str(_STATIC_PAYMENTS / "wechat_10_days_discount.jpg"),
     "wechat_1_month":          str(_STATIC_PAYMENTS / "wechat_1_month.jpg"),
     "wechat_1_month_discount": str(_STATIC_PAYMENTS / "wechat_1_month_discount.jpg"),
+    "alipay_admin_discount":    str(_STATIC_PAYMENTS / "alipay_admin_discount.jpg"),
+    "wechat_admin_discount":    str(_STATIC_PAYMENTS / "wechat_admin_discount.jpg"),
 }
 
 
@@ -139,7 +141,8 @@ def build_checkout_text(lang: str, checkout_info: dict) -> str:
 
     if discount_applied:
         lines.append(f"{t('subscription_original_price_label', lang)}: {base_amount} {currency}")
-        lines.append(f"💎 {t('subscription_discounted_price_label', lang)}: {final_amount} {currency}")
+        percent = checkout_info.get("discount_percent", 20)
+        lines.append(f"💎 {t('subscription_discounted_price_label', lang)}: {final_amount} {currency} (-{percent}%)")
     else:
         lines.append(f"{t('subscription_price_label', lang)}: {final_amount} {currency}")
 
@@ -373,9 +376,14 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
     plan = callback.data.split(":")[-1]
 
     payment_service = PaymentService(session)
-    checkout_info = await payment_service.get_checkout_info(user, plan)
+    payment, checkout_info, error_key = await payment_service.create_checkout_draft(
+        telegram_id=callback.from_user.id,
+        plan_type=plan,
+    )
 
-    if not checkout_info:
+    if not payment or not checkout_info:
+        if error_key:
+            await callback.message.answer(t(error_key, lang))
         return
 
     await user_repo.set_selected_plan_type(user, plan)
@@ -388,9 +396,12 @@ async def subscription_plan_handler(callback: CallbackQuery, session):
 
     if checkout_info["currency"] == "¥":
         # Send QR photo for Alipay / WeChat — pick correct image by method + plan + discount
-        qr_key = f"{user.payment_method}_{plan}"
-        if checkout_info.get("discount_applied"):
-            qr_key += "_discount"
+        if checkout_info.get("discount_source") == "admin_campaign":
+            qr_key = f"{user.payment_method}_admin_discount"
+        else:
+            qr_key = f"{user.payment_method}_{plan}"
+            if checkout_info.get("discount_applied"):
+                qr_key += "_discount"
         photo_path = QR_PHOTO_PATHS.get(qr_key)
         if photo_path:
             photo = FSInputFile(photo_path)

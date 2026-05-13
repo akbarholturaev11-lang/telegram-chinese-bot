@@ -86,6 +86,7 @@ async def _redraw_panel(callback: CallbackQuery, data: dict) -> None:
     discount_filter = data.get("discount_filter")
     course_promo_filter = data.get("course_promo_filter")
     activity_filter = data.get("activity_filter")
+    section = data.get("bc_section", "main")
     try:
         await callback.message.edit_text(
             _panel_text(
@@ -111,6 +112,7 @@ async def _redraw_panel(callback: CallbackQuery, data: dict) -> None:
                 discount_filter,
                 course_promo_filter,
                 activity_filter,
+                section,
             ),
             parse_mode="HTML",
         )
@@ -137,17 +139,30 @@ async def broadcast_command(message: Message, state: FSMContext):
         discount_filter=None,
         course_promo_filter=None,
         activity_filter=None,
+        bc_section="main",
     )
 
     sent = await message.answer(
         _panel_text(None, None, None),
-        reply_markup=broadcast_panel_keyboard(None, None, None),
+        reply_markup=broadcast_panel_keyboard(None, None, None, section="main"),
         parse_mode="HTML",
     )
     await state.update_data(panel_msg_id=sent.message_id, panel_chat_id=sent.chat.id)
 
 
 # ── Filter toggles ───────────────────────────────────────────────────────────
+
+@router.callback_query(F.data.startswith("bc:section:"))
+async def bc_section(callback: CallbackQuery, state: FSMContext):
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+    section = callback.data.split(":")[2]
+    data = await state.get_data()
+    data["bc_section"] = section
+    await state.update_data(bc_section=section)
+    await _redraw_panel(callback, data)
+    await callback.answer()
 
 @router.callback_query(F.data.startswith("bc:lang:"))
 async def bc_lang_filter(callback: CallbackQuery, state: FSMContext):
@@ -249,7 +264,12 @@ async def bc_enter_text(callback: CallbackQuery, state: FSMContext):
 
     await state.set_state(BroadcastStates.waiting_for_text)
     await callback.answer()
-    await callback.message.answer("✏️ Xabar matnini yuboring:")
+    await callback.message.answer(
+        "✏️ Xabarni yuboring:\n"
+        "• faqat matn\n"
+        "• foto + caption\n"
+        "• video + caption"
+    )
 
 
 @router.message(BroadcastStates.waiting_for_text)
@@ -257,13 +277,29 @@ async def bc_receive_text(message: Message, state: FSMContext, session):
     if not _is_admin(message.from_user.id):
         return
 
-    text = message.text or message.caption
-    if not text:
-        await message.answer("Faqat matn xabar yuboring.")
+    text = message.text or message.caption or ""
+    content_type = "text"
+    media_file_id = None
+    if message.photo:
+        content_type = "photo"
+        media_file_id = message.photo[-1].file_id
+    elif message.video:
+        content_type = "video"
+        media_file_id = message.video.file_id
+
+    if not text and not media_file_id:
+        await message.answer("Matn, foto yoki video yuboring.")
+        return
+    if content_type in ("photo", "video") and len(text) > 1024:
+        await message.answer("Foto/video caption 1024 belgidan oshmasin.")
         return
 
     await state.set_state(None)
-    await state.update_data(broadcast_text=text)
+    await state.update_data(
+        broadcast_text=text,
+        broadcast_content_type=content_type,
+        broadcast_media_file_id=media_file_id,
+    )
 
     data = await state.get_data()
     user_repo = UserRepository(session)
@@ -281,9 +317,12 @@ async def bc_receive_text(message: Message, state: FSMContext, session):
     )
     count = len(users)
 
-    preview = escape(text[:200] + ("..." if len(text) > 200 else ""))
+    media_label = {"text": "Matn", "photo": "Foto", "video": "Video"}[content_type]
+    preview_source = text if text else f"[{media_label}]"
+    preview = escape(preview_source[:200] + ("..." if len(preview_source) > 200 else ""))
     confirm_text = (
         "📢 <b>Broadcast tasdiqlash</b>\n\n"
+        f"Tur: <b>{media_label}</b>\n"
         f"<blockquote>{preview}</blockquote>\n\n"
         f"👥 Segment: <b>{count} ta user</b>\n"
         "⚠️ Xabar faqat tanlangan filterlarga mos userlarga yuboriladi.\n\n"
@@ -326,10 +365,12 @@ async def bc_confirm(callback: CallbackQuery, state: FSMContext, session):
 
     data = await state.get_data()
     broadcast_text = data.get("broadcast_text", "")
+    content_type = data.get("broadcast_content_type", "text")
+    media_file_id = data.get("broadcast_media_file_id")
     await state.clear()
 
-    if not broadcast_text:
-        await callback.message.edit_text("❌ Xabar matni topilmadi.")
+    if not broadcast_text and not media_file_id:
+        await callback.message.edit_text("❌ Xabar topilmadi.")
         return
 
     user_repo = UserRepository(session)
@@ -355,7 +396,20 @@ async def bc_confirm(callback: CallbackQuery, state: FSMContext, session):
 
     for i, user in enumerate(users, start=1):
         try:
-            await callback.bot.send_message(user.telegram_id, broadcast_text)
+            if content_type == "photo" and media_file_id:
+                await callback.bot.send_photo(
+                    user.telegram_id,
+                    media_file_id,
+                    caption=broadcast_text or None,
+                )
+            elif content_type == "video" and media_file_id:
+                await callback.bot.send_video(
+                    user.telegram_id,
+                    media_file_id,
+                    caption=broadcast_text or None,
+                )
+            else:
+                await callback.bot.send_message(user.telegram_id, broadcast_text)
             sent_count += 1
         except Exception:
             failed_count += 1

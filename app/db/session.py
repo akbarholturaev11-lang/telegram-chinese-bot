@@ -28,6 +28,13 @@ _BOOTSTRAP_COLUMNS: dict[str, dict[str, str]] = {
         "checkout_msg_id": "INTEGER",
         "screenshot_msg_id": "INTEGER",
         "waiting_msg_id": "INTEGER",
+        "payment_method": "VARCHAR(16)",
+        "base_amount": "INTEGER",
+        "discount_source": "VARCHAR(32) DEFAULT 'none' NOT NULL",
+        "discount_percent": "INTEGER DEFAULT 0 NOT NULL",
+        "discount_campaign_id": "INTEGER",
+        "discount_title": "VARCHAR(120)",
+        "discount_details": "TEXT",
     },
 }
 
