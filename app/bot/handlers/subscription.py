@@ -189,6 +189,38 @@ async def build_admin_discount_offer_view(session, user, lang: str) -> tuple[str
     )
 
 
+async def _replace_with_text(
+    callback: CallbackQuery,
+    text: str,
+    reply_markup: InlineKeyboardMarkup | None = None,
+    *,
+    parse_mode: str | None = "HTML",
+    disable_web_page_preview: bool = True,
+) -> None:
+    try:
+        await callback.message.edit_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+            disable_web_page_preview=disable_web_page_preview,
+        )
+        return
+    except Exception:
+        pass
+
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
+
+    await callback.message.answer(
+        text,
+        reply_markup=reply_markup,
+        parse_mode=parse_mode,
+        disable_web_page_preview=disable_web_page_preview,
+    )
+
+
 def build_checkout_text(lang: str, checkout_info: dict) -> str:
     plan_type = checkout_info["plan_type"]
     base_amount = checkout_info["base_amount"]
@@ -269,7 +301,8 @@ async def discount_offer_open_handler(callback: CallbackQuery, session):
     await callback.answer()
 
     if not user.payment_method:
-        await callback.message.edit_text(
+        await _replace_with_text(
+            callback,
             t("subscription_admin_discount_payment_choose", lang),
             reply_markup=discount_payment_method_keyboard(lang),
             parse_mode="HTML",
@@ -282,7 +315,8 @@ async def discount_offer_open_handler(callback: CallbackQuery, session):
         return
 
     text, keyboard = view
-    await callback.message.edit_text(
+    await _replace_with_text(
+        callback,
         text,
         reply_markup=keyboard,
         parse_mode="HTML",
@@ -305,14 +339,16 @@ async def discount_offer_method_handler(callback: CallbackQuery, session):
     view = await build_admin_discount_offer_view(session, user, lang)
     await callback.answer()
     if not view:
-        await callback.message.edit_text(
+        await _replace_with_text(
+            callback,
             t("subscription_admin_discount_expired", lang),
             parse_mode="HTML",
         )
         return
 
     text, keyboard = view
-    await callback.message.edit_text(
+    await _replace_with_text(
+        callback,
         text,
         reply_markup=keyboard,
         parse_mode="HTML",
@@ -328,7 +364,8 @@ async def discount_offer_change_payment_handler(callback: CallbackQuery, session
         return
     lang = user.language or "ru"
     await callback.answer()
-    await callback.message.edit_text(
+    await _replace_with_text(
+        callback,
         t("subscription_admin_discount_payment_choose", lang),
         reply_markup=discount_payment_method_keyboard(lang),
         parse_mode="HTML",
@@ -582,7 +619,8 @@ async def discount_offer_plan_handler(callback: CallbackQuery, session):
 
     lang = user.language or "ru"
     if not user.payment_method:
-        await callback.message.edit_text(
+        await _replace_with_text(
+            callback,
             t("subscription_admin_discount_payment_choose", lang),
             reply_markup=discount_payment_method_keyboard(lang),
             parse_mode="HTML",
