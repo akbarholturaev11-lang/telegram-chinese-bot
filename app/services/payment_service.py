@@ -35,6 +35,7 @@ class PaymentService:
         user,
         plan_type: str,
         force_admin_discount: bool = False,
+        admin_discount_campaign_id: Optional[int] = None,
         force_feedback_discount: bool = False,
         feedback_id: Optional[int] = None,
     ):
@@ -64,17 +65,31 @@ class PaymentService:
                 feedback_id=feedback_id,
             )
         elif force_admin_discount:
-            discount = await discount_service.get_best_admin_discount(
-                user=user,
-                plan_type=plan_type,
-                payment_method=user.payment_method,
-            )
+            if admin_discount_campaign_id:
+                discount = await discount_service.get_campaign_discount(
+                    campaign_id=admin_discount_campaign_id,
+                    user=user,
+                    plan_type=plan_type,
+                    payment_method=user.payment_method,
+                )
+            else:
+                discount = await discount_service.get_best_admin_discount(
+                    user=user,
+                    plan_type=plan_type,
+                    payment_method=user.payment_method,
+                )
         else:
             discount = await discount_service.get_best_discount(
                 user=user,
                 plan_type=plan_type,
                 payment_method=user.payment_method,
             )
+
+        if force_feedback_discount and discount.source != "feedback_price_offer":
+            return None
+        if force_admin_discount and discount.source != "admin_campaign":
+            return None
+
         discount_applied = discount.percent > 0
         final_amount = self.calculate_percent_discounted_price(base_amount, discount.percent) if discount_applied else base_amount
 
@@ -96,6 +111,7 @@ class PaymentService:
         telegram_id: int,
         plan_type: str,
         force_admin_discount: bool = False,
+        admin_discount_campaign_id: Optional[int] = None,
         force_feedback_discount: bool = False,
         feedback_id: Optional[int] = None,
     ):
@@ -107,6 +123,7 @@ class PaymentService:
             user=user,
             plan_type=plan_type,
             force_admin_discount=force_admin_discount,
+            admin_discount_campaign_id=admin_discount_campaign_id,
             force_feedback_discount=force_feedback_discount,
             feedback_id=feedback_id,
         )
@@ -155,6 +172,7 @@ class PaymentService:
         plan_type: str,
         screenshot_file_id: Optional[str] = None,
         force_admin_discount: bool = False,
+        admin_discount_campaign_id: Optional[int] = None,
     ):
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -164,6 +182,7 @@ class PaymentService:
             user=user,
             plan_type=plan_type,
             force_admin_discount=force_admin_discount,
+            admin_discount_campaign_id=admin_discount_campaign_id,
         )
         if not checkout_info:
             return None, "payment_invalid_plan"
@@ -206,6 +225,8 @@ class PaymentService:
                 checkout_info = await self.get_checkout_info(
                     user=user,
                     plan_type=plan_type,
+                    force_admin_discount=draft_payment.discount_source == "admin_campaign",
+                    admin_discount_campaign_id=draft_payment.discount_campaign_id,
                     force_feedback_discount=draft_payment.discount_source == "feedback_price_offer",
                 )
                 if not checkout_info:

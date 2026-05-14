@@ -94,6 +94,27 @@ class DiscountService:
 
         return max(choices, key=lambda item: item.percent)
 
+    async def get_campaign_discount(
+        self,
+        *,
+        campaign_id: int,
+        user,
+        plan_type: str,
+        payment_method: Optional[str],
+    ) -> DiscountChoice:
+        campaign = await self.repo.get_by_id(campaign_id)
+        now = datetime.now(timezone.utc)
+
+        if not campaign or not campaign.is_active:
+            return DiscountChoice()
+        if campaign.starts_at > now or campaign.ends_at <= now:
+            return DiscountChoice()
+        if not self._matches_campaign(campaign, user, plan_type, payment_method):
+            return DiscountChoice()
+
+        choice = await self._campaign_choice(campaign, user, now)
+        return choice or DiscountChoice()
+
     async def get_feedback_price_discount(
         self,
         *,

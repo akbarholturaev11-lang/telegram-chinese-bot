@@ -140,8 +140,8 @@ def _wizard_text(data: dict, prompt: str, error: Optional[str] = None) -> str:
     return "\n".join(lines)
 
 
-def _discount_notify_keyboard(lang: str) -> InlineKeyboardMarkup:
-    return admin_discount_entry_keyboard(lang)
+def _discount_notify_keyboard(lang: str, campaign_id: Optional[int] = None) -> InlineKeyboardMarkup:
+    return admin_discount_entry_keyboard(lang, campaign_id=campaign_id)
 
 
 def _plan_price(plan_type: str, payment_method: Optional[str]) -> tuple[int, str]:
@@ -184,14 +184,6 @@ def _discount_notify_text(data: dict, lang: str, payment_method: Optional[str] =
 
 async def _prepare_title_i18n(data: dict) -> dict:
     title = str(data["title"])[:120]
-    audience_language = data.get("audience_language")
-    if audience_language in ("tj", "ru", "uz"):
-        return {
-            "title_tj": title if audience_language == "tj" else None,
-            "title_ru": title if audience_language == "ru" else None,
-            "title_uz": title if audience_language == "uz" else None,
-        }
-
     translated = await DiscountTranslationService().translate_title(title)
     return {
         "title_tj": translated["tj"],
@@ -266,7 +258,12 @@ async def _delete_admin_input(message: Message) -> None:
         pass
 
 
-async def _notify_discount_users(callback: CallbackQuery, session, data: dict) -> tuple[int, int, int]:
+async def _notify_discount_users(
+    callback: CallbackQuery,
+    session,
+    data: dict,
+    campaign_id: Optional[int] = None,
+) -> tuple[int, int, int]:
     user_repo = UserRepository(session)
     users = await user_repo.get_filtered_users(
         language=data.get("audience_language"),
@@ -289,7 +286,7 @@ async def _notify_discount_users(callback: CallbackQuery, session, data: dict) -
                     chat_id=user.telegram_id,
                     photo=data["notify_media_file_id"],
                     caption=text,
-                    reply_markup=_discount_notify_keyboard(lang),
+                    reply_markup=_discount_notify_keyboard(lang, campaign_id=campaign_id),
                     parse_mode="HTML",
                 )
             elif data.get("notify_media_type") == "video" and data.get("notify_media_file_id"):
@@ -297,14 +294,14 @@ async def _notify_discount_users(callback: CallbackQuery, session, data: dict) -
                     chat_id=user.telegram_id,
                     video=data["notify_media_file_id"],
                     caption=text,
-                    reply_markup=_discount_notify_keyboard(lang),
+                    reply_markup=_discount_notify_keyboard(lang, campaign_id=campaign_id),
                     parse_mode="HTML",
                 )
             else:
                 await callback.bot.send_message(
                     chat_id=user.telegram_id,
                     text=text,
-                    reply_markup=_discount_notify_keyboard(lang),
+                    reply_markup=_discount_notify_keyboard(lang, campaign_id=campaign_id),
                     parse_mode="HTML",
                     disable_web_page_preview=True,
                 )
@@ -880,7 +877,12 @@ async def discount_confirm(callback: CallbackQuery, state: FSMContext, session):
             f"⏳ Xabar userlarga yuborilmoqda...",
             reply_markup=None,
         )
-        notify_total, sent_count, failed_count = await _notify_discount_users(callback, session, data)
+        notify_total, sent_count, failed_count = await _notify_discount_users(
+            callback,
+            session,
+            data,
+            campaign_id=campaign_id,
+        )
 
     await state.clear()
     notify_line = "📣 Userlarga xabar: yuborilmadi"
