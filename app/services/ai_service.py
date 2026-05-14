@@ -228,3 +228,56 @@ class AIService:
             user_level=user_level,
         )
         return result.content
+
+    async def translate_voice_with_usage(
+        self,
+        transcript: str,
+        user_language: str,
+        history: Optional[List[Dict[str, str]]] = None,
+    ) -> AIUsageResult:
+        lang_labels = {
+            "tj": "Tajik",
+            "uz": "Uzbek",
+            "ru": "Russian",
+        }
+        target_lang = lang_labels.get(user_language, "Russian")
+        model = "gpt-4o-mini"
+
+        messages = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a context-aware Chinese conversation interpreter for real-life dialogue. "
+                    f"The user's interface language is {target_lang}. "
+                    "Use recent context to choose the natural meaning, tone, and situation. "
+                    "If the latest transcript is mainly Chinese, reply only with a natural translation in the interface language. "
+                    "Do not repeat the Chinese text, because the app already shows the transcript. "
+                    "If the latest transcript is mainly not Chinese, reply only with a natural Simplified Chinese sentence that fits the context. "
+                    "Do not add explanations, markdown, labels, or alternatives unless the transcript is truly ambiguous."
+                ),
+            }
+        ]
+
+        if history:
+            for msg in history[-6:]:
+                if msg.get("role") in ("user", "assistant"):
+                    messages.append(msg)
+
+        messages.append(
+            {
+                "role": "user",
+                "content": f"Latest transcript:\n{transcript}",
+            }
+        )
+
+        response = await self.client.chat.completions.create(
+            model=model,
+            messages=messages,
+            max_completion_tokens=300,
+        )
+
+        return self._result_from_response(
+            response=response,
+            model=model,
+            content=response.choices[0].message.content or "",
+        )

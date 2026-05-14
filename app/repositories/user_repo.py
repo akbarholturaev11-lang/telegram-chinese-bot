@@ -39,6 +39,7 @@ class UserRepository:
             language=language,
             level=level,
             learning_mode="qa",
+            voice_mode="none",
             status="active",
             payment_status="none",
             question_limit=5,
@@ -60,6 +61,10 @@ class UserRepository:
 
     async def update_last_active(self, user: User) -> None:
         user.last_active_at = datetime.now(timezone.utc)
+        await self.session.flush()
+
+    async def set_voice_mode(self, user: User, mode: str) -> None:
+        user.voice_mode = mode
         await self.session.flush()
 
     async def set_referred_by(

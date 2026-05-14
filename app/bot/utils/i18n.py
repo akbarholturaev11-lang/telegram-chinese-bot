@@ -545,7 +545,18 @@ COURSE_I18N = {
         "voice_status_received": "🎙 Voice қабул шуд...",
         "voice_status_transcribing": "🎧 Матн карда истодаам...",
         "voice_status_understanding": "🧠 Мефаҳмам...",
-        "voice_status_answering": "✍️ Ҷавоб тайёр мешавад..."
+        "voice_status_answering": "✍️ Ҷавоб тайёр мешавад...",
+        "voice_mode_choose": "Ин voice-ро чӣ гуна истифода мекунем?",
+        "voice_mode_translator_button": "🌐 Реҷаи тарҷумон",
+        "voice_mode_qa_button": "💬 Истифодаи оддӣ",
+        "voice_mode_cancel_button": "❌ Бекор кардан",
+        "voice_mode_activated_translator": "🌐 <b>Реҷаи тарҷумон фаъол шуд</b>\n\nVoice фиристед — ман контекстро нигоҳ дошта тарҷума мекунам.",
+        "voice_mode_activated_qa": "💬 <b>Истифодаи оддӣ фаъол шуд</b>\n\nVoice фиристед — ман онро мисли саволи оддӣ коркард мекунам.",
+        "voice_mode_cancelled": "✅ Voice режими бекор шуд.",
+        "voice_mode_text_exit": "✅ Voice режими хомӯш шуд. Матни шуморо ҳамчун саволи оддӣ коркард мекунам.",
+        "voice_mode_no_pending": "Voice матни пешина ёфт нашуд. Лутфан voice-ро дубора фиристед.",
+        "voice_translator_result": "🌐 Тарҷума:\n<blockquote>{text}</blockquote>",
+        "voice_translation_failed": "🌐 Тарҷумаро тайёр карда натавонистам. Лутфан дубора фиристед."
     },
 
     "ru": {
@@ -664,7 +675,18 @@ COURSE_I18N = {
         "voice_status_received": "🎙 Voice получен...",
         "voice_status_transcribing": "🎧 Перевожу в текст...",
         "voice_status_understanding": "🧠 Разбираю смысл...",
-        "voice_status_answering": "✍️ Готовлю ответ..."
+        "voice_status_answering": "✍️ Готовлю ответ...",
+        "voice_mode_choose": "Как использовать этот voice?",
+        "voice_mode_translator_button": "🌐 Режим переводчика",
+        "voice_mode_qa_button": "💬 Обычное использование",
+        "voice_mode_cancel_button": "❌ Отмена",
+        "voice_mode_activated_translator": "🌐 <b>Режим переводчика включён</b>\n\nОтправляйте voice — я буду переводить с учётом контекста.",
+        "voice_mode_activated_qa": "💬 <b>Обычное использование включено</b>\n\nОтправляйте voice — я обработаю его как обычный вопрос.",
+        "voice_mode_cancelled": "✅ Voice-режим отключён.",
+        "voice_mode_text_exit": "✅ Voice-режим отключён. Обрабатываю ваш текст как обычный вопрос.",
+        "voice_mode_no_pending": "Предыдущий voice-текст не найден. Пожалуйста, отправьте voice ещё раз.",
+        "voice_translator_result": "🌐 Перевод:\n<blockquote>{text}</blockquote>",
+        "voice_translation_failed": "🌐 Не смог подготовить перевод. Пожалуйста, отправьте ещё раз."
     },
 
     "uz": {
@@ -783,7 +805,18 @@ COURSE_I18N = {
         "voice_status_received": "🎙 Voice qabul qilindi...",
         "voice_status_transcribing": "🎧 Matnga aylantiryapman...",
         "voice_status_understanding": "🧠 Ma'nosini tushunyapman...",
-        "voice_status_answering": "✍️ Javob tayyorlanmoqda..."
+        "voice_status_answering": "✍️ Javob tayyorlanmoqda...",
+        "voice_mode_choose": "Bu voice'ni qanday ishlatamiz?",
+        "voice_mode_translator_button": "🌐 Tarjimon rejimi",
+        "voice_mode_qa_button": "💬 Oddiy foydalanish",
+        "voice_mode_cancel_button": "❌ Bekor qilish",
+        "voice_mode_activated_translator": "🌐 <b>Tarjimon rejimi yoqildi</b>\n\nVoice yuboring — kontekstni ushlab tarjima qilaman.",
+        "voice_mode_activated_qa": "💬 <b>Oddiy foydalanish yoqildi</b>\n\nVoice yuboring — oddiy savol kabi ishlayman.",
+        "voice_mode_cancelled": "✅ Voice rejimi bekor qilindi.",
+        "voice_mode_text_exit": "✅ Voice rejimi o'chdi. Matningizni oddiy savol sifatida ishlayman.",
+        "voice_mode_no_pending": "Oldingi voice matni topilmadi. Iltimos voice'ni qayta yuboring.",
+        "voice_translator_result": "🌐 Tarjima:\n<blockquote>{text}</blockquote>",
+        "voice_translation_failed": "🌐 Tarjimani tayyorlay olmadim. Iltimos qayta yuboring."
     },
 }
 

@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 import json
@@ -261,7 +262,7 @@ async def course_pick_lesson_handler(callback: CallbackQuery, session):
 
 
 @router.callback_query(F.data == "mode:qa")
-async def mode_qa_handler(callback: CallbackQuery, session):
+async def mode_qa_handler(callback: CallbackQuery, state: FSMContext, session):
 
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
@@ -275,6 +276,8 @@ async def mode_qa_handler(callback: CallbackQuery, session):
 
     lang = user.language if user.language else "ru"
     user.learning_mode = "qa"
+    user.voice_mode = "none"
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await session.commit()
 
     await callback.answer()
@@ -282,10 +285,11 @@ async def mode_qa_handler(callback: CallbackQuery, session):
     await callback.message.answer(t("send_first_message", lang), reply_markup=main_menu_keyboard(lang))
 
 @router.callback_query(F.data == "mode:course")
-async def course_mode_open_handler(callback: CallbackQuery, session):
+async def course_mode_open_handler(callback: CallbackQuery, state: FSMContext, session):
     if await _block_if_course_disabled(callback, session):
         return
 
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await callback.answer()
     await run_course_entry_flow(
         session=session,
@@ -324,6 +328,7 @@ async def run_course_entry_flow(
         return
 
     user.learning_mode = "course"
+    user.voice_mode = "none"
     await session.commit()
 
     progress = await engine.progress_repo.get_by_user_id(user.id)
@@ -432,7 +437,8 @@ async def run_course_entry_flow(
         await _send_step(respond, user, lesson, step, lang, session)
 
 @router.message(F.text == "/course")
-async def course_command_handler(message: Message, session):
+async def course_command_handler(message: Message, state: FSMContext, session):
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
 
     if not COURSE_MODE_ENABLED:
         lang = "ru"
@@ -462,7 +468,7 @@ async def course_command_handler(message: Message, session):
 
 
 @router.callback_query(F.data == "course:back_to_qa")
-async def course_back_to_qa_handler(callback: CallbackQuery, session):
+async def course_back_to_qa_handler(callback: CallbackQuery, state: FSMContext, session):
     if await _block_if_course_disabled(callback, session):
         return
 
@@ -475,6 +481,8 @@ async def course_back_to_qa_handler(callback: CallbackQuery, session):
         return
 
     user.learning_mode = "qa"
+    user.voice_mode = "none"
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await session.commit()
 
     lang = user.language if user.language else "ru"
@@ -486,10 +494,11 @@ async def course_back_to_qa_handler(callback: CallbackQuery, session):
 
 
 @router.callback_query(F.data == "course:continue")
-async def course_continue_handler(callback: CallbackQuery, session):
+async def course_continue_handler(callback: CallbackQuery, state: FSMContext, session):
     if await _block_if_course_disabled(callback, session):
         return
 
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await callback.answer()
     await run_course_entry_flow(
         session=session,
@@ -685,7 +694,7 @@ async def course_progress_handler(callback: CallbackQuery, session):
 
 
 @router.callback_query(F.data == "course:review_last")
-async def course_review_last_handler(callback: CallbackQuery, session):
+async def course_review_last_handler(callback: CallbackQuery, state: FSMContext, session):
     if await _block_if_course_disabled(callback, session):
         return
 
@@ -710,6 +719,8 @@ async def course_review_last_handler(callback: CallbackQuery, session):
         return
 
     user.learning_mode = "course"
+    user.voice_mode = "none"
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await session.commit()
 
     user, progress, lesson, error_key = await engine.get_current_lesson(callback.from_user.id)

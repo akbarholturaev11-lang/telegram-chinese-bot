@@ -267,6 +267,7 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
     now = datetime.now(timezone.utc)
     user.level = level
     user.learning_mode = "qa"
+    user.voice_mode = "none"
     user.status = "active"
     user.start_date = now
     user.end_date = now + timedelta(hours=24)

@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from app.config import settings
@@ -6,11 +7,18 @@ from app.repositories.user_repo import UserRepository
 from app.services.course_engine_service import CourseEngineService
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course import reminder_time_keyboard
-from app.bot.keyboards.main_menu import main_menu_keyboard
 from app.bot.utils.i18n import t
 
 
 router = Router()
+
+
+async def _clear_voice_mode(user, session, state: FSMContext | None = None) -> None:
+    if state:
+        await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
+    if user and (getattr(user, "voice_mode", "none") or "none") != "none":
+        user.voice_mode = "none"
+        await session.commit()
 
 # ──────────────────────────────────────────────
 # QA rejim menyusi — barcha tugmalar handleri
@@ -21,7 +29,7 @@ router = Router()
     "💳 Подписка",
     "💳 Obuna",
 ]))
-async def handle_subscription_button(message: Message, session):
+async def handle_subscription_button(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
 
@@ -29,6 +37,7 @@ async def handle_subscription_button(message: Message, session):
         return
 
     lang = user.language if user.language else "ru"
+    await _clear_voice_mode(user, session, state)
 
     await message.answer(
         t("payment_method_choose", lang),
@@ -42,13 +51,14 @@ async def handle_subscription_button(message: Message, session):
     "👤 Профиль",
     "👤 Profil",
 ]))
-async def handle_profile_button(message: Message, session):
+async def handle_profile_button(message: Message, state: FSMContext, session):
     from app.bot.handlers.commands import _profile_text, profile_menu_keyboard
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     if not user:
         return
     lang = user.language if user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     await message.answer(
         _profile_text(user, lang),
         parse_mode="HTML",
@@ -61,12 +71,13 @@ async def handle_profile_button(message: Message, session):
     "👥 Пригласить друга",
     "👥 Do'st chaqirish",
 ]))
-async def handle_invite_button(message: Message, session):
+async def handle_invite_button(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     if not user:
         return
     lang = user.language if user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     await user_repo.ensure_referral_code(user)
     await session.commit()
 
@@ -102,10 +113,11 @@ async def handle_invite_button(message: Message, session):
     "❓ Помощь",
     "❓ Yordam",
 ]))
-async def handle_help_button(message: Message, session):
+async def handle_help_button(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     lang = user.language if user and user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     await message.answer(
         t("help_section_text", lang),
         parse_mode="HTML",
@@ -118,13 +130,14 @@ async def handle_help_button(message: Message, session):
     "⏰ Напоминание",
     "⏰ Eslatma vaqti",
 ]))
-async def handle_reminder_time_button(message: Message, session):
+async def handle_reminder_time_button(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     if not user:
         return
 
     lang = user.language if user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     engine = CourseEngineService(session)
     _, progress, error_key = await engine.get_or_create_progress(message.from_user.id)
     if error_key or not progress:
@@ -145,12 +158,13 @@ async def handle_reminder_time_button(message: Message, session):
     "📚 Режим курса",
     "📚 Kurs rejimi",
 ]))
-async def handle_course_mode_button(message: Message, session):
+async def handle_course_mode_button(message: Message, state: FSMContext, session):
     from app.bot.handlers.course import run_course_entry_flow
     from app.config import COURSE_MODE_ENABLED
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     lang = user.language if user and user.language else "ru"
+    await _clear_voice_mode(user, session, state)
 
     if not COURSE_MODE_ENABLED:
         msg_map = {

@@ -23,6 +23,7 @@ from app.db.base import Base
 _BOOTSTRAP_COLUMNS: dict[str, dict[str, str]] = {
     "users": {
         "pending_checkout_msg_id": "INTEGER",
+        "voice_mode": "VARCHAR(20) DEFAULT 'none' NOT NULL",
     },
     "payments": {
         "checkout_msg_id": "INTEGER",

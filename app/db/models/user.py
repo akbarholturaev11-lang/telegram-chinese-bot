@@ -20,6 +20,7 @@ class User(Base):
     language: Mapped[str] = mapped_column(String(8), default="tj", nullable=False)
     level: Mapped[str] = mapped_column(String(32), default="beginner", nullable=False)
     learning_mode: Mapped[str] = mapped_column(String(16), default="qa", nullable=False)
+    voice_mode: Mapped[str] = mapped_column(String(20), default="none", nullable=False)
 
     status: Mapped[str] = mapped_column(String(16), default="free", nullable=False)
     payment_status: Mapped[str] = mapped_column(String(16), default="none", nullable=False)

@@ -1,6 +1,7 @@
 from app.bot.keyboards.onboarding import level_keyboard
 from aiogram import Router, F
 from aiogram.filters import Command
+from aiogram.fsm.context import FSMContext
 from aiogram.types import (
     Message,
     CallbackQuery,
@@ -23,6 +24,14 @@ router = Router()
 
 def _lang(user) -> str:
     return user.language if user and user.language else "ru"
+
+
+async def _clear_voice_mode(user, session, state: FSMContext | None = None) -> None:
+    if state:
+        await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
+    if user and (getattr(user, "voice_mode", "none") or "none") != "none":
+        user.voice_mode = "none"
+        await session.commit()
 
 
 def _fmt_date(dt) -> str:
@@ -248,7 +257,7 @@ def profile_menu_keyboard(lang: str) -> InlineKeyboardMarkup:
 
 
 @router.message(Command("profile"))
-async def profile_command(message: Message, session):
+async def profile_command(message: Message, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(message.from_user.id)
     lang = _lang(user)
 
@@ -256,6 +265,7 @@ async def profile_command(message: Message, session):
         await message.answer(t("user_not_found", lang))
         return
 
+    await _clear_voice_mode(user, session, state)
     text = _profile_text(user, lang)
     await message.answer(
         text,
@@ -265,7 +275,7 @@ async def profile_command(message: Message, session):
 
 
 @router.message(Command("subscription"))
-async def subscription_command_handler(message: Message, session):
+async def subscription_command_handler(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
 
@@ -273,6 +283,7 @@ async def subscription_command_handler(message: Message, session):
         return
 
     lang = user.language if user.language else "ru"
+    await _clear_voice_mode(user, session, state)
 
     await message.answer(
         t("payment_method_choose", lang),
@@ -295,9 +306,10 @@ def command_language_keyboard() -> InlineKeyboardMarkup:
 
 
 @router.message(Command("language"))
-async def language_command_handler(message: Message, session):
+async def language_command_handler(message: Message, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(message.from_user.id)
     lang = getattr(user, "language", None) or "ru"
+    await _clear_voice_mode(user, session, state)
 
     await message.answer(
         t("choose_language", lang),
@@ -338,9 +350,10 @@ def command_level_keyboard(lang: str):
 
 
 @router.message(Command("level"))
-async def level_command_handler(message: Message, session):
+async def level_command_handler(message: Message, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(message.from_user.id)
     lang = getattr(user, "language", None) or "ru"
+    await _clear_voice_mode(user, session, state)
 
     await message.answer(
         t("choose_level", lang),
@@ -383,12 +396,13 @@ async def command_level_callback_handler(callback: CallbackQuery, session):
 
 
 @router.message(Command("invite"))
-async def invite_command_handler(message: Message, session):
+async def invite_command_handler(message: Message, state: FSMContext, session):
     user_repo = UserRepository(session)
     user = await user_repo.get_by_telegram_id(message.from_user.id)
     if not user:
         return
 
+    await _clear_voice_mode(user, session, state)
     await user_repo.ensure_referral_code(user)
     await session.commit()
 
@@ -432,9 +446,10 @@ async def invite_command_handler(message: Message, session):
 
 
 @router.message(Command("help"))
-async def help_command_handler(message: Message, session):
+async def help_command_handler(message: Message, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(message.from_user.id)
     lang = getattr(user, "language", None) or "ru"
+    await _clear_voice_mode(user, session, state)
 
     await message.answer(
         t("help_section_text", lang),
@@ -527,9 +542,10 @@ async def admin_stats_handler(message: Message, session):
 
 
 @router.callback_query(F.data == "profile_menu:language")
-async def profile_menu_language(callback: CallbackQuery, session):
+async def profile_menu_language(callback: CallbackQuery, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
     lang = user.language if user and user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     await callback.answer()
     await callback.message.answer(
         t("choose_language", lang),
@@ -537,9 +553,10 @@ async def profile_menu_language(callback: CallbackQuery, session):
     )
 
 @router.callback_query(F.data == "profile_menu:level")
-async def profile_menu_level(callback: CallbackQuery, session):
+async def profile_menu_level(callback: CallbackQuery, state: FSMContext, session):
     user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
     lang = user.language if user and user.language else "ru"
+    await _clear_voice_mode(user, session, state)
     await callback.answer()
     await callback.message.answer(
         t("choose_level", lang),
@@ -547,8 +564,9 @@ async def profile_menu_level(callback: CallbackQuery, session):
     )
 
 @router.callback_query(F.data == "profile_menu:course")
-async def profile_menu_course(callback: CallbackQuery, session):
+async def profile_menu_course(callback: CallbackQuery, state: FSMContext, session):
     from app.bot.handlers.course import run_course_entry_flow
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await callback.answer()
     await run_course_entry_flow(
         session=session,
@@ -557,7 +575,7 @@ async def profile_menu_course(callback: CallbackQuery, session):
     )
 
 @router.callback_query(F.data == "profile_menu:qa")
-async def profile_menu_qa(callback: CallbackQuery, session):
+async def profile_menu_qa(callback: CallbackQuery, state: FSMContext, session):
     from app.repositories.user_repo import UserRepository as UR
     user_repo = UR(session)
     user = await user_repo.get_by_telegram_id(callback.from_user.id)
@@ -565,8 +583,9 @@ async def profile_menu_qa(callback: CallbackQuery, session):
         await callback.answer()
         return
     user.learning_mode = "qa"
+    user.voice_mode = "none"
+    await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
     await session.commit()
     lang = user.language if user.language else "ru"
     await callback.answer()
     await callback.message.answer(t("send_first_message", lang))
-
