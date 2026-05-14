@@ -9,6 +9,10 @@ from app.services.referral_service import ReferralService
 from app.services.access_service import AccessService
 
 
+QA_MODEL = "gpt-4o-mini"
+QA_MAX_COMPLETION_TOKENS = 900
+
+
 class QAService:
     def __init__(self, session):
         self.session = session
@@ -89,6 +93,8 @@ class QAService:
             user_language=user.language,
             user_level=user.level,
             history=history,
+            model_override=QA_MODEL,
+            max_completion_tokens=QA_MAX_COMPLETION_TOKENS,
         )
 
         await self.message_repo.create(

@@ -26,6 +26,7 @@ class AIService:
         user_level: str,
         history: Optional[List[Dict[str, str]]] = None,
         model_override: str = None,
+        max_completion_tokens: int | None = None,
     ) -> str:
         system_prompt = self._build_system_prompt(
             user_language=user_language,
@@ -51,10 +52,14 @@ class AIService:
             }
         )
 
-        response = await self.client.chat.completions.create(
-            model=model_override or "o4-mini",
-            messages=messages,
-        )
+        request = {
+            "model": model_override or "o4-mini",
+            "messages": messages,
+        }
+        if max_completion_tokens is not None:
+            request["max_completion_tokens"] = max_completion_tokens
+
+        response = await self.client.chat.completions.create(**request)
 
         return response.choices[0].message.content or ""
 
