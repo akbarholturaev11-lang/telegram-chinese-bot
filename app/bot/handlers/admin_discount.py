@@ -120,7 +120,6 @@ def _wizard_text(data: dict, prompt: str, error: Optional[str] = None) -> str:
         "",
         "<blockquote>",
         f"Nomi: <b>{escape(str(data.get('title') or '—'))}</b>",
-        f"Sabab: <b>{escape(str(data.get('reason') or '—'))}</b>",
         f"Foiz: <b>{data.get('percent') or '—'}%</b>",
         f"Davomiylik: <b>{_fmt_duration(duration_hours)}</b>",
         f"Boshlanish: <b>{_fmt_time(start_at)}</b>",
@@ -185,19 +184,20 @@ def _discount_notify_text(data: dict, lang: str, payment_method: Optional[str] =
 
 async def _prepare_title_i18n(data: dict) -> dict:
     title = str(data["title"])[:120]
-    reason = str(data.get("reason") or "")[:500]
     audience_language = data.get("audience_language")
     if audience_language in ("tj", "ru", "uz"):
         return {
             "title_tj": title if audience_language == "tj" else None,
             "title_ru": title if audience_language == "ru" else None,
             "title_uz": title if audience_language == "uz" else None,
-            "reason_tj": reason if audience_language == "tj" else None,
-            "reason_ru": reason if audience_language == "ru" else None,
-            "reason_uz": reason if audience_language == "uz" else None,
         }
 
-    return await DiscountTranslationService().translate_campaign_texts(title, reason)
+    translated = await DiscountTranslationService().translate_title(title)
+    return {
+        "title_tj": translated["tj"],
+        "title_ru": translated["ru"],
+        "title_uz": translated["uz"],
+    }
 
 
 async def _remember_panel(state: FSMContext, callback: CallbackQuery) -> None:
@@ -325,7 +325,6 @@ def _preview(data: dict) -> str:
     return (
         "🎁 <b>Chegirma tasdiqlash</b>\n\n"
         f"Nomi: <b>{escape(str(data['title']))}</b>\n"
-        f"Sabab: <b>{escape(str(data.get('reason') or '-'))}</b>\n"
         f"Foiz: <b>{data['percent']}%</b>\n"
         f"Muddat: <b>{start_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}</b> dan "
         f"<b>{ends_at.astimezone(ADMIN_TZ):%Y-%m-%d %H:%M}</b> gacha\n"
@@ -398,37 +397,6 @@ async def discount_title(message: Message, state: FSMContext):
         )
         return
     await state.update_data(title=title[:120])
-    await state.set_state(DiscountStates.waiting_reason)
-    data = await state.get_data()
-    await _delete_admin_input(message)
-    await _edit_stored_panel(
-        message,
-        state,
-        _wizard_text(data, "Chegirma sababini yozing. Masalan: 400 ta userga yetganimiz sharafiga"),
-        discount_cancel_keyboard(),
-    )
-
-
-@router.message(StateFilter(DiscountStates.waiting_reason))
-async def discount_reason(message: Message, state: FSMContext):
-    if not _is_admin(message.from_user.id):
-        return
-    reason = (message.text or "").strip()
-    if len(reason) < 3:
-        data = await state.get_data()
-        await _delete_admin_input(message)
-        await _edit_stored_panel(
-            message,
-            state,
-            _wizard_text(
-                data,
-                "Chegirma sababini yozing. Masalan: 400 ta userga yetganimiz sharafiga",
-                "Sabab juda qisqa. Qayta yozing.",
-            ),
-            discount_cancel_keyboard(),
-        )
-        return
-    await state.update_data(reason=reason[:500])
     await state.set_state(DiscountStates.waiting_percent)
     data = await state.get_data()
     await _delete_admin_input(message)
@@ -873,7 +841,7 @@ async def discount_confirm(callback: CallbackQuery, state: FSMContext, session):
         await callback.answer()
         return
     data = await state.get_data()
-    required = ["title", "reason", "percent", "duration_hours", "starts_at"]
+    required = ["title", "percent", "duration_hours", "starts_at"]
     if any(key not in data for key in required):
         await callback.answer("Ma'lumot yetishmayapti", show_alert=True)
         return
@@ -890,10 +858,6 @@ async def discount_confirm(callback: CallbackQuery, state: FSMContext, session):
         title_tj=title_i18n["title_tj"],
         title_ru=title_i18n["title_ru"],
         title_uz=title_i18n["title_uz"],
-        reason=data.get("reason"),
-        reason_tj=title_i18n["reason_tj"],
-        reason_ru=title_i18n["reason_ru"],
-        reason_uz=title_i18n["reason_uz"],
         percent=data["percent"],
         starts_at=starts_at,
         ends_at=ends_at,

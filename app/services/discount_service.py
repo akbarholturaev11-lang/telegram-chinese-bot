@@ -139,7 +139,6 @@ class DiscountService:
 
         details = (
             f"Admin kampaniya #{campaign.id}: {campaign.title}; "
-            f"sabab: {campaign.reason or '-'}; "
             f"limit: {quota_text}; qoida: {usage_rule}; "
             f"amal qiladi: {campaign.starts_at:%Y-%m-%d %H:%M} - {campaign.ends_at:%Y-%m-%d %H:%M} UTC."
         )
