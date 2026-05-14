@@ -1,12 +1,12 @@
-# Graph Report - telegram_chinese_bot_clean  (2026-05-13)
+# Graph Report - telegram_chinese_bot_clean  (2026-05-14)
 
 ## Corpus Check
-- 270 files · ~534,062 words
+- 277 files · ~537,256 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2395 nodes · 5573 edges · 49 communities detected
-- Extraction: 56% EXTRACTED · 44% INFERRED · 0% AMBIGUOUS · INFERRED: 2444 edges (avg confidence: 0.75)
+- 2459 nodes · 5767 edges · 47 communities detected
+- Extraction: 56% EXTRACTED · 44% INFERRED · 0% AMBIGUOUS · INFERRED: 2536 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -57,13 +57,11 @@
 - [[_COMMUNITY_Community 44|Community 44]]
 - [[_COMMUNITY_Community 45|Community 45]]
 - [[_COMMUNITY_Community 46|Community 46]]
-- [[_COMMUNITY_Community 47|Community 47]]
-- [[_COMMUNITY_Community 48|Community 48]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `UserRepository` - 121 edges
-2. `t()` - 88 edges
-3. `add()` - 84 edges
+1. `UserRepository` - 127 edges
+2. `t()` - 100 edges
+3. `add()` - 85 edges
 4. `CourseLesson` - 68 edges
 5. `CourseEngineService` - 51 edges
 6. `handle_text_message()` - 49 edges
@@ -77,62 +75,62 @@
   check_tables.py → graphify/worked/httpx/raw/models.py
 - `clean()` --calls--> `text()`  [INFERRED]
   full_clean.py → graphify/worked/httpx/raw/models.py
+- `_ensure_bootstrap_columns()` --calls--> `text()`  [INFERRED]
+  app/db/session.py → graphify/worked/httpx/raw/models.py
 - `discount_confirm()` --calls--> `create()`  [INFERRED]
   app/bot/handlers/admin_discount.py → graphify/tests/fixtures/sample.ex
-- `delete_user()` --calls--> `text()`  [INFERRED]
-  scripts/delete_user.py → graphify/worked/httpx/raw/models.py
-- `upgrade()` --calls--> `text()`  [INFERRED]
-  alembic/versions/0002_add_messages.py → graphify/worked/httpx/raw/models.py
+- `process_level()` --calls--> `create()`  [INFERRED]
+  app/bot/handlers/start.py → graphify/tests/fixtures/sample.ex
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.02
-Nodes (193): create(), admin_deleteuser_handler(), delete_user_command(), admin_payment_approve_handler(), admin_payment_reject_handler(), admin_payment_reject_with_reason_handler(), command_language_callback_handler(), command_language_keyboard() (+185 more)
+Nodes (161): MyApp.Accounts.User, create(), validate(), admin_deleteuser_handler(), delete_user_command(), admin_payment_approve_handler(), admin_payment_reject_handler(), admin_payment_reject_with_reason_handler() (+153 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.02
-Nodes (210): _check_tree_sitter_version(), _csharp_extra_walk(), extract(), extract_blade(), extract_c(), extract_cpp(), extract_csharp(), extract_dart() (+202 more)
-
-### Community 2 - "Community 2"
-Cohesion: 0.02
-Nodes (115): add(), build(), build_from_json(), build_merge(), deduplicate_by_label(), _norm_label(), _normalize_id(), Merge multiple extraction results into one graph.      directed=True produces a (+107 more)
-
-### Community 3 - "Community 3"
 Cohesion: 0.03
 Nodes (101): Exception, Auth, BasicAuth, BearerAuth, DigestAuth, NetRCAuth, Authentication handlers. Auth objects are callables that modify a request before, Load credentials from ~/.netrc based on the request host. (+93 more)
 
-### Community 4 - "Community 4"
-Cohesion: 0.03
-Nodes (153): _cross_community_surprises(), _cross_file_surprises(), _file_category(), god_nodes(), graph_diff(), _is_concept_node(), _is_file_node(), _node_community_map() (+145 more)
+### Community 2 - "Community 2"
+Cohesion: 0.02
+Nodes (176): _csharp_extra_walk(), extract_blade(), extract_c(), extract_cpp(), extract_csharp(), extract_dart(), extract_elixir(), _extract_generic() (+168 more)
 
-### Community 5 - "Community 5"
+### Community 3 - "Community 3"
+Cohesion: 0.02
+Nodes (104): add(), build_from_json(), Build a NetworkX graph from an extraction dict.      directed=True produces a Di, attach_hyperedges(), Store hyperedges in the graph's metadata dict., admin_stats_handler(), CourseLesson, cluster() (+96 more)
+
+### Community 4 - "Community 4"
 Cohesion: 0.02
 Nodes (165): _git_root(), _hooks_dir(), install(), _install_hook(), Walk up to find .git directory., Return the git hooks directory, respecting core.hooksPath if set (e.g. Husky)., Install a single git hook, appending if an existing hook is present., Remove graphify section from a git hook using start/end markers. (+157 more)
 
+### Community 5 - "Community 5"
+Cohesion: 0.03
+Nodes (118): cluster(), cohesion_score(), _partition(), Community detection on NetworkX graphs. Uses Leiden (graspologic) if available,, Run a second Leiden pass on a community subgraph to split it further., Context manager to suppress stdout/stderr during library calls.      graspologic, Ratio of actual intra-community edges to maximum possible., Run community detection. Returns {node_id: community_id}.      Tries Leiden (gra (+110 more)
+
 ### Community 6 - "Community 6"
-Cohesion: 0.04
-Nodes (98): build_graph(), Graph, Server, Return the first path component - used to detect cross-repo edges., Score how surprising a cross-file edge is. Returns (score, reasons)., _surprise_score(), _top_level_dir(), _bfs() (+90 more)
+Cohesion: 0.03
+Nodes (119): find(), collect_files(), extract_python(), Extract classes, functions, and imports from a .py file via tree-sitter AST., _prepare_title_i18n(), _status_label(), course_go_dialogue(), course_go_exercise() (+111 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.03
-Nodes (100): _detect_url_type(), _download_binary(), _fetch_arxiv(), _fetch_html(), _fetch_tweet(), _fetch_webpage(), _html_to_markdown(), ingest() (+92 more)
+Nodes (117): build_graph(), Graph, _cross_community_surprises(), _cross_file_surprises(), _file_category(), god_nodes(), graph_diff(), _is_concept_node() (+109 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.04
-Nodes (62): Base, Base, DeclarativeBase, AdminAudioStates, BroadcastStates, DiscountStates, OnboardingStates, admin_audio_list_handler() (+54 more)
+Cohesion: 0.03
+Nodes (74): Base, Base, DeclarativeBase, AdminAudioStates, BroadcastStates, DiscountStates, FeedbackStates, OnboardingStates (+66 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.04
-Nodes (19): handle_image_message(), MessageRepository, ReferralRepository, AccessService, AIService, run_background(), CourseTutorService, V2: birinchi 8 ta so'z. (+11 more)
+Cohesion: 0.03
+Nodes (102): Export graph as an SVG file using matplotlib + spring layout.      Lightweight a, to_svg(), _detect_url_type(), _download_binary(), _fetch_arxiv(), _fetch_html(), _fetch_tweet(), _fetch_webpage() (+94 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.06
-Nodes (72): admin_discount_panel(), _admin_ids(), _delete_admin_input(), discount_cancel(), discount_confirm(), discount_custom_duration(), discount_disable(), discount_duration() (+64 more)
+Cohesion: 0.05
+Nodes (15): handle_image_message(), MessageRepository, AccessService, AIService, run_background(), CourseTutorService, V2: birinchi 8 ta so'z., V2: n-chi dialog bloki (grammar_notes inline). (+7 more)
 
 ### Community 11 - "Community 11"
-Cohesion: 0.03
-Nodes (32): ApiClient, area(), CacheManager, Circle, Color, Config, createProcessor(), DataProcessor (+24 more)
+Cohesion: 0.04
+Nodes (77): _body_content(), cache_dir(), cached_files(), check_semantic_cache(), clear_cache(), file_hash(), load_cached(), Return set of file paths that have a valid cache entry (hash still matches). (+69 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.04
@@ -143,64 +141,64 @@ Cohesion: 0.05
 Nodes (70): Enum, classify_file(), convert_office_file(), count_words(), detect(), detect_incremental(), docx_to_markdown(), extract_pdf_text() (+62 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.04
-Nodes (29): _background_scheduler(), lifespan(), Run all lesson seed scripts in the background after startup., _seed_lessons(), BaseMiddleware, create_bot(), main(), _ensure_bootstrap_columns() (+21 more)
+Cohesion: 0.05
+Nodes (53): area(), Analyzer, compute_score(), normalize(), Fixture: functions and methods that call each other - for call-graph extraction, run_analysis(), Circle, Color (+45 more)
 
 ### Community 15 - "Community 15"
-Cohesion: 0.05
-Nodes (48): MyApp.Accounts.User, find(), validate(), _body_content(), cache_dir(), cached_files(), check_semantic_cache(), clear_cache() (+40 more)
+Cohesion: 0.09
+Nodes (57): admin_discount_panel(), _admin_ids(), _delete_admin_input(), discount_cancel(), discount_confirm(), discount_custom_duration(), discount_disable(), discount_duration() (+49 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.07
-Nodes (42): collect_files(), extract_python(), Extract classes, functions, and imports from a .py file via tree-sitter AST., After merging multiple files, no internal edges should be dangling., Call-graph pass must produce INFERRED calls edges., AST-resolved call edges are deterministic and should be EXTRACTED/1.0., Same input always produces same output., run_analysis() calls compute_score() - must appear as a calls edge. (+34 more)
+Cohesion: 0.04
+Nodes (19): ApiClient, CacheManager, Config, createProcessor(), DataProcessor, Get-Data(), GraphifyDemo, HttpClient (+11 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.09
-Nodes (9): admin_payment_reject_reason_select_handler(), _is_night(), payment_screenshot_handler(), _waiting_message(), admin_payment_review_keyboard(), admin_reject_reason_keyboard(), PaymentRepository, AdminNotifyService (+1 more)
+Cohesion: 0.07
+Nodes (19): _background_scheduler(), lifespan(), Run all lesson seed scripts in the background after startup., Run all lesson seed scripts in the background after startup., Run all lesson seed scripts in the background after startup., _seed_lessons(), BaseMiddleware, create_bot() (+11 more)
 
 ### Community 18 - "Community 18"
+Cohesion: 0.08
+Nodes (17): admin_payment_reject_reason_select_handler(), _edit_message(), _edit_stored_message(), feedback_callback_handler(), feedback_other_text_handler(), _load_feedback_context(), _parse_feedback_callback(), admin_payment_review_keyboard() (+9 more)
+
+### Community 19 - "Community 19"
+Cohesion: 0.06
+Nodes (18): do_run_migrations(), ensure_version_column_width(), run_async_migrations(), run_migrations_online(), text(), delete_user(), main(), clean() (+10 more)
+
+### Community 20 - "Community 20"
+Cohesion: 0.1
+Nodes (26): build(), build_merge(), deduplicate_by_label(), _norm_label(), _normalize_id(), Merge multiple extraction results into one graph.      directed=True produces a, Canonical dedup key — lowercase, alphanumeric only., Merge nodes that share a normalised label, rewriting edge references.      Prefe (+18 more)
+
+### Community 21 - "Community 21"
 Cohesion: 0.16
 Nodes (22): bc_activity_filter(), bc_cancel(), bc_confirm(), bc_discount_filter(), bc_enter_text(), bc_lang_filter(), bc_level_filter(), bc_mode_filter() (+14 more)
 
-### Community 19 - "Community 19"
-Cohesion: 0.13
-Nodes (24): _cross_community_surprises(), _cross_file_surprises(), _file_category(), god_nodes(), graph_diff(), _is_concept_node(), _is_file_node(), _node_community_map() (+16 more)
-
-### Community 20 - "Community 20"
+### Community 22 - "Community 22"
 Cohesion: 0.19
 Nodes (22): _estimate_tokens(), print_benchmark(), _query_subgraph_tokens(), Token-reduction benchmark - measures how much context graphify saves vs naive fu, Print a human-readable benchmark report., Run BFS from best-matching nodes and return estimated tokens in the subgraph con, Measure token reduction: corpus tokens vs graphify query tokens.      Args:, run_benchmark() (+14 more)
 
-### Community 21 - "Community 21"
-Cohesion: 0.13
-Nodes (14): check_update(), _notify_only(), Check for pending semantic update flag and notify the user if set.      Cron-saf, Write a flag file and print a notification (fallback for non-code-only corpora)., Tests for watch.py - file watcher helpers (no watchdog required)., check_update returns True and is silent when needs_update flag is absent., check_update returns True and prints notification when flag exists., check_update never removes the needs_update flag (clearing is LLM's job). (+6 more)
-
-### Community 22 - "Community 22"
-Cohesion: 0.2
-Nodes (15): assert_valid(), Validate an extraction JSON dict against the graphify schema.     Returns a list, Raise ValueError with all errors if extraction is invalid., validate_extraction(), test_assert_valid_passes_silently(), test_assert_valid_raises_on_errors(), test_dangling_edge_source(), test_dangling_edge_target() (+7 more)
-
 ### Community 23 - "Community 23"
-Cohesion: 0.39
-Nodes (5): Analyzer, compute_score(), normalize(), Fixture: functions and methods that call each other - for call-graph extraction, run_analysis()
+Cohesion: 0.48
+Nodes (6): _add_column_if_missing(), downgrade(), _drop_column_if_exists(), _has_column(), add discount campaign title i18n  Revision ID: 0019_add_discount_campaign_title_, upgrade()
 
 ### Community 24 - "Community 24"
+Cohesion: 0.48
+Nodes (6): _add_column_if_missing(), downgrade(), _drop_column_if_exists(), _has_column(), add discount campaign reason i18n  Revision ID: 0020_add_discount_campaign_reaso, upgrade()
+
+### Community 25 - "Community 25"
 Cohesion: 0.43
 Nodes (6): EventServiceProvider, NotifyAdmins, OrderPlaced, SendWelcomeEmail, ShipOrder, UserRegistered
 
-### Community 25 - "Community 25"
+### Community 26 - "Community 26"
 Cohesion: 0.53
 Nodes (4): Get-PyVenvConfig(), global:deactivate(), global:_OLD_VIRTUAL_PROMPT(), global:prompt()
 
-### Community 26 - "Community 26"
+### Community 27 - "Community 27"
 Cohesion: 0.33
 Nodes (5): Animal, -initWithName, -speak, Dog, -fetch
 
-### Community 27 - "Community 27"
+### Community 28 - "Community 28"
 Cohesion: 0.67
 Nodes (4): AppServiceProvider, CashierGateway, PaymentGateway, StripeGateway
-
-### Community 28 - "Community 28"
-Cohesion: 0.5
-Nodes (2): run_async_migrations(), run_migrations_online()
 
 ### Community 29 - "Community 29"
 Cohesion: 0.6
@@ -244,49 +242,39 @@ Nodes (1): add referrals and user discount fields  Revision ID: 0003 Revises: 00
 
 ### Community 39 - "Community 39"
 Cohesion: 0.5
-Nodes (1): add discount campaign title i18n  Revision ID: 0019_add_discount_campaign_title_
+Nodes (1): add expiry reminder sent at to users  Revision ID: 0010 Revises: 0009 Create Dat
 
 ### Community 40 - "Community 40"
 Cohesion: 0.5
-Nodes (1): add discount campaign reason i18n  Revision ID: 0020_add_discount_campaign_reaso
+Nodes (1): add discount progress fields to users  Revision ID: 0007 Revises: 0006 Create Da
 
 ### Community 41 - "Community 41"
 Cohesion: 0.5
-Nodes (1): add expiry reminder sent at to users  Revision ID: 0010 Revises: 0009 Create Dat
+Nodes (1): add payment message ids for cleanup on approve  Revision ID: 0012_add_payment_ms
 
 ### Community 42 - "Community 42"
 Cohesion: 0.5
-Nodes (1): add discount progress fields to users  Revision ID: 0007 Revises: 0006 Create Da
+Nodes (1): add bonus questions used to users  Revision ID: 0009 Revises: 0008 Create Date:
 
 ### Community 43 - "Community 43"
 Cohesion: 0.5
-Nodes (1): add payment message ids for cleanup on approve  Revision ID: 0012_add_payment_ms
+Nodes (1): add reminder_tz_offset and last_reminder_sent_at to course_progress  Revision ID
 
 ### Community 44 - "Community 44"
 Cohesion: 0.5
-Nodes (1): add bonus questions used to users  Revision ID: 0009 Revises: 0008 Create Date:
+Nodes (1): initial migration  Revision ID: 0001 Revises: Create Date: 2026-03-24
 
 ### Community 45 - "Community 45"
 Cohesion: 0.5
-Nodes (1): add reminder_tz_offset and last_reminder_sent_at to course_progress  Revision ID
-
-### Community 46 - "Community 46"
-Cohesion: 0.5
-Nodes (1): initial migration  Revision ID: 0001 Revises: Create Date: 2026-03-24
-
-### Community 47 - "Community 47"
-Cohesion: 0.5
 Nodes (1): Transformer
 
-### Community 48 - "Community 48"
+### Community 46 - "Community 46"
 Cohesion: 0.67
 Nodes (1): graphify - extract · build · cluster · analyze · report.
 
 ## Knowledge Gaps
-- **391 isolated node(s):** `AI tutor javobidan keyin: 'Tushundim' → keyingi bo'limga o'tish.`, `Shown while waiting for 3 referrals — only back button.`, `Shown when 3/3 referrals reached — plan buttons + back.`, `lesson.title oddiy string yoki JSON bo'lishi mumkin — xitoycha qismini qaytaradi`, `V2 darslar uchun universal 'Davom etamiz' tugmasi (audiosiz).` (+386 more)
+- **392 isolated node(s):** `AI tutor javobidan keyin: 'Tushundim' → keyingi bo'limga o'tish.`, `Shown while waiting for 3 referrals — only back button.`, `Shown when 3/3 referrals reached — plan buttons + back.`, `lesson.title oddiy string yoki JSON bo'lishi mumkin — xitoycha qismini qaytaradi`, `V2 darslar uchun universal 'Davom etamiz' tugmasi (audiosiz).` (+387 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 28`** (5 nodes): `do_run_migrations()`, `env.py`, `run_async_migrations()`, `run_migrations_offline()`, `run_migrations_online()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 29`** (5 nodes): `ColorResolver`, `.accent()`, `.primary()`, `DefaultPalette`, `sample_php_static_prop.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 30`** (4 nodes): `admin_id_list()`, `config.py`, `Settings`, `BaseSettings`
@@ -307,41 +295,37 @@ Nodes (1): graphify - extract · build · cluster · analyze · report.
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 38`** (4 nodes): `0003_add_referrals_and_user_discount_fields.py`, `downgrade()`, `add referrals and user discount fields  Revision ID: 0003 Revises: 0002 Create D`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (4 nodes): `0019_add_discount_campaign_title_i18n.py`, `downgrade()`, `add discount campaign title i18n  Revision ID: 0019_add_discount_campaign_title_`, `upgrade()`
+- **Thin community `Community 39`** (4 nodes): `0010_add_expiry_reminder_sent_at_to_users.py`, `downgrade()`, `add expiry reminder sent at to users  Revision ID: 0010 Revises: 0009 Create Dat`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (4 nodes): `0020_add_discount_campaign_reason_i18n.py`, `downgrade()`, `add discount campaign reason i18n  Revision ID: 0020_add_discount_campaign_reaso`, `upgrade()`
+- **Thin community `Community 40`** (4 nodes): `0007_add_discount_progress_fields_to_users.py`, `downgrade()`, `add discount progress fields to users  Revision ID: 0007 Revises: 0006 Create Da`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (4 nodes): `0010_add_expiry_reminder_sent_at_to_users.py`, `downgrade()`, `add expiry reminder sent at to users  Revision ID: 0010 Revises: 0009 Create Dat`, `upgrade()`
+- **Thin community `Community 41`** (4 nodes): `0012_add_payment_msg_ids.py`, `downgrade()`, `add payment message ids for cleanup on approve  Revision ID: 0012_add_payment_ms`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (4 nodes): `0007_add_discount_progress_fields_to_users.py`, `downgrade()`, `add discount progress fields to users  Revision ID: 0007 Revises: 0006 Create Da`, `upgrade()`
+- **Thin community `Community 42`** (4 nodes): `0009_add_bonus_questions_used_to_users.py`, `downgrade()`, `add bonus questions used to users  Revision ID: 0009 Revises: 0008 Create Date:`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (4 nodes): `0012_add_payment_msg_ids.py`, `downgrade()`, `add payment message ids for cleanup on approve  Revision ID: 0012_add_payment_ms`, `upgrade()`
+- **Thin community `Community 43`** (4 nodes): `0013_add_reminder_tz_and_last_sent.py`, `downgrade()`, `add reminder_tz_offset and last_reminder_sent_at to course_progress  Revision ID`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (4 nodes): `0009_add_bonus_questions_used_to_users.py`, `downgrade()`, `add bonus questions used to users  Revision ID: 0009 Revises: 0008 Create Date:`, `upgrade()`
+- **Thin community `Community 44`** (4 nodes): `0001_initial.py`, `downgrade()`, `initial migration  Revision ID: 0001 Revises: Create Date: 2026-03-24`, `upgrade()`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (4 nodes): `0013_add_reminder_tz_and_last_sent.py`, `downgrade()`, `add reminder_tz_offset and last_reminder_sent_at to course_progress  Revision ID`, `upgrade()`
+- **Thin community `Community 45`** (4 nodes): `Transformer`, `.forward()`, `.__init__()`, `sample.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (4 nodes): `0001_initial.py`, `downgrade()`, `initial migration  Revision ID: 0001 Revises: Create Date: 2026-03-24`, `upgrade()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (4 nodes): `Transformer`, `.forward()`, `.__init__()`, `sample.py`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (3 nodes): `__init__.py`, `__getattr__()`, `graphify - extract · build · cluster · analyze · report.`
+- **Thin community `Community 46`** (3 nodes): `__init__.py`, `__getattr__()`, `graphify - extract · build · cluster · analyze · report.`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `t()` connect `Community 0` to `Community 17`, `Community 10`, `Community 9`, `Community 14`?**
+- **Why does `add()` connect `Community 3` to `Community 0`, `Community 2`, `Community 6`, `Community 7`, `Community 8`, `Community 11`, `Community 12`, `Community 13`, `Community 14`, `Community 16`, `Community 18`, `Community 22`?**
+  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+- **Why does `t()` connect `Community 0` to `Community 5`, `Community 6`, `Community 8`, `Community 10`, `Community 15`, `Community 17`, `Community 18`?**
   _High betweenness centrality (0.057) - this node is a cross-community bridge._
-- **Why does `add()` connect `Community 2` to `Community 0`, `Community 1`, `Community 4`, `Community 6`, `Community 8`, `Community 10`, `Community 11`, `Community 12`, `Community 13`, `Community 19`, `Community 20`?**
-  _High betweenness centrality (0.057) - this node is a cross-community bridge._
-- **Why does `UserRepository` connect `Community 0` to `Community 8`, `Community 9`, `Community 10`, `Community 14`, `Community 17`, `Community 18`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Are the 96 inferred relationships involving `UserRepository` (e.g. with `User` and `Message`) actually correct?**
-  _`UserRepository` has 96 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 109 inferred relationships involving `str` (e.g. with `_ensure_bootstrap_columns()` and `discount_title_for_lang()`) actually correct?**
-  _`str` has 109 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 87 inferred relationships involving `t()` (e.g. with `course_review_offer_keyboard()` and `course_satisfaction_keyboard()`) actually correct?**
-  _`t()` has 87 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 82 inferred relationships involving `add()` (e.g. with `.create()` and `.create()`) actually correct?**
-  _`add()` has 82 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `UserRepository` connect `Community 0` to `Community 6`, `Community 8`, `Community 10`, `Community 15`, `Community 17`, `Community 18`, `Community 21`?**
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+- **Are the 102 inferred relationships involving `UserRepository` (e.g. with `User` and `Message`) actually correct?**
+  _`UserRepository` has 102 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 110 inferred relationships involving `str` (e.g. with `_ensure_bootstrap_columns()` and `discount_title_for_lang()`) actually correct?**
+  _`str` has 110 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 99 inferred relationships involving `t()` (e.g. with `course_review_offer_keyboard()` and `course_satisfaction_keyboard()`) actually correct?**
+  _`t()` has 99 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 83 inferred relationships involving `add()` (e.g. with `.create()` and `.create()`) actually correct?**
+  _`add()` has 83 INFERRED edges - model-reasoned connections that need verification._

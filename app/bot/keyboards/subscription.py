@@ -89,19 +89,21 @@ def payment_method_keyboard(lang: str):
     ])
 
 
-def discount_payment_method_keyboard(lang: str):
+def discount_payment_method_keyboard(lang: str, methods: list[str] | tuple[str, ...] | None = None):
+    labels = {
+        "visa": "💳 VISA card",
+        "alipay": "🇨🇳 Alipay",
+        "wechat": "🇨🇳 WeChat Pay",
+    }
+    methods = list(methods or ("visa", "alipay", "wechat"))
     return InlineKeyboardMarkup(inline_keyboard=[
-        [
-            InlineKeyboardButton(text="💳 VISA card", callback_data="discount_offer:method:visa"),
+        *[
+            [InlineKeyboardButton(text=labels[method], callback_data=f"discount_offer:method:{method}")]
+            for method in methods
+            if method in labels
         ],
         [
-            InlineKeyboardButton(text="🇨🇳 Alipay", callback_data="discount_offer:method:alipay"),
-        ],
-        [
-            InlineKeyboardButton(text="🇨🇳 WeChat Pay", callback_data="discount_offer:method:wechat"),
-        ],
-        [
-            InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
+            InlineKeyboardButton(text=t("payment_back", lang), callback_data="discount_offer:back_entry"),
         ],
     ])
 
@@ -119,23 +121,30 @@ def admin_discount_entry_keyboard(lang: str) -> InlineKeyboardMarkup:
     )
 
 
-def admin_discount_plan_keyboard(lang: str) -> InlineKeyboardMarkup:
+def admin_discount_plan_keyboard(
+    lang: str,
+    plans: list[str] | tuple[str, ...] | None = None,
+    payment_method: str | None = None,
+    back_callback: str = "discount_offer:back_entry",
+) -> InlineKeyboardMarkup:
+    plans = list(plans or ("10_days", "1_month"))
+    plan_buttons = []
+    for plan in plans:
+        callback_data = f"discount_offer:plan:{payment_method}:{plan}" if payment_method else f"discount_offer:plan:{plan}"
+        plan_buttons.append(
+            InlineKeyboardButton(
+                text=t("subscription_button_10_days" if plan == "10_days" else "subscription_button_1_month", lang),
+                callback_data=callback_data,
+            )
+        )
+
     return InlineKeyboardMarkup(
         inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text=t("subscription_button_10_days", lang),
-                    callback_data="discount_offer:plan:10_days",
-                ),
-                InlineKeyboardButton(
-                    text=t("subscription_button_1_month", lang),
-                    callback_data="discount_offer:plan:1_month",
-                ),
-            ],
+            plan_buttons,
             [
                 InlineKeyboardButton(
                     text=t("payment_back", lang),
-                    callback_data="discount_offer:change_payment",
+                    callback_data=back_callback,
                 )
             ],
         ]

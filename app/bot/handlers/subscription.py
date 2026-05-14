@@ -5,6 +5,7 @@ from aiogram import Router, F
 from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, FSInputFile
 
 from app.config import settings
+from app.repositories.payment_repo import PaymentRepository
 from app.repositories.user_repo import UserRepository
 from app.services.discount_service import DiscountService
 from app.services.payment_service import PaymentService
@@ -21,6 +22,8 @@ from app.bot.keyboards.checkout import checkout_keyboard
 
 
 router = Router()
+PAYMENT_METHODS = ("visa", "alipay", "wechat")
+PLANS = ("10_days", "1_month")
 
 # subscription.py → bot/handlers/ → bot/ → app/ → project root → app/static/payments/
 _STATIC_PAYMENTS = Path(__file__).parent.parent.parent / "static" / "payments"
@@ -57,6 +60,29 @@ async def _admin_discount_choices(session, user):
         if choice.source == "admin_campaign" and choice.ends_at and choice.starts_at:
             plan_choices[plan] = choice
     return plan_choices
+
+
+async def _admin_discount_matrix(session, user):
+    service = DiscountService(session)
+    choices = {}
+    for method in PAYMENT_METHODS:
+        for plan in PLANS:
+            choice = await service.get_best_admin_discount(
+                user=user,
+                plan_type=plan,
+                payment_method=method,
+            )
+            if choice.source == "admin_campaign" and choice.ends_at and choice.starts_at:
+                choices[(method, plan)] = choice
+    return choices
+
+
+def _available_methods(choices: dict[tuple[str, str], object]) -> list[str]:
+    return [method for method in PAYMENT_METHODS if any(key[0] == method for key in choices)]
+
+
+def _available_plans(choices: dict[tuple[str, str], object], payment_method: str) -> list[str]:
+    return [plan for plan in PLANS if (payment_method, plan) in choices]
 
 
 async def _admin_discount_offer(session, user, lang: str, *, as_window: bool = False) -> str | None:
@@ -179,13 +205,62 @@ async def build_subscription_main_view(session, user, lang: str) -> tuple[str, I
     )
 
 
-async def build_admin_discount_offer_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup] | None:
-    block = await _admin_discount_offer(session, user, lang, as_window=True)
-    if not block:
+async def build_admin_discount_entry_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup] | None:
+    choices = await _admin_discount_matrix(session, user)
+    if not choices:
         return None
+    return (t("subscription_admin_discount_entry_text", lang), admin_discount_entry_keyboard(lang))
+
+
+async def build_admin_discount_payment_view(session, user, lang: str) -> tuple[str, InlineKeyboardMarkup] | None:
+    choices = await _admin_discount_matrix(session, user)
+    methods = _available_methods(choices)
+    if not methods:
+        return None
+    if len(methods) == 1:
+        return await build_admin_discount_plan_view(session, user, lang, methods[0], choices=choices)
     return (
-        t("subscription_admin_discount_window", lang, block=block),
-        admin_discount_plan_keyboard(lang),
+        t("subscription_admin_discount_payment_choose", lang),
+        discount_payment_method_keyboard(lang, methods),
+    )
+
+
+async def build_admin_discount_plan_view(
+    session,
+    user,
+    lang: str,
+    payment_method: str,
+    *,
+    choices: dict[tuple[str, str], object] | None = None,
+) -> tuple[str, InlineKeyboardMarkup] | None:
+    choices = choices or await _admin_discount_matrix(session, user)
+    plans = _available_plans(choices, payment_method)
+    if not plans:
+        return None
+
+    lines = []
+    for plan in plans:
+        choice = choices[(payment_method, plan)]
+        base, currency = _plan_price(plan, payment_method)
+        lines.append(
+            build_discount_plan_line(
+                lang=lang,
+                plan=plan,
+                base=base,
+                currency=currency,
+                percent=choice.percent,
+            )
+        )
+
+    back_callback = "discount_offer:back_payment" if len(_available_methods(choices)) > 1 else "discount_offer:back_entry"
+    return (
+        t("subscription_admin_discount_plan_choose", lang, lines="\n".join(lines)),
+        admin_discount_plan_keyboard(
+            lang,
+            plans=plans,
+            payment_method=payment_method,
+            back_callback=back_callback,
+        ),
     )
 
 
@@ -300,16 +375,7 @@ async def discount_offer_open_handler(callback: CallbackQuery, session):
     lang = user.language or "ru"
     await callback.answer()
 
-    if not user.payment_method:
-        await _replace_with_text(
-            callback,
-            t("subscription_admin_discount_payment_choose", lang),
-            reply_markup=discount_payment_method_keyboard(lang),
-            parse_mode="HTML",
-        )
-        return
-
-    view = await build_admin_discount_offer_view(session, user, lang)
+    view = await build_admin_discount_payment_view(session, user, lang)
     if not view:
         await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
         return
@@ -336,7 +402,7 @@ async def discount_offer_method_handler(callback: CallbackQuery, session):
     await session.commit()
 
     lang = user.language or "ru"
-    view = await build_admin_discount_offer_view(session, user, lang)
+    view = await build_admin_discount_plan_view(session, user, lang, user.payment_method)
     await callback.answer()
     if not view:
         await _replace_with_text(
@@ -364,10 +430,57 @@ async def discount_offer_change_payment_handler(callback: CallbackQuery, session
         return
     lang = user.language or "ru"
     await callback.answer()
+    view = await build_admin_discount_payment_view(session, user, lang)
+    if not view:
+        await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+        return
+    text, keyboard = view
     await _replace_with_text(
         callback,
-        t("subscription_admin_discount_payment_choose", lang),
-        reply_markup=discount_payment_method_keyboard(lang),
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+    )
+
+
+@router.callback_query(F.data == "discount_offer:back_entry")
+async def discount_offer_back_entry_handler(callback: CallbackQuery, session):
+    user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+    lang = user.language or "ru"
+    view = await build_admin_discount_entry_view(session, user, lang)
+    await callback.answer()
+    if not view:
+        await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+        return
+    text, keyboard = view
+    await _replace_with_text(
+        callback,
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+    )
+
+
+@router.callback_query(F.data == "discount_offer:back_payment")
+async def discount_offer_back_payment_handler(callback: CallbackQuery, session):
+    user = await UserRepository(session).get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+    lang = user.language or "ru"
+    view = await build_admin_discount_payment_view(session, user, lang)
+    await callback.answer()
+    if not view:
+        await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+        return
+    text, keyboard = view
+    await _replace_with_text(
+        callback,
+        text,
+        reply_markup=keyboard,
         parse_mode="HTML",
     )
 
@@ -530,8 +643,30 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
 
     lang = user.language if user.language else "ru"
 
+    draft = await PaymentRepository(session).get_latest_draft_by_user(callback.from_user.id)
     await user_repo.set_selected_plan_type(user, None)
     await session.commit()
+
+    if draft and draft.discount_source == "admin_campaign":
+        view = await build_admin_discount_plan_view(
+            session,
+            user,
+            lang,
+            draft.payment_method or user.payment_method or "visa",
+        )
+        if not view:
+            await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+            return
+        text, keyboard = view
+        await _replace_with_text(
+            callback,
+            text,
+            reply_markup=keyboard,
+            parse_mode="HTML",
+            disable_web_page_preview=True,
+        )
+        await callback.answer()
+        return
 
     text, keyboard = await build_subscription_main_view(session, user, lang)
 
@@ -618,16 +753,34 @@ async def discount_offer_plan_handler(callback: CallbackQuery, session):
         return
 
     lang = user.language or "ru"
-    if not user.payment_method:
+    parts = callback.data.split(":")
+    if len(parts) >= 4:
+        payment_method = parts[2]
+        plan = parts[3]
+    else:
+        payment_method = user.payment_method
+        plan = parts[-1]
+
+    if payment_method not in PAYMENT_METHODS:
+        payment_method = None
+
+    if not payment_method:
+        view = await build_admin_discount_payment_view(session, user, lang)
+        if not view:
+            await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+            return
+        text, keyboard = view
         await _replace_with_text(
             callback,
-            t("subscription_admin_discount_payment_choose", lang),
-            reply_markup=discount_payment_method_keyboard(lang),
+            text,
+            reply_markup=keyboard,
             parse_mode="HTML",
         )
         return
 
-    plan = callback.data.split(":")[-1]
+    user.payment_method = payment_method
+    await session.flush()
+
     payment_service = PaymentService(session)
     payment, checkout_info, error_key = await payment_service.create_checkout_draft(
         telegram_id=callback.from_user.id,
