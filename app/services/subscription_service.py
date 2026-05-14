@@ -3,6 +3,7 @@ from typing import Optional
 
 from app.repositories.bot_feedback_repo import BotFeedbackRepository
 from app.repositories.user_repo import UserRepository
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 
 
 PLAN_DURATIONS = {
@@ -22,6 +23,7 @@ class SubscriptionService:
         telegram_id: int,
         plan_type: str,
         discount_source: Optional[str] = None,
+        payment=None,
     ) -> bool:
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -46,6 +48,13 @@ class SubscriptionService:
 
         if discount_source == "feedback_price_offer":
             await self.feedback_repo.mark_latest_price_offer_used(telegram_id)
+
+        if payment is not None:
+            await AIUsageBudgetService(self.session).create_for_payment(
+                payment=payment,
+                starts_at=user.start_date,
+                ends_at=user.end_date,
+            )
 
         await self.session.flush()
         return True

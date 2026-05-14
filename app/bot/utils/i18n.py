@@ -25,6 +25,8 @@ TEXTS = {
         "access_daily_limit_reached": "<b>📊 Лимити имрӯзаи шумо ба анҷом расид</b>\n\n<blockquote>Лимити рӯзонаи пурсишҳои шумо ба анҷом расид.\nФардо лимит аз нав навшавад ё дӯстеро даъват кунед ва +5 савол гиред.</blockquote>",
         "access_subscription_expired": "<b>💳 Муҳлати обунаи шумо ба анҷом расид</b>\n\n<blockquote>Барои идома аз нав обуна гиред.</blockquote>",
         "access_payment_pending_review": "<b>⏳ Пардохти шумо баррасӣ мешавад</b>\n\n<blockquote>Пардохти шумо барои санҷиш фиристода шуд. Лутфан интизори тасдиқи админ шавед.</blockquote>",
+        "ai_budget_cooldown": "<b>⏳ Барои 6 соат танаффус гузошта шуд</b>\n\n<blockquote>Шумо хеле зиёд ва зуд мехонед. Ин самаранок нест.\n\nДар ин вақт истироҳат кунед ё дарсҳои пешинаро такрор кунед. Пас аз 6 соат бот боз кор мекунад.</blockquote>",
+        "ai_budget_cooldown_notice": "<b>⏳ Барои 6 соат танаффус гузошта шуд</b>\n\n<blockquote>Шумо имрӯз хеле зиёд хондед. Шитоб накунед — бо сифат хонед.\n\nДар ин вақт дарсҳои пешинаро такрор кунед. Пас аз 6 соат бот боз кор мекунад.</blockquote>",
 
         "referral_daily_limit_offer": "<b>📸 Лимити имрӯзаи шумо ба анҷом расид</b>\n\n<blockquote>Лимити имрӯз ба анҷом расид. Дӯсти худро даъват кунед ва +5 саволи бонусӣ гиред.\n\nЁ шумо метавонед обуна гиред.</blockquote>",
 
@@ -159,6 +161,8 @@ TEXTS = {
         "access_trial_expired": "<b>⏰ Пробный период закончился</b>\n\n<blockquote>Для продолжения обучения необходима подписка.\nОформите подписку и пользуйтесь всеми возможностями.</blockquote>",
         "access_daily_limit_reached": "<b>📊 Ваш лимит на сегодня закончился</b>\n\n<blockquote>Дневной лимит запросов исчерпан.\nЗавтра лимит обновится, или пригласите друга и получите +5 вопросов.</blockquote>",
         "access_subscription_expired": "<b>💳 Срок вашей подписки закончился</b>\n\n<blockquote>Оформите подписку заново, чтобы продолжить.</blockquote>",
+        "ai_budget_cooldown": "<b>⏳ Поставлен перерыв на 6 часов</b>\n\n<blockquote>Вы учитесь слишком много и слишком быстро. Так обучение становится менее эффективным.\n\nОтдохните или повторите прошлые уроки. Через 6 часов бот снова будет доступен.</blockquote>",
+        "ai_budget_cooldown_notice": "<b>⏳ Поставлен перерыв на 6 часов</b>\n\n<blockquote>Сегодня вы слишком быстро израсходовали учебный лимит. Спешка не помогает учиться — двигайтесь медленнее и качественнее.\n\nПовторите прошлые уроки. Через 6 часов бот снова заработает.</blockquote>",
 
         "referral_daily_limit_offer": "<b>📸 Ваш лимит на сегодня закончился</b>\n\n<blockquote>Лимит на сегодня исчерпан. Пригласите друга и получите +5 бонусных вопросов.\n\nИли вы можете оформить подписку.</blockquote>",
 
@@ -290,6 +294,8 @@ TEXTS = {
         "access_trial_expired": "<b>⏰ Sinov muddati tugadi</b>\n\n<blockquote>O’rganishni davom ettirish uchun obuna kerak.\nObuna rasmiylashtiring va barcha imkoniyatlardan foydalaning.</blockquote>",
         "access_daily_limit_reached": "<b>📊 Bugungi limitingiz tugadi</b>\n\n<blockquote>Kunlik so’rovlar limitingiz tugadi.\nErtaga limit yangilanadi yoki do’stingizni taklif qiling va +5 savol oling.</blockquote>",
         "access_subscription_expired": "<b>💳 Obuna muddatingiz tugadi</b>\n\n<blockquote>Davom etish uchun qaytadan obuna oling.</blockquote>",
+        "ai_budget_cooldown": "<b>⏳ 6 soatlik tanaffus qo‘yildi</b>\n\n<blockquote>Siz juda ko‘p va juda tez o‘qiyapsiz. Bu samarali emas.\n\nShu vaqt ichida dam oling yoki oldingi darslarni takrorlab oling. 6 soatdan keyin botdan yana foydalana olasiz.</blockquote>",
+        "ai_budget_cooldown_notice": "<b>⏳ 6 soatlik tanaffus qo‘yildi</b>\n\n<blockquote>Bugun o‘quv limitingizni juda tez ishlatdingiz. Shoshilib hech narsa o‘rganmaysiz — sekinroq va sifatliroq o‘qing.\n\nOldingi darslarni takrorlab oling. 6 soatdan keyin bot yana ishlaydi.</blockquote>",
 
         "referral_daily_limit_offer": "<b>📸 Kunlik limitingiz tugadi</b>\n\n<blockquote>Bugungi limit tugadi. Do’stingizni taklif qiling va +5 bonus savol oling.\n\nYoki obuna rasmiylashtirishingiz mumkin.</blockquote>",
 

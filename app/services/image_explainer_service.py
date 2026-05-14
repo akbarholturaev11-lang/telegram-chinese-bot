@@ -92,6 +92,7 @@ Analyzer result:
 class ImageExplainerService:
     def __init__(self):
         self.ai_service = AIService()
+        self.last_ai_result = None
 
     async def explain_analysis(
         self,
@@ -105,9 +106,10 @@ class ImageExplainerService:
             analyzer_result=analyzer_result,
         )
 
-        return await self.ai_service.generate_reply(
+        self.last_ai_result = await self.ai_service.generate_reply_with_usage(
             text=prompt,
             user_language=user_language,
             user_level=user_level,
             history=[],
         )
+        return self.last_ai_result.content

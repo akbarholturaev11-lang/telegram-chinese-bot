@@ -7,6 +7,7 @@ from app.db.models.user import User
 from app.repositories.user_repo import UserRepository
 from app.repositories.message_repo import MessageRepository
 from app.repositories.payment_repo import PaymentRepository
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 
 class AccessService:
     def __init__(self, session):
@@ -72,6 +73,9 @@ class AccessService:
                 await self._downgrade_expired_user(user)
                 # falls through to trial logic below
             else:
+                budget_access = await AIUsageBudgetService(self.session).can_use_ai(telegram_id)
+                if not budget_access.allowed:
+                    return False, budget_access.message_key
                 return True, ""
 
         if user.status == "expired":
@@ -116,6 +120,9 @@ class AccessService:
                 await self._downgrade_expired_user(user)
                 # falls through to trial logic below
             else:
+                budget_access = await AIUsageBudgetService(self.session).can_use_ai(telegram_id)
+                if not budget_access.allowed:
+                    return False, budget_access.message_key
                 return True, ""
 
         if user.status == "expired":

@@ -4,6 +4,8 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 import json
 
 from app.repositories.user_repo import UserRepository
+from app.services.access_service import AccessService
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 from app.services.course_engine_service import CourseEngineService
 from app.services.course_progress_summary_service import CourseProgressSummaryService
 from app.services.course_tutor_service import CourseTutorService
@@ -100,6 +102,30 @@ async def send_course_completion_prompt(*, respond, engine: CourseEngineService,
         )
     else:
         await respond(t("course_completed_title", lang))
+
+
+async def _ensure_ai_available(session, telegram_id: int, respond, lang: str) -> bool:
+    can_use, message_key = await AccessService(session).can_use_text_ai(telegram_id)
+    if can_use:
+        return True
+    await respond(t(message_key, lang), parse_mode="HTML")
+    return False
+
+
+async def _record_tutor_usage(session, telegram_id: int, tutor: CourseTutorService, source: str):
+    return await AIUsageBudgetService(session).record_usage(
+        telegram_id=telegram_id,
+        result=tutor.last_ai_result,
+        source=source,
+    )
+
+
+async def _send_budget_notice(respond, record, lang: str) -> None:
+    if not record or not getattr(record, "cooldown_started", False):
+        return
+    message_key = getattr(record, "message_key", "")
+    if message_key:
+        await respond(t(message_key, lang), parse_mode="HTML")
 
 
 def _format_homework_text(lang: str, homework_raw) -> str:
@@ -500,6 +526,10 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
+    if not await _ensure_ai_available(session, callback.from_user.id, callback.message.answer, lang):
+        await callback.answer()
+        return
+
     review_text = await tutor.generate_step_response(
         user_language=user.language,
         user_level=user.level,
@@ -507,6 +537,7 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
         step="review",
         user_message="",
     )
+    review_record = await _record_tutor_usage(session, callback.from_user.id, tutor, "course_review")
 
     if getattr(progress, "homework_status", None) == "completed":
         await engine.progress_repo.set_waiting_for(progress, "none")
@@ -521,11 +552,13 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
             lesson=lesson,
             lang=lang,
         )
+        await _send_budget_notice(callback.message.answer, review_record, lang)
         return
 
     await engine.progress_repo.set_waiting_for(progress, "homework_submission")
     await session.commit()
 
+    homework_record = None
     if lesson.homework_json:
         homework_text = _format_homework_text(lang, lesson.homework_json)
     else:
@@ -536,12 +569,16 @@ async def course_review_yes_handler(callback: CallbackQuery, session):
             step="homework",
             user_message="",
         )
+        homework_record = await _record_tutor_usage(session, callback.from_user.id, tutor, "course_homework_prompt")
+        await session.commit()
 
     await callback.answer()
     await callback.message.answer(t("course_review_then_homework", lang))
     await callback.message.answer(review_text)
     await callback.message.answer(t("course_lesson_homework_intro", lang))
     await callback.message.answer(homework_text)
+    await _send_budget_notice(callback.message.answer, review_record, lang)
+    await _send_budget_notice(callback.message.answer, homework_record, lang)
 
 
 @router.callback_query(F.data == "course:review_no")
@@ -716,20 +753,28 @@ async def course_satisfied_yes_handler(callback: CallbackQuery, session):
     await engine.progress_repo.set_waiting_for(progress, "homework_submission")
     await session.commit()
 
+    homework_record = None
     if lesson.homework_json:
         homework_text = _format_homework_text(lang, lesson.homework_json)
     else:
-        homework_text = await CourseTutorService().generate_step_response(
+        if not await _ensure_ai_available(session, callback.from_user.id, callback.message.answer, lang):
+            await callback.answer()
+            return
+        tutor = CourseTutorService()
+        homework_text = await tutor.generate_step_response(
             user_language=user.language,
             user_level=user.level,
             lesson=lesson,
             step="homework",
             user_message="",
         )
+        homework_record = await _record_tutor_usage(session, callback.from_user.id, tutor, "course_homework_prompt")
+        await session.commit()
 
     await callback.answer()
     await callback.message.answer(t("course_lesson_homework_intro", lang))
     await callback.message.answer(homework_text)
+    await _send_budget_notice(callback.message.answer, homework_record, lang)
 
 
 @router.callback_query(F.data == "course:satisfied_no")
@@ -782,16 +827,23 @@ async def course_show_homework_handler(callback: CallbackQuery, session):
         await callback.message.answer(t(error_key, lang))
         return
 
+    homework_record = None
     if lesson.homework_json:
         homework_text = _format_homework_text(lang, lesson.homework_json)
     else:
-        homework_text = await CourseTutorService().generate_step_response(
+        if not await _ensure_ai_available(session, callback.from_user.id, callback.message.answer, lang):
+            await callback.answer()
+            return
+        tutor = CourseTutorService()
+        homework_text = await tutor.generate_step_response(
             user_language=user.language,
             user_level=user.level,
             lesson=lesson,
             step="homework",
             user_message="",
         )
+        homework_record = await _record_tutor_usage(session, callback.from_user.id, tutor, "course_homework_prompt")
+        await session.commit()
 
     if progress.current_step == "homework" and progress.homework_status != "completed":
         await engine.progress_repo.set_waiting_for(progress, "homework_submission")
@@ -799,6 +851,7 @@ async def course_show_homework_handler(callback: CallbackQuery, session):
 
     await callback.answer()
     await callback.message.answer(homework_text)
+    await _send_budget_notice(callback.message.answer, homework_record, lang)
 
 
 @router.callback_query(F.data == "course:start_next_lesson")
@@ -899,6 +952,8 @@ async def _send_step(respond, user, lesson, step: str, lang: str, session):
     else:
         # AI tutor orqali javob
         tutor = CourseTutorService()
+        if not await _ensure_ai_available(session, user.telegram_id, respond, lang):
+            return
         text = await tutor.generate_step_response(
             user_language=user.language,
             user_level=user.level,
@@ -906,8 +961,11 @@ async def _send_step(respond, user, lesson, step: str, lang: str, session):
             step=step,
             user_message="",
         )
+        budget_record = await _record_tutor_usage(session, user.telegram_id, tutor, "course_step")
+        await session.commit()
         keyboard = _keyboard_for_step(lang, step, lesson)
         await respond(text, reply_markup=keyboard, parse_mode="HTML")
+        await _send_budget_notice(respond, budget_record, lang)
 
 
 async def _go_to_step(callback, session, step: str):

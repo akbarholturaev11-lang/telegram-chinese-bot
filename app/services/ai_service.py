@@ -1,10 +1,20 @@
 import base64
+from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Dict, Optional
 
 from openai import AsyncOpenAI
 
 from app.config import settings
+
+
+@dataclass(frozen=True)
+class AIUsageResult:
+    content: str
+    model: str
+    prompt_tokens: int = 0
+    completion_tokens: int = 0
+    total_tokens: int = 0
 
 
 class AIService:
@@ -19,7 +29,36 @@ class AIService:
             user_level=user_level,
         )
 
-    async def generate_reply(
+    def _usage_value(self, usage, *names: str) -> int:
+        if not usage:
+            return 0
+        for name in names:
+            value = getattr(usage, name, None)
+            if value is None and isinstance(usage, dict):
+                value = usage.get(name)
+            if value is not None:
+                try:
+                    return int(value)
+                except (TypeError, ValueError):
+                    return 0
+        return 0
+
+    def _result_from_response(self, response, model: str, content: str) -> AIUsageResult:
+        usage = getattr(response, "usage", None)
+        prompt_tokens = self._usage_value(usage, "prompt_tokens", "input_tokens")
+        completion_tokens = self._usage_value(usage, "completion_tokens", "output_tokens")
+        total_tokens = self._usage_value(usage, "total_tokens")
+        if not total_tokens:
+            total_tokens = prompt_tokens + completion_tokens
+        return AIUsageResult(
+            content=content or "",
+            model=model,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+        )
+
+    async def generate_reply_with_usage(
         self,
         text: str,
         user_language: str,
@@ -27,7 +66,7 @@ class AIService:
         history: Optional[List[Dict[str, str]]] = None,
         model_override: str = None,
         max_completion_tokens: int | None = None,
-    ) -> str:
+    ) -> AIUsageResult:
         system_prompt = self._build_system_prompt(
             user_language=user_language,
             user_level=user_level,
@@ -52,8 +91,9 @@ class AIService:
             }
         )
 
+        model = model_override or "o4-mini"
         request = {
-            "model": model_override or "o4-mini",
+            "model": model,
             "messages": messages,
         }
         if max_completion_tokens is not None:
@@ -61,19 +101,43 @@ class AIService:
 
         response = await self.client.chat.completions.create(**request)
 
-        return response.choices[0].message.content or ""
+        return self._result_from_response(
+            response=response,
+            model=model,
+            content=response.choices[0].message.content or "",
+        )
 
-    async def generate_vision_reply(
+    async def generate_reply(
+        self,
+        text: str,
+        user_language: str,
+        user_level: str,
+        history: Optional[List[Dict[str, str]]] = None,
+        model_override: str = None,
+        max_completion_tokens: int | None = None,
+    ) -> str:
+        result = await self.generate_reply_with_usage(
+            text=text,
+            user_language=user_language,
+            user_level=user_level,
+            history=history,
+            model_override=model_override,
+            max_completion_tokens=max_completion_tokens,
+        )
+        return result.content
+
+    async def generate_vision_reply_with_usage(
         self,
         image_bytes: bytes,
         mime_type: str,
         prompt: str,
-    ) -> str:
+        model: str = "o4-mini",
+    ) -> AIUsageResult:
         image_b64 = base64.b64encode(image_bytes).decode("utf-8")
         data_url = f"data:{mime_type};base64,{image_b64}"
 
         response = await self.client.chat.completions.create(
-            model="o4-mini",
+            model=model,
             messages=[
                 {
                     "role": "user",
@@ -93,15 +157,32 @@ class AIService:
             ],
         )
 
-        return response.choices[0].message.content or ""
+        return self._result_from_response(
+            response=response,
+            model=model,
+            content=response.choices[0].message.content or "",
+        )
 
-    async def transcribe_voice(
+    async def generate_vision_reply(
+        self,
+        image_bytes: bytes,
+        mime_type: str,
+        prompt: str,
+    ) -> str:
+        result = await self.generate_vision_reply_with_usage(
+            image_bytes=image_bytes,
+            mime_type=mime_type,
+            prompt=prompt,
+        )
+        return result.content
+
+    async def transcribe_voice_with_usage(
         self,
         audio_bytes: bytes,
         filename: str,
         user_language: str,
         user_level: str,
-    ) -> str:
+    ) -> AIUsageResult:
         lang_labels = {
             "tj": "Tajik",
             "uz": "Uzbek",
@@ -116,8 +197,9 @@ class AIService:
             "If speech is unclear, transcribe only what you can hear."
         )
 
+        model = "gpt-4o-mini-transcribe"
         response = await self.client.audio.transcriptions.create(
-            model="gpt-4o-mini-transcribe",
+            model=model,
             chunking_strategy="auto",
             file=(filename, audio_bytes, "audio/ogg"),
             prompt=prompt,
@@ -125,5 +207,24 @@ class AIService:
         )
 
         if isinstance(response, str):
-            return response.strip()
-        return (getattr(response, "text", "") or "").strip()
+            return AIUsageResult(content=response.strip(), model=model)
+        return self._result_from_response(
+            response=response,
+            model=model,
+            content=(getattr(response, "text", "") or "").strip(),
+        )
+
+    async def transcribe_voice(
+        self,
+        audio_bytes: bytes,
+        filename: str,
+        user_language: str,
+        user_level: str,
+    ) -> str:
+        result = await self.transcribe_voice_with_usage(
+            audio_bytes=audio_bytes,
+            filename=filename,
+            user_language=user_language,
+            user_level=user_level,
+        )
+        return result.content

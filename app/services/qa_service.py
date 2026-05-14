@@ -5,6 +5,7 @@ from aiogram import Bot
 from app.repositories.user_repo import UserRepository
 from app.repositories.message_repo import MessageRepository
 from app.services.ai_service import AIService
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 from app.services.referral_service import ReferralService
 from app.services.access_service import AccessService
 
@@ -21,6 +22,7 @@ class QAService:
         self.ai_service = AIService()
         self.referral_service = ReferralService(session)
         self.access_service = AccessService(session)
+        self.last_budget_record = None
 
     async def handle_user_message(
         self,
@@ -88,7 +90,7 @@ class QAService:
             telegram_message_id=telegram_message_id,
         )
 
-        assistant_reply = await self.ai_service.generate_reply(
+        usage_result = await self.ai_service.generate_reply_with_usage(
             text=cleaned_text,
             user_language=user.language,
             user_level=user.level,
@@ -96,12 +98,18 @@ class QAService:
             model_override=QA_MODEL,
             max_completion_tokens=QA_MAX_COMPLETION_TOKENS,
         )
+        assistant_reply = usage_result.content
 
         await self.message_repo.create(
             user_id=user.id,
             role="assistant",
             content=assistant_reply,
             content_type="text",
+        )
+        self.last_budget_record = await AIUsageBudgetService(self.session).record_usage(
+            telegram_id=telegram_id,
+            result=usage_result,
+            source="qa",
         )
 
         await self.access_service.consume_one_question(telegram_id)

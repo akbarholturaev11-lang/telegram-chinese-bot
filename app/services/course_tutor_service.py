@@ -33,6 +33,7 @@ MUHIM QOIDA (ASOSIY VAZIFA):
 class CourseTutorService:
     def __init__(self):
         self.ai_service = AIService()
+        self.last_ai_result = None
 
     def _parse(self, value: Any, default: Any):
         if value is None or value == "":
@@ -392,13 +393,14 @@ QOIDALAR:
         if user_message:
             full_text += f"\n\nFOYDALANUVCHI XABARI:\n{user_message}"
 
-        response = await self.ai_service.generate_reply(
+        self.last_ai_result = await self.ai_service.generate_reply_with_usage(
             text=full_text,
             user_language=user_language,
             user_level=user_level,
             history=history or [],
             model_override=COURSE_MODEL,
         )
+        response = self.last_ai_result.content
 
         if step in _CONVERSATIONAL_STEPS:
             hint = _PRESS_BUTTON_HINT.get(user_language, _PRESS_BUTTON_HINT["ru"])
@@ -446,13 +448,14 @@ RULES:
 
         prompt = self._build_homework_evaluation_prompt(user_language, user_level, lesson, submission_text)
 
-        raw = await self.ai_service.generate_reply(
+        self.last_ai_result = await self.ai_service.generate_reply_with_usage(
             text=prompt,
             user_language=user_language,
             user_level=user_level,
             history=[],
             model_override=COURSE_MODEL,
         )
+        raw = self.last_ai_result.content
 
         try:
             cleaned = raw.strip().replace("```json","").replace("```","")

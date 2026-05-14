@@ -5,6 +5,7 @@ from app.repositories.user_repo import UserRepository
 from app.repositories.course_lesson_repo import CourseLessonRepository
 from app.repositories.course_progress_repo import CourseProgressRepository
 from app.repositories.course_attempt_repo import CourseAttemptRepository
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 from app.services.course_tutor_service import CourseTutorService
 
 
@@ -324,6 +325,11 @@ class CourseEngineService:
 
         await self.progress_repo.set_homework_status(progress, "completed")
         await self.progress_repo.set_waiting_for(progress, "next_study_time")
+        usage_record = await AIUsageBudgetService(self.session).record_usage(
+            telegram_id=telegram_id,
+            result=self.tutor.last_ai_result,
+            source="course_homework",
+        )
 
         await self.session.commit()
 
@@ -333,6 +339,8 @@ class CourseEngineService:
             "ask_next_study_time": True,
             "score": score,
             "passed": passed,
+            "budget_cooldown_started": usage_record.cooldown_started,
+            "budget_message_key": usage_record.message_key,
         }
 
     async def set_next_study_at(self, telegram_id: int, next_study_at):

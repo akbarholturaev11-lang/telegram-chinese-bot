@@ -6,6 +6,7 @@ from aiogram import Bot
 from app.repositories.user_repo import UserRepository
 from app.repositories.message_repo import MessageRepository
 from app.services.access_service import AccessService
+from app.services.ai_usage_budget_service import AIUsageBudgetService
 from app.services.image_analyzer_service import ImageAnalyzerService
 from app.services.image_explainer_service import ImageExplainerService
 
@@ -18,6 +19,7 @@ class ImageQAService:
         self.access_service = AccessService(session)
         self.image_analyzer_service = ImageAnalyzerService()
         self.image_explainer_service = ImageExplainerService()
+        self.last_budget_record = None
 
     async def _download_image_bytes(
         self,
@@ -67,6 +69,24 @@ class ImageQAService:
             analyzer_result=analyzer_result,
             user_language=user.language,
             user_level=user.level,
+        )
+        budget_service = AIUsageBudgetService(self.session)
+        analyzer_record = await budget_service.record_usage(
+            telegram_id=telegram_id,
+            result=self.image_analyzer_service.last_ai_result,
+            source="image_analyze",
+        )
+        explainer_record = await budget_service.record_usage(
+            telegram_id=telegram_id,
+            result=self.image_explainer_service.last_ai_result,
+            source="image_explain",
+        )
+        self.last_budget_record = (
+            explainer_record
+            if explainer_record.cooldown_started
+            else analyzer_record
+            if analyzer_record.cooldown_started
+            else explainer_record
         )
 
         await self.message_repo.create(

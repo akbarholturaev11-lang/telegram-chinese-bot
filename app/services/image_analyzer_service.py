@@ -41,14 +41,16 @@ ELEMENTS:
 class ImageAnalyzerService:
     def __init__(self):
         self.ai_service = AIService()
+        self.last_ai_result = None
 
     async def analyze_image(
         self,
         image_bytes: bytes,
         mime_type: str,
     ) -> str:
-        return await self.ai_service.generate_vision_reply(
+        self.last_ai_result = await self.ai_service.generate_vision_reply_with_usage(
             image_bytes=image_bytes,
             mime_type=mime_type,
             prompt=ANALYZER_PROMPT,
         )
+        return self.last_ai_result.content
