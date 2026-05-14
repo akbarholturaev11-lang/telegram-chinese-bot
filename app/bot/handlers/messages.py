@@ -1,5 +1,6 @@
 import json
 import os
+from html import escape
 from datetime import datetime, timezone, time
 
 from aiogram import F, Router
@@ -31,10 +32,12 @@ from app.bot.keyboards.main_menu import main_menu_keyboard, course_menu_keyboard
 from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.keyboards.referral import referral_daily_limit_keyboard
 from app.bot.keyboards.mode import course_promo_keyboard
+from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.utils.course_formatter import format_intro
 from app.repositories.message_repo import MessageRepository
 from app.repositories.user_repo import UserRepository
 from app.services.access_service import AccessService
+from app.services.ai_service import AIService
 from app.services.course_engine_service import CourseEngineService
 from app.services.course_progress_summary_service import CourseProgressSummaryService
 from app.services.course_tutor_service import CourseTutorService
@@ -45,6 +48,8 @@ from app.bot.utils.i18n import t
 
 
 router = Router()
+
+MAX_VOICE_DURATION_SECONDS = 60
 
 _ADMIN_FSM_STATES = {
     AdminAudioStates.waiting_for_audio.state,
@@ -74,6 +79,127 @@ def _parse_reminder_time(text: str):
     except (ValueError, AttributeError):
         pass
     return None
+
+
+class _TextMessageProxy:
+    def __init__(self, message: Message, text: str):
+        self._message = message
+        self.text = text
+
+    def __getattr__(self, name):
+        return getattr(self._message, name)
+
+
+def _is_paid_voice_user(user) -> bool:
+    return (
+        user is not None
+        and user.status == "active"
+        and user.payment_status == "approved"
+    )
+
+
+@router.message(F.voice)
+async def handle_voice_message(message: Message, state: FSMContext, session):
+    if await _is_admin_flow_message(state):
+        await message.answer("Admin sozlash jarayoni davom etyapti. Bu voice AI'ga yuborilmadi.")
+        return
+
+    user_repo = UserRepository(session)
+    access_service = AccessService(session)
+
+    user = await user_repo.get_by_telegram_id(message.from_user.id)
+    user_lang = user.language if user and user.language else "ru"
+
+    if user and user.selected_plan_type and user.payment_status != "approved":
+        await message.answer(
+            t("payment_send_screenshot_only", user_lang),
+            reply_markup=checkout_keyboard(user_lang),
+        )
+        return
+
+    if not user:
+        await message.answer(t("access_start_first", user_lang))
+        return
+
+    can_use, message_key = await access_service.can_use_text_ai(message.from_user.id)
+    if not can_use and message_key in {"access_blocked", "access_payment_pending_review"}:
+        await message.answer(t(message_key, user_lang))
+        return
+
+    if not _is_paid_voice_user(user):
+        await session.commit()
+        await message.answer(
+            t("voice_subscription_required", user_lang),
+            reply_markup=payment_method_keyboard(user_lang),
+            parse_mode="HTML",
+        )
+        return
+
+    if not can_use:
+        await message.answer(t(message_key, user_lang))
+        return
+
+    if user.learning_mode != "course":
+        await message.answer(
+            t("voice_course_only", user_lang),
+            reply_markup=course_promo_keyboard(user_lang),
+            parse_mode="HTML",
+        )
+        return
+
+    if message.voice and message.voice.duration > MAX_VOICE_DURATION_SECONDS:
+        await message.answer(t("voice_too_long", user_lang, seconds=MAX_VOICE_DURATION_SECONDS))
+        return
+
+    effect = ResponseEffect(
+        message,
+        step_delay=1.8,
+        states=(
+            t("voice_status_received", user_lang),
+            t("voice_status_transcribing", user_lang),
+            t("voice_status_understanding", user_lang),
+            t("voice_status_answering", user_lang),
+        ),
+        delete_on_stop=False,
+    )
+    await effect.start()
+
+    try:
+        telegram_file = await message.bot.get_file(message.voice.file_id)
+        downloaded = await message.bot.download_file(telegram_file.file_path)
+        downloaded.seek(0)
+        audio_bytes = downloaded.read()
+        transcript = await AIService().transcribe_voice(
+            audio_bytes=audio_bytes,
+            filename="telegram_voice.ogg",
+            user_language=user.language,
+            user_level=user.level,
+        )
+    except Exception:
+        await effect.stop()
+        await effect.set_text(t("voice_transcription_failed", user_lang))
+        return
+
+    await effect.stop()
+
+    transcript = (transcript or "").strip()
+    if not transcript:
+        await effect.set_text(t("voice_transcript_empty", user_lang))
+        return
+
+    preview_text = escape(transcript[:1000])
+    await effect.set_text(t("voice_transcript_preview", user_lang, text=preview_text))
+
+    await MessageRepository(session).create(
+        user_id=user.id,
+        role="user",
+        content=transcript,
+        content_type="voice",
+        telegram_message_id=message.message_id,
+    )
+    await session.commit()
+
+    await handle_text_message(_TextMessageProxy(message, transcript), state, session)
 
 
 

@@ -529,7 +529,17 @@ COURSE_I18N = {
         "course_lesson_started": "📚 Дарс оғоз шуд.",
         "course_test_submitted": "📝 Тест қабул шуд.",
         "course_homework_saved": "✅ Вазифаи хонагӣ сабт шуд.",
-        "course_ai_followup_blocked": "Шумо ҳоло дар режими курс ҳастед. Саволи шумо дар доираи ҳамин дарс коркард мешавад."
+        "course_ai_followup_blocked": "Шумо ҳоло дар режими курс ҳастед. Саволи шумо дар доираи ҳамин дарс коркард мешавад.",
+        "voice_subscription_required": "🎙 <b>Voice танҳо барои обуначиён аст</b>\n\n<blockquote>Обуна гиред ва ботро бе лимит истифода баред: курс, AI ҷавобҳо, сурат ва voice.</blockquote>\n\n💳 Усули пардохтро интихоб кунед:",
+        "voice_course_only": "🎙 Voice ҳоло танҳо дар <b>Режими курс</b> кор мекунад.\n\n<blockquote>Ба курс гузаред ва ҷавобҳои худро бо овоз фиристед.</blockquote>",
+        "voice_too_long": "🎙 Voice хеле дароз аст. Лутфан то {seconds} сония кӯтоҳтар фиристед.",
+        "voice_transcription_failed": "🎙 Voice-ро аниқ шунида натавонистам. Лутфан дубора фиристед ё матн нависед.",
+        "voice_transcript_empty": "🎙 Voice холӣ ё нофаҳмо баромад. Лутфан дубора равшантар фиристед.",
+        "voice_transcript_preview": "🎧 Ман чунин шунидам:\n<blockquote>{text}</blockquote>",
+        "voice_status_received": "🎙 Voice қабул шуд...",
+        "voice_status_transcribing": "🎧 Матн карда истодаам...",
+        "voice_status_understanding": "🧠 Мефаҳмам...",
+        "voice_status_answering": "✍️ Ҷавоб тайёр мешавад..."
     },
 
     "ru": {
@@ -638,7 +648,17 @@ COURSE_I18N = {
         "course_lesson_started": "📚 Урок начат.",
         "course_test_submitted": "📝 Тест принят.",
         "course_homework_saved": "✅ Домашнее задание сохранено.",
-        "course_ai_followup_blocked": "Сейчас вы в режиме курса. Ваш вопрос будет обработан в рамках текущего урока."
+        "course_ai_followup_blocked": "Сейчас вы в режиме курса. Ваш вопрос будет обработан в рамках текущего урока.",
+        "voice_subscription_required": "🎙 <b>Voice доступен только подписчикам</b>\n\n<blockquote>Оформите подписку и пользуйтесь ботом без лимитов: курс, AI-ответы, фото и voice.</blockquote>\n\n💳 Выберите способ оплаты:",
+        "voice_course_only": "🎙 Voice сейчас работает только в <b>режиме курса</b>.\n\n<blockquote>Перейдите в курс и отправляйте ответы голосом.</blockquote>",
+        "voice_too_long": "🎙 Voice слишком длинный. Пожалуйста, отправьте до {seconds} секунд.",
+        "voice_transcription_failed": "🎙 Не смог точно распознать voice. Отправьте ещё раз или напишите текстом.",
+        "voice_transcript_empty": "🎙 Voice пустой или неразборчивый. Пожалуйста, отправьте ещё раз понятнее.",
+        "voice_transcript_preview": "🎧 Я услышал так:\n<blockquote>{text}</blockquote>",
+        "voice_status_received": "🎙 Voice получен...",
+        "voice_status_transcribing": "🎧 Перевожу в текст...",
+        "voice_status_understanding": "🧠 Разбираю смысл...",
+        "voice_status_answering": "✍️ Готовлю ответ..."
     },
 
     "uz": {
@@ -747,7 +767,17 @@ COURSE_I18N = {
         "course_lesson_started": "📚 Dars boshlandi.",
         "course_test_submitted": "📝 Test qabul qilindi.",
         "course_homework_saved": "✅ Uyga vazifa saqlandi.",
-        "course_ai_followup_blocked": "Siz hozir kurs rejimidasiz. Savolingiz joriy dars doirasida qayta ishlanadi."
+        "course_ai_followup_blocked": "Siz hozir kurs rejimidasiz. Savolingiz joriy dars doirasida qayta ishlanadi.",
+        "voice_subscription_required": "🎙 <b>Voice faqat obunachilar uchun</b>\n\n<blockquote>Obuna oling va botdan limitsiz foydalaning: kurs, AI javoblar, rasm va voice.</blockquote>\n\n💳 To'lov usulini tanlang:",
+        "voice_course_only": "🎙 Voice hozircha faqat <b>Kurs rejimi</b>da ishlaydi.\n\n<blockquote>Kursga o'ting va javoblaringizni ovoz bilan yuboring.</blockquote>",
+        "voice_too_long": "🎙 Voice juda uzun. Iltimos {seconds} sekundgacha qisqa yuboring.",
+        "voice_transcription_failed": "🎙 Voice'ni aniq eshita olmadim. Qayta yuboring yoki matn qilib yozing.",
+        "voice_transcript_empty": "🎙 Voice bo'sh yoki tushunarsiz chiqdi. Iltimos qayta aniqroq yuboring.",
+        "voice_transcript_preview": "🎧 Men shunday eshitdim:\n<blockquote>{text}</blockquote>",
+        "voice_status_received": "🎙 Voice qabul qilindi...",
+        "voice_status_transcribing": "🎧 Matnga aylantiryapman...",
+        "voice_status_understanding": "🧠 Ma'nosini tushunyapman...",
+        "voice_status_answering": "✍️ Javob tayyorlanmoqda..."
     },
 }
 

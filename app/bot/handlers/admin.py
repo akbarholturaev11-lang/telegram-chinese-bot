@@ -1,4 +1,5 @@
 from aiogram import Router, F
+from aiogram.dispatcher.event.bases import SkipHandler
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from sqlalchemy import select, func
@@ -362,7 +363,7 @@ async def admin_upload_audio_handler(message: Message, session):
       hsk2 3 dialogue_2
     """
     if not _is_admin(message.from_user.id):
-        return
+        raise SkipHandler()
 
     caption = (message.caption or "").strip().lower()
     import re

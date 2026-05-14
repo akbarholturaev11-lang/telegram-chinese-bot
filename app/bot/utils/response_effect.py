@@ -11,10 +11,12 @@ class ResponseEffect:
         message: Message,
         step_delay: float = 1.6,
         states: tuple[str, ...] = ("🔥", "⚡", "✍️", "📚", "🧠"),
+        delete_on_stop: bool = True,
     ):
         self.message = message
         self.step_delay = step_delay
         self.states = states
+        self.delete_on_stop = delete_on_stop
         self.temp_message = None
         self._task: Optional[asyncio.Task] = None
         self._stopped = False
@@ -39,6 +41,14 @@ class ResponseEffect:
         self.temp_message = await self.message.answer(self.states[0])
         self._task = asyncio.create_task(self._runner())
 
+    async def set_text(self, text: str):
+        if not self.temp_message:
+            return
+        try:
+            await self.temp_message.edit_text(text)
+        except Exception:
+            pass
+
     async def stop(self):
         self._stopped = True
 
@@ -47,7 +57,7 @@ class ResponseEffect:
             with suppress(asyncio.CancelledError):
                 await self._task
 
-        if self.temp_message:
+        if self.delete_on_stop and self.temp_message:
             try:
                 await self.temp_message.delete()
             except Exception:

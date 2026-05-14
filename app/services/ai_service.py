@@ -89,3 +89,36 @@ class AIService:
         )
 
         return response.choices[0].message.content or ""
+
+    async def transcribe_voice(
+        self,
+        audio_bytes: bytes,
+        filename: str,
+        user_language: str,
+        user_level: str,
+    ) -> str:
+        lang_labels = {
+            "tj": "Tajik",
+            "uz": "Uzbek",
+            "ru": "Russian",
+        }
+        primary_lang = lang_labels.get(user_language, "Russian")
+        prompt = (
+            "Transcribe this Telegram voice message. Do not translate it. "
+            f"The user's interface language is {primary_lang}, and their Chinese level is {user_level}. "
+            "The audio is likely in the user's interface language or Chinese. "
+            "Preserve Chinese characters, pinyin, names, numbers, and short mixed-language phrases carefully. "
+            "If speech is unclear, transcribe only what you can hear."
+        )
+
+        response = await self.client.audio.transcriptions.create(
+            model="gpt-4o-mini-transcribe",
+            chunking_strategy="auto",
+            file=(filename, audio_bytes, "audio/ogg"),
+            prompt=prompt,
+            temperature=0,
+        )
+
+        if isinstance(response, str):
+            return response.strip()
+        return (getattr(response, "text", "") or "").strip()
