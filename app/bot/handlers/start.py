@@ -278,16 +278,13 @@ async def process_level(callback: CallbackQuery, state: FSMContext, session):
     data = await state.get_data()
     onboarding_message_id = data.get("onboarding_message_id")
 
-    ordinal_suffixes = {"tj": "ум", "uz": "-chi", "ru": "-й"}
-    suffix = ordinal_suffixes.get(user.language, "-chi")
-    user_num = f"{user.id}{suffix}"
+    user_num = str(user.id)
 
     try:
         if onboarding_message_id:
-            await callback.bot.edit_message_reply_markup(
+            await callback.bot.delete_message(
                 chat_id=callback.message.chat.id,
                 message_id=onboarding_message_id,
-                reply_markup=None,
             )
     except Exception:
         pass
