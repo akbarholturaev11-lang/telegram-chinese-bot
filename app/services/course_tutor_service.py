@@ -2,9 +2,7 @@ import json
 from typing import Any
 from app.services.ai_service import AIService
 
-COURSE_MODEL = "gpt-4o-mini"
-COURSE_MAX_COMPLETION_TOKENS = 1200
-HOMEWORK_EVALUATION_MAX_COMPLETION_TOKENS = 800
+COURSE_MODEL = "o4-mini"
 
 # Steps where "press button below" hint is appended — exercise is handled separately (no hint)
 _CONVERSATIONAL_STEPS = {
@@ -20,25 +18,12 @@ _PRESS_BUTTON_HINT = {
     "tj": "\n\n✅ <i>Агар фаҳмидед, тугмаи поёниро пахш кунед.</i>",
 }
 
-_CHINESE_FORMAT_RULE = """
-XITOYCHA MATN FORMATI (HECH QACHON BUZMANG):
-- Har qanday xitoycha so'z, ibora yoki jumla FAQAT shu 3 qatorli formatda beriladi:
-  <b>汉字</b>
-  <code>pīnyīn</code>
-  tarjima
-- Xitoychani bitta qatorda "<b>汉字</b> [<code>pinyin</code>] — tarjima" ko'rinishida yozma.
-- Bir nechta xitoycha birlik bo'lsa, har bir birlik orasida bitta bo'sh qator qoldir.
-- Pinyin har doim tone belgilar bilan yozilsin.
-- Tarjima foydalanuvchi tanlagan tilda bo'lsin.
-"""
-
 # MUHIM QOIDA — barcha tushuntirish bulimlari uchun (intro/vocab/dialogue/grammar)
 _EXPLANATION_RULE = """
 MUHIM QOIDA (ASOSIY VAZIFA):
 - Sen HECH QACHON foydalanuvchiga mashq, savol yoki test bermaysan
 - Sening vazifang: foydalanuvchiga hozirgi mavzuni tushuntirish
 - Agar foydalanuvchi savol bersa — tushuntir, misollar keltir
-- Agar foydalanuvchi xato yozsa: avval xatoni ko'rsat, keyin "Nega xato:" va "To'g'ri qilish uchun:" deb qisqa tushuntir
 - Har bir javob oxirida yana biror narsani tushuntirishni TAKLIF qil
   (masalan: "Yana so'zlar haqida misollar xohlaysizmi?" yoki "Grammatika qoidasi haqida ko'proq aytaymi?")
 - Aslo: "Endi mashq qilamiz", "Quyidagi savolga javob bering", "Sinab ko'ring" dema
@@ -86,11 +71,11 @@ DARS MA'LUMOTLARI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasiga moslashtirilgan
-- Jami 12 qatordan oshmasin, 90 so'zdan uzun bo'lmasin
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code> ishlatilsin
+- Jami 4 qatordan oshmasin
 - 2-3 ta so'z va asosiy grammatika mavzusini qiziqarli tarzda tanishtir
 - Hali o'qitma — faqat tanishtir
 - Oxirida "Tayyor? Ketdik! 🚀" kabi quvnoq gap bilan tugat ({user_language} tilida)
-{_CHINESE_FORMAT_RULE}
 {_EXPLANATION_RULE}"""
 
         return prompt, data
@@ -108,13 +93,11 @@ SO'ZLAR MA'LUMOTI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 8 ta asosiy so'zni tanla, javob 32 qatordan oshmasin
-- Har bir so'z 3 qatorli xitoycha formatda bo'lsin
-- Misol jumla kerak bo'lsa, u ham 3 qatorli xitoycha formatda bo'lsin
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol jumla
 - O'xshash so'zlar bo'lsa (masalan 我/你, 大/小), ularni yonma-yon solishtir
-- Izohlar juda qisqa bo'lsin: har so'zga maksimum 1 oddiy gap
+- So'z boshiga 2 qatordan oshmasin, jami 15 qatordan kam
 - Foydalanuvchi savollarini tushuntir, keyin TAKLIF qil (masalan: "Yana qaysi so'z haqida ko'proq bilmoqchisiz?")
-{_CHINESE_FORMAT_RULE}
 {_EXPLANATION_RULE}"""
 
         return prompt, data
@@ -132,13 +115,12 @@ DIALOG MA'LUMOTI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 4 ta dialog qatorini tushuntir, javob 26 qatordan oshmasin
-- Har bir dialog qatori 3 qatorli xitoycha formatda bo'lsin
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir qator: <b>Xitoycha</b> [<code>pinyin</code>] — {user_language}dagi ma'nosi
 - Taqdimotdan keyin kontekstni qisqacha tushuntir (bu suhbat qayerda/qachon bo'ladi)
 - Dialogdan 1-2 ta foydali iboralarni amaliy hayot bilan solishtirgan holda tushuntir
-- Qo'shimcha izohlar 4 qisqa gapdan oshmasin
+- Jami 12 qatordan oshmasin
 - Foydalanuvchi dialog haqida savol bersa — tushuntir va TAKLIF qil (masalan: "Ushbu ibora boshqa situatsiyalarda qanday ishlatiladi, ko'rmoqchimisiz?")
-{_CHINESE_FORMAT_RULE}
 {_EXPLANATION_RULE}"""
 
         return prompt, data
@@ -161,14 +143,12 @@ GRAMMATIKA MA'LUMOTI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 2 ta grammatika nuqtasini tushuntir, javob 28 qatordan oshmasin
-- Har bir grammatika nuqtasi: 1 qisqa qoida + 1 naqsh + 1-2 misol
-- Har bir xitoycha misol 3 qatorli xitoycha formatda bo'lsin
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir grammatika nuqtasi: qoida → bo'sh joy bilan naqsh → dars lug'atidan 2 ta misol
 - O'xshash tuzilmalar bo'lsa (masalan 的/地/得, 吗/呢, 在/有), tezkor maslahat bilan solishtir
 - Misollar FAQAT lesson_vocabulary so'zlaridan foydalansin
-- Har bir izoh maksimum 2 gap bo'lsin
+- Jami 10 qatordan oshmasin
 - Foydalanuvchi savol bersa tushuntir va TAKLIF qil (masalan: "Bu qoidani boshqa misollar bilan ko'rmoqchimisiz?")
-{_CHINESE_FORMAT_RULE}
 {_EXPLANATION_RULE}"""
 
         return prompt, data
@@ -206,17 +186,15 @@ ASOSIY VAZIFA — JAVOBNI MAZMUN BO'YICHA TEKSHIR (FORMAT BO'YICHA EMAS):
 - Har bir javobni FAQAT MAZMUN bo'yicha tekshir:
   * ✅ — ma'no/so'z to'g'ri bo'lsa
   * ❌ — ma'no/so'z noto'g'ri bo'lsa
-- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI 3 qatorli xitoycha formatda ko'rsat
-- Noto'g'ri bo'lsa albatta yoz:
-  * Nega xato: 1 qisqa gap
-  * To'g'ri qilish uchun: 1 aniq maslahat
+- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat (faqat bot o'zi <b>汉字</b> [<code>pinyin</code>] — ma'no formatida yozadi)
+- Xatolarni qisqa tushuntir
 - Rag'batlantiruvchi bo'l: "Yaxshi! 👏" yoki "Deyarli to'g'ri! Mana maslahat..."
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Javob 16 qatordan oshmasin
-- Keyingi bo'limga o'tish haqida HECH NARSA dema — tizim o'zi o'tkazadi
-{_CHINESE_FORMAT_RULE}"""
+- Bot o'z javobida xitoy: <b>...</b>, pinyin: <code>...</code> ishlatadi
+- Jami 10 qatordan oshmasin
+- Keyingi bo'limga o'tish haqida HECH NARSA dema — tizim o'zi o'tkazadi"""
 
         return prompt, data
 
@@ -238,21 +216,19 @@ TEST MA'LUMOTI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
 - BIRINCHI CHAQIRUVDA (foydalanuvchi xabari yo'q bo'lsa):
   * FAQAT 3-4 ta TEST SAVOLI ber — raqamlangan (1, 2, 3, 4)
   * Savol turlari: ko'p tanlovli (A/B/C/D) YOKI bo'sh to'ldirish
   * FAQAT test_vocabulary va test_grammar dan — tashqi so'z yo'q
   * Tushuntirma, izoh, so'z ma'nolari BERMA — faqat savollar
-  * Savoldagi har bir xitoycha matn 3 qatorli xitoycha formatda bo'lsin
-  * Test savollari 18 qatordan oshmasin
 - FOYDALANUVCHI JAVOB YUBORGANDA:
   * Har bir javobni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
-  * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI 3 qatorli xitoycha formatda ko'rsat
-  * Noto'g'ri bo'lsa: "Nega xato:" va "To'g'ri qilish uchun:" deb 1 tadan aniq gap yoz
+  * Noto'g'ri bo'lsa: TO'G'RI JAVOBNI ko'rsat
   * Umumiy ball ber (masalan: 3/4 ✅)
-  * Tekshiruv javobi 18 qatordan oshmasin
+  * Xatolarni 1 qatorda qisqa tushuntir
 - Rag'batlantiruvchi bo'l
-{_CHINESE_FORMAT_RULE}"""
+- Jami 12 qatordan oshmasin"""
 
         return prompt, data
 
@@ -269,8 +245,7 @@ QOIDALAR:
 - BITTA oddiy savol ber: darsni tushundingizmi?
 - Maksimal 2 qator
 - Yangi kontent o'qitma
-- Oldinga siljima — talabaning tugmalar orqali javobini kut
-{_CHINESE_FORMAT_RULE}"""
+- Oldinga siljima — talabaning tugmalar orqali javobini kut"""
 
         return prompt, data
 
@@ -301,18 +276,15 @@ UY VAZIFASI MA'LUMOTI:
 
 ASOSIY VAZIFA — FOYDALANUVCHI JAVOBINI TEKSHIR:
 - Har bir bandni tekshir: ✅ to'g'ri yoki ❌ noto'g'ri
-- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI 3 qatorli xitoycha formatda ko'rsat
-- Noto'g'ri bo'lsa albatta yoz:
-  * Nega xato: 1 qisqa gap
-  * To'g'ri qilish uchun: 1 aniq maslahat
+- Noto'g'ri bo'lsa: TO'G'RI JAVOBNI va TO'G'RI FORMATNI ko'rsat
 - Ball ber: 0-100
 - Nimasi yaxshi va nimani yaxshilash kerakligini aniq ayt
 - Rag'batlantiruvchi va aniq bo'l
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 16 qator
-{_CHINESE_FORMAT_RULE}"""
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Maksimal 8 qator"""
 
         return prompt, data
 
@@ -329,11 +301,9 @@ SO'ZLAR (1–8):
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 8 ta so'z ber, javob 32 qatordan oshmasin
-- Har bir so'z 3 qatorli xitoycha formatda bo'lsin
-- Misol kerak bo'lsa, u ham 3 qatorli xitoycha formatda bo'lsin
-- Har bir so'z izohi maksimum 1 qisqa gap bo'lsin
-{_CHINESE_FORMAT_RULE}
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol
+- Jami 15 qatordan oshmasin
 {_EXPLANATION_RULE}"""
         return prompt, data
 
@@ -350,11 +320,9 @@ SO'ZLAR (9+):
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 8 ta so'z ber, javob 32 qatordan oshmasin
-- Har bir so'z 3 qatorli xitoycha formatda bo'lsin
-- Misol kerak bo'lsa, u ham 3 qatorli xitoycha formatda bo'lsin
-- Har bir so'z izohi maksimum 1 qisqa gap bo'lsin
-{_CHINESE_FORMAT_RULE}
+- Xitoy belgilari uchun <b>...</b>, pinyin uchun <code>...</code>
+- Har bir so'z: <b>汉字</b> [<code>pīnyīn</code>] — ma'nosi — qisqa misol
+- Jami 15 qatordan oshmasin
 {_EXPLANATION_RULE}"""
         return prompt, data
 
@@ -372,11 +340,10 @@ DIALOG MA'LUMOTI:
 
 QOIDALAR:
 - Faqat {user_language} tilida javob ber, {user_level} darajasi
-- Maksimal 4 ta dialog qatorini tushuntir, javob 26 qatordan oshmasin
-- Har bir dialog qatori 3 qatorli xitoycha formatda bo'lsin
+- Xitoy: <b>...</b>, pinyin: <code>...</code>
+- Har bir qator: <b>Xitoycha</b> [<code>pinyin</code>] — tarjima
 - Dialogdan 1-2 ta foydali ibora va grammar_notes ni qisqa tushuntir
-- Qo'shimcha izohlar 4 qisqa gapdan oshmasin
-{_CHINESE_FORMAT_RULE}
+- Jami 12 qatordan oshmasin
 {_EXPLANATION_RULE}"""
         return prompt, data
 
@@ -431,7 +398,6 @@ QOIDALAR:
             user_level=user_level,
             history=history or [],
             model_override=COURSE_MODEL,
-            max_completion_tokens=COURSE_MAX_COMPLETION_TOKENS,
         )
 
         if step in _CONVERSATIONAL_STEPS:
@@ -468,24 +434,15 @@ DATA:
 RULES:
 - Evaluate ONLY against the homework and lesson content above
 - Give score 0-100
-- Set passed = true if score >= 60
+- decided passed = true if score >= 60
 - feedback_text must be in {user_language}, short and clear
-- feedback_text must be max 8 lines and max 600 characters
-- If the student is wrong, feedback_text must include:
-  1. Why it is wrong
-  2. How to avoid the same mistake next time
-  3. The correct answer if needed
-- Any Chinese word, phrase, or sentence inside feedback_text must follow this exact 3-line format:
-  <b>汉字</b>
-  <code>pīnyīn</code>
-  translation in {user_language}
 - Return ONLY valid JSON, nothing else:
 {{"score": 0, "passed": false, "feedback_text": "..."}}"""
 
     async def evaluate_homework(self, user_language, user_level, lesson, submission_text) -> dict:
         submission_text = (submission_text or "").strip()
         if not submission_text:
-            return {"score": 0, "passed": False, "feedback_text": "Javob bo'sh."}
+            return {"score": 0, "passed": False, "feedback_text": "Empty submission."}
 
         prompt = self._build_homework_evaluation_prompt(user_language, user_level, lesson, submission_text)
 
@@ -495,7 +452,6 @@ RULES:
             user_level=user_level,
             history=[],
             model_override=COURSE_MODEL,
-            max_completion_tokens=HOMEWORK_EVALUATION_MAX_COMPLETION_TOKENS,
         )
 
         try:
