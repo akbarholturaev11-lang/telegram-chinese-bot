@@ -10,7 +10,7 @@ class ResponseEffect:
         self,
         message: Message,
         step_delay: float = 1.6,
-        states: tuple[str, ...] = ("🔥", "⚡", "✍️", "📚", "🧠"),
+        states: tuple[str, ...] = ("🔥", "⚡", "✍️", "📚", "💫", "💎"),
         delete_on_stop: bool = True,
     ):
         self.message = message
