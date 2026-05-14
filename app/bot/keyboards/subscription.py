@@ -149,3 +149,51 @@ def admin_discount_plan_keyboard(
             ],
         ]
     )
+
+
+def feedback_discount_payment_method_keyboard(feedback_id: int, lang: str):
+    labels = {
+        "visa": "💳 VISA card",
+        "alipay": "🇨🇳 Alipay",
+        "wechat": "🇨🇳 WeChat Pay",
+    }
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(
+                text=label,
+                callback_data=f"feedback_discount:method:{feedback_id}:{method}",
+            )
+        ]
+        for method, label in labels.items()
+    ] + [
+        [
+            InlineKeyboardButton(text=t("payment_back", lang), callback_data="payment:back"),
+        ],
+    ])
+
+
+def feedback_discount_plan_keyboard(
+    feedback_id: int,
+    lang: str,
+    payment_method: str,
+) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("subscription_button_10_days", lang),
+                    callback_data=f"feedback_discount:plan:{feedback_id}:{payment_method}:10_days",
+                ),
+                InlineKeyboardButton(
+                    text=t("subscription_button_1_month", lang),
+                    callback_data=f"feedback_discount:plan:{feedback_id}:{payment_method}:1_month",
+                ),
+            ],
+            [
+                InlineKeyboardButton(
+                    text=t("payment_back", lang),
+                    callback_data=f"feedback_discount:open:{feedback_id}",
+                )
+            ],
+        ]
+    )

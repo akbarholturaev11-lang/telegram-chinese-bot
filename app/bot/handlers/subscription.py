@@ -6,6 +6,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 
 from app.config import settings
 from app.repositories.payment_repo import PaymentRepository
+from app.repositories.bot_feedback_repo import BotFeedbackRepository
 from app.repositories.user_repo import UserRepository
 from app.services.discount_service import DiscountService
 from app.services.payment_service import PaymentService
@@ -14,6 +15,8 @@ from app.bot.utils.i18n import t
 from app.bot.keyboards.subscription import (
     admin_discount_plan_keyboard,
     discount_payment_method_keyboard,
+    feedback_discount_payment_method_keyboard,
+    feedback_discount_plan_keyboard,
     subscription_discount_progress_keyboard,
     subscription_discount_ready_keyboard,
     payment_method_keyboard,
@@ -264,6 +267,58 @@ async def build_admin_discount_plan_view(
     )
 
 
+async def _get_available_feedback_offer(session, user, feedback_id: int):
+    return await BotFeedbackRepository(session).get_available_price_offer(
+        feedback_id=feedback_id,
+        telegram_id=user.telegram_id,
+    )
+
+
+async def build_feedback_discount_payment_view(
+    session,
+    user,
+    lang: str,
+    feedback_id: int,
+) -> tuple[str, InlineKeyboardMarkup] | None:
+    feedback = await _get_available_feedback_offer(session, user, feedback_id)
+    if not feedback:
+        return None
+    return (
+        t("feedback_price_offer_payment_choose", lang),
+        feedback_discount_payment_method_keyboard(feedback.id, lang),
+    )
+
+
+async def build_feedback_discount_plan_view(
+    session,
+    user,
+    lang: str,
+    feedback_id: int,
+    payment_method: str,
+) -> tuple[str, InlineKeyboardMarkup] | None:
+    feedback = await _get_available_feedback_offer(session, user, feedback_id)
+    if not feedback:
+        return None
+
+    lines = []
+    for plan in PLANS:
+        base, currency = _plan_price(plan, payment_method)
+        lines.append(
+            build_discount_plan_line(
+                lang=lang,
+                plan=plan,
+                base=base,
+                currency=currency,
+                percent=20,
+            )
+        )
+
+    return (
+        t("feedback_price_offer_plan_choose", lang, lines="\n".join(lines)),
+        feedback_discount_plan_keyboard(feedback.id, lang, payment_method),
+    )
+
+
 async def _replace_with_text(
     callback: CallbackQuery,
     text: str,
@@ -388,6 +443,118 @@ async def discount_offer_open_handler(callback: CallbackQuery, session):
         parse_mode="HTML",
         disable_web_page_preview=True,
     )
+
+
+@router.callback_query(F.data.startswith("feedback_discount:open:"))
+async def feedback_discount_open_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language or "ru"
+    feedback_id = int(callback.data.split(":")[2])
+    view = await build_feedback_discount_payment_view(session, user, lang, feedback_id)
+    if not view:
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    await callback.answer()
+    text, keyboard = view
+    await _replace_with_text(
+        callback,
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+
+
+@router.callback_query(F.data.startswith("feedback_discount:method:"))
+async def feedback_discount_method_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    parts = callback.data.split(":")
+    feedback_id = int(parts[2])
+    payment_method = parts[3]
+    lang = user.language or "ru"
+
+    if payment_method not in PAYMENT_METHODS:
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    user.payment_method = payment_method
+    await session.flush()
+
+    view = await build_feedback_discount_plan_view(
+        session,
+        user,
+        lang,
+        feedback_id,
+        payment_method,
+    )
+    if not view:
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    await callback.answer()
+    text, keyboard = view
+    await _replace_with_text(
+        callback,
+        text,
+        reply_markup=keyboard,
+        parse_mode="HTML",
+        disable_web_page_preview=True,
+    )
+
+
+@router.callback_query(F.data.startswith("feedback_discount:plan:"))
+async def feedback_discount_plan_handler(callback: CallbackQuery, session):
+    user_repo = UserRepository(session)
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    parts = callback.data.split(":")
+    feedback_id = int(parts[2])
+    payment_method = parts[3]
+    plan = parts[4]
+    lang = user.language or "ru"
+
+    if payment_method not in PAYMENT_METHODS or plan not in PLANS:
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    feedback = await _get_available_feedback_offer(session, user, feedback_id)
+    if not feedback:
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    user.payment_method = payment_method
+    await session.flush()
+
+    payment_service = PaymentService(session)
+    payment, checkout_info, error_key = await payment_service.create_checkout_draft(
+        telegram_id=callback.from_user.id,
+        plan_type=plan,
+        force_feedback_discount=True,
+        feedback_id=feedback.id,
+    )
+
+    if not payment or not checkout_info or checkout_info.get("discount_source") != "feedback_price_offer":
+        await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+        return
+
+    await user_repo.set_selected_plan_type(user, plan)
+    await _show_checkout(callback, user_repo, user, lang, plan, checkout_info)
+    await session.commit()
+    await callback.answer()
 
 
 @router.callback_query(F.data.startswith("discount_offer:method:"))
@@ -656,6 +823,32 @@ async def checkout_change_plan_handler(callback: CallbackQuery, session):
         )
         if not view:
             await callback.answer(t("subscription_admin_discount_expired", lang), show_alert=True)
+            return
+        text, keyboard = view
+        await _replace_with_text(
+            callback,
+            text,
+            reply_markup=keyboard,
+            parse_mode="HTML",
+            disable_web_page_preview=True,
+        )
+        await callback.answer()
+        return
+
+    if draft and draft.discount_source == "feedback_price_offer":
+        feedback = await BotFeedbackRepository(session).get_latest_available_price_offer(callback.from_user.id)
+        if not feedback:
+            await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
+            return
+        view = await build_feedback_discount_plan_view(
+            session,
+            user,
+            lang,
+            feedback.id,
+            draft.payment_method or user.payment_method or "visa",
+        )
+        if not view:
+            await callback.answer(t("feedback_price_offer_expired", lang), show_alert=True)
             return
         text, keyboard = view
         await _replace_with_text(

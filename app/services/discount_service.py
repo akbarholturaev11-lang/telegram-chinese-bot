@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from app.db.models.discount_campaign import DiscountCampaign
+from app.repositories.bot_feedback_repo import BotFeedbackRepository
 from app.repositories.discount_campaign_repo import DiscountCampaignRepository
 
 
@@ -30,7 +31,9 @@ class DiscountChoice:
 
 class DiscountService:
     def __init__(self, session):
+        self.session = session
         self.repo = DiscountCampaignRepository(session)
+        self.feedback_repo = BotFeedbackRepository(session)
 
     async def get_best_discount(
         self,
@@ -90,6 +93,30 @@ class DiscountService:
             return DiscountChoice()
 
         return max(choices, key=lambda item: item.percent)
+
+    async def get_feedback_price_discount(
+        self,
+        *,
+        user,
+        feedback_id: Optional[int] = None,
+    ) -> DiscountChoice:
+        if feedback_id is not None:
+            feedback = await self.feedback_repo.get_available_price_offer(
+                feedback_id=feedback_id,
+                telegram_id=user.telegram_id,
+            )
+        else:
+            feedback = await self.feedback_repo.get_latest_available_price_offer(user.telegram_id)
+
+        if not feedback:
+            return DiscountChoice()
+
+        return DiscountChoice(
+            source="feedback_price_offer",
+            percent=20,
+            title="Feedback 20%",
+            details=f"Bot feedback #{feedback.id}: user obuna narxini qimmat deb belgilagan.",
+        )
 
     def _matches_campaign(
         self,

@@ -1,6 +1,7 @@
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
+from app.repositories.bot_feedback_repo import BotFeedbackRepository
 from app.repositories.user_repo import UserRepository
 
 
@@ -14,6 +15,7 @@ class SubscriptionService:
     def __init__(self, session):
         self.session = session
         self.user_repo = UserRepository(session)
+        self.feedback_repo = BotFeedbackRepository(session)
 
     async def activate_plan(
         self,
@@ -41,6 +43,9 @@ class SubscriptionService:
         if discount_source == "referral" and user.discount_eligible and not user.discount_used:
             user.discount_used = True
             user.discount_eligible = False
+
+        if discount_source == "feedback_price_offer":
+            await self.feedback_repo.mark_latest_price_offer_used(telegram_id)
 
         await self.session.flush()
         return True

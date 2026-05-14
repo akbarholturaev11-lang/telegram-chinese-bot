@@ -50,6 +50,8 @@ async def _background_scheduler(bot: Bot) -> None:
                 await CourseReminderService(session).send_due_reminders(bot)
             async with async_session_maker() as session:
                 await CourseReminderService(session).send_weekly_progress_reports(bot)
+            async with async_session_maker() as session:
+                await BotFeedbackService(session).send_due_price_discount_offers(bot)
             now = datetime.now(timezone.utc)
             if (
                 _last_feedback_check_at is None

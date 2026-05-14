@@ -35,6 +35,8 @@ class PaymentService:
         user,
         plan_type: str,
         force_admin_discount: bool = False,
+        force_feedback_discount: bool = False,
+        feedback_id: Optional[int] = None,
     ):
         base_amount = self.get_plan_price(plan_type)
         if base_amount is None:
@@ -56,7 +58,12 @@ class PaymentService:
             currency = "somoni"
 
         discount_service = DiscountService(self.session)
-        if force_admin_discount:
+        if force_feedback_discount:
+            discount = await discount_service.get_feedback_price_discount(
+                user=user,
+                feedback_id=feedback_id,
+            )
+        elif force_admin_discount:
             discount = await discount_service.get_best_admin_discount(
                 user=user,
                 plan_type=plan_type,
@@ -89,6 +96,8 @@ class PaymentService:
         telegram_id: int,
         plan_type: str,
         force_admin_discount: bool = False,
+        force_feedback_discount: bool = False,
+        feedback_id: Optional[int] = None,
     ):
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
@@ -98,6 +107,8 @@ class PaymentService:
             user=user,
             plan_type=plan_type,
             force_admin_discount=force_admin_discount,
+            force_feedback_discount=force_feedback_discount,
+            feedback_id=feedback_id,
         )
         if not checkout_info:
             return None, None, "payment_invalid_plan"
@@ -192,7 +203,11 @@ class PaymentService:
         if draft_payment:
             if draft_payment.plan_type != plan_type:
                 user = await self.user_repo.get_by_telegram_id(telegram_id)
-                checkout_info = await self.get_checkout_info(user=user, plan_type=plan_type)
+                checkout_info = await self.get_checkout_info(
+                    user=user,
+                    plan_type=plan_type,
+                    force_feedback_discount=draft_payment.discount_source == "feedback_price_offer",
+                )
                 if not checkout_info:
                     return None, "payment_invalid_plan"
                 await self.payment_repo.update_checkout(

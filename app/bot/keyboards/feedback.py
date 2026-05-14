@@ -54,3 +54,16 @@ def feedback_cancel_keyboard(feedback_id: int, lang: str) -> InlineKeyboardMarku
             ]
         ]
     )
+
+
+def feedback_price_offer_keyboard(feedback_id: int, lang: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                InlineKeyboardButton(
+                    text=t("feedback_price_offer_button", lang),
+                    callback_data=f"feedback_discount:open:{feedback_id}",
+                )
+            ]
+        ]
+    )

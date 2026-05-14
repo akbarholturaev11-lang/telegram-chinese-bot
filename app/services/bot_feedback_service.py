@@ -4,7 +4,11 @@ from typing import Optional
 from aiogram import Bot
 from sqlalchemy import select
 
-from app.bot.keyboards.feedback import feedback_dislike_keyboard, feedback_like_keyboard
+from app.bot.keyboards.feedback import (
+    feedback_dislike_keyboard,
+    feedback_like_keyboard,
+    feedback_price_offer_keyboard,
+)
 from app.bot.utils.i18n import t
 from app.db.models.bot_feedback import BotFeedback
 from app.db.models.user import User
@@ -16,6 +20,7 @@ FEEDBACK_PERIOD_DAYS = 30
 FEEDBACK_JOIN_DELAY = timedelta(days=1)
 FEEDBACK_RETRY_AFTER = timedelta(hours=24)
 FEEDBACK_REWARD_DAYS = 1
+FEEDBACK_PRICE_OFFER_DELAY = timedelta(minutes=5)
 
 
 class BotFeedbackService:
@@ -126,4 +131,37 @@ class BotFeedbackService:
         user: User,
     ) -> None:
         await self.feedback_repo.complete(feedback)
+        if feedback.disliked_code == "price" and not feedback.price_offer_due_at:
+            await self.feedback_repo.schedule_price_offer(
+                feedback,
+                datetime.now(timezone.utc) + FEEDBACK_PRICE_OFFER_DELAY,
+            )
         await self.grant_feedback_reward(user, feedback)
+
+    async def send_due_price_discount_offers(self, bot: Bot) -> int:
+        now = datetime.now(timezone.utc)
+        feedbacks = await self.feedback_repo.list_due_price_offers(now)
+
+        sent_count = 0
+        for feedback in feedbacks:
+            user = await self.user_repo.get_by_telegram_id(feedback.telegram_id)
+            if not user or user.status == "blocked":
+                await self.feedback_repo.mark_price_offer_sent(feedback)
+                continue
+
+            lang = user.language if user.language else feedback.language or "ru"
+            try:
+                await bot.send_message(
+                    chat_id=user.telegram_id,
+                    text=t("feedback_price_offer_text", lang),
+                    reply_markup=feedback_price_offer_keyboard(feedback.id, lang),
+                    parse_mode="HTML",
+                )
+                sent_count += 1
+            except Exception:
+                continue
+
+            await self.feedback_repo.mark_price_offer_sent(feedback)
+
+        await self.session.commit()
+        return sent_count

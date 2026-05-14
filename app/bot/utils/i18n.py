@@ -775,6 +775,15 @@ FEEDBACK_I18N = {
             "<blockquote>Мо албатта камбудиҳоро ислоҳ мекунем.\n"
             "Ба шумо 1 рӯз дастрасии бе лимит фаъол шуд.</blockquote>"
         ),
+        "feedback_price_offer_text": (
+            "<b>Мо одзиви шуморо дидем 🙏</b>\n\n"
+            "<blockquote>Шумо гуфтед, ки нархи обуна баланд аст. Барои ҳамин ба шумо пешниҳоди махсус додем: "
+            "обунаро бо <b>20% тахфиф</b> гирифта метавонед.</blockquote>"
+        ),
+        "feedback_price_offer_button": "🎁 Истифодаи 20% тахфиф",
+        "feedback_price_offer_payment_choose": "💳 Барои истифодаи 20% тахфиф усули пардохтро интихоб кунед:",
+        "feedback_price_offer_plan_choose": "🎁 <b>20% тахфифи махсус</b>\n\n<blockquote>{lines}</blockquote>\n\nТарифро интихоб кунед:",
+        "feedback_price_offer_expired": "Ин пешниҳоди махсус дигар дастрас нест.",
         "feedback_like_course": "📚 Режими курс қулай аст",
         "feedback_like_answers": "💬 Ҷавобҳо зуд ва фаҳмоанд",
         "feedback_like_photo": "📸 Кор бо сурат/иероглиф қулай аст",
@@ -808,6 +817,15 @@ FEEDBACK_I18N = {
             "<blockquote>Мы обязательно постараемся убрать недочёты.\n"
             "Вам активирован 1 день доступа без лимитов.</blockquote>"
         ),
+        "feedback_price_offer_text": (
+            "<b>Мы заметили ваш отзыв 🙏</b>\n\n"
+            "<blockquote>Вы отметили, что цена подписки высокая. Поэтому мы подготовили для вас специальное предложение: "
+            "подписка со <b>скидкой 20%</b>.</blockquote>"
+        ),
+        "feedback_price_offer_button": "🎁 Получить скидку 20%",
+        "feedback_price_offer_payment_choose": "💳 Выберите способ оплаты для скидки 20%:",
+        "feedback_price_offer_plan_choose": "🎁 <b>Специальная скидка 20%</b>\n\n<blockquote>{lines}</blockquote>\n\nВыберите тариф:",
+        "feedback_price_offer_expired": "Это специальное предложение больше недоступно.",
         "feedback_like_course": "📚 Удобный режим курса",
         "feedback_like_answers": "💬 Быстрые и понятные ответы",
         "feedback_like_photo": "📸 Удобная работа с фото/иероглифами",
@@ -841,6 +859,15 @@ FEEDBACK_I18N = {
             "<blockquote>Biz albatta kamchiliklarni yo'qotishga harakat qilamiz.\n"
             "Sizga 1 kunlik limitsiz kirish faollashtirildi.</blockquote>"
         ),
+        "feedback_price_offer_text": (
+            "<b>Biz sizning otzivingizni payqadik 🙏</b>\n\n"
+            "<blockquote>Siz obuna narxi balandligini belgiladingiz. Shuning uchun sizga maxsus taklif berdik: "
+            "obunani <b>20% chegirma</b> bilan olishingiz mumkin.</blockquote>"
+        ),
+        "feedback_price_offer_button": "🎁 20% chegirmadan foydalanish",
+        "feedback_price_offer_payment_choose": "💳 20% chegirma uchun to'lov usulini tanlang:",
+        "feedback_price_offer_plan_choose": "🎁 <b>Maxsus 20% chegirma</b>\n\n<blockquote>{lines}</blockquote>\n\nTarifni tanlang:",
+        "feedback_price_offer_expired": "Bu maxsus taklif endi mavjud emas.",
         "feedback_like_course": "📚 Kurs rejimi qulay",
         "feedback_like_answers": "💬 Javoblar tez va tushunarli",
         "feedback_like_photo": "📸 Foto/ieroglif bilan ishlash qulay",

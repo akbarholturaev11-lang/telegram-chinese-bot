@@ -97,3 +97,70 @@ class BotFeedbackRepository:
         feedback.reward_granted_at = now
         feedback.updated_at = now
         await self.session.flush()
+
+    async def schedule_price_offer(
+        self,
+        feedback: BotFeedback,
+        due_at: datetime,
+    ) -> None:
+        feedback.price_offer_due_at = due_at
+        feedback.updated_at = datetime.now(timezone.utc)
+        await self.session.flush()
+
+    async def list_due_price_offers(self, now: datetime) -> list[BotFeedback]:
+        result = await self.session.execute(
+            select(BotFeedback)
+            .where(BotFeedback.status == "completed")
+            .where(BotFeedback.disliked_code == "price")
+            .where(BotFeedback.price_offer_due_at.is_not(None))
+            .where(BotFeedback.price_offer_due_at <= now)
+            .where(BotFeedback.price_offer_sent_at.is_(None))
+            .order_by(BotFeedback.price_offer_due_at.asc())
+        )
+        return list(result.scalars().all())
+
+    async def mark_price_offer_sent(self, feedback: BotFeedback) -> None:
+        now = datetime.now(timezone.utc)
+        feedback.price_offer_sent_at = now
+        feedback.updated_at = now
+        await self.session.flush()
+
+    async def get_available_price_offer(
+        self,
+        *,
+        feedback_id: int,
+        telegram_id: int,
+    ) -> Optional[BotFeedback]:
+        result = await self.session.execute(
+            select(BotFeedback)
+            .where(BotFeedback.id == feedback_id)
+            .where(BotFeedback.telegram_id == telegram_id)
+            .where(BotFeedback.status == "completed")
+            .where(BotFeedback.disliked_code == "price")
+            .where(BotFeedback.price_offer_sent_at.is_not(None))
+            .where(BotFeedback.price_offer_used_at.is_(None))
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
+    async def get_latest_available_price_offer(self, telegram_id: int) -> Optional[BotFeedback]:
+        result = await self.session.execute(
+            select(BotFeedback)
+            .where(BotFeedback.telegram_id == telegram_id)
+            .where(BotFeedback.status == "completed")
+            .where(BotFeedback.disliked_code == "price")
+            .where(BotFeedback.price_offer_sent_at.is_not(None))
+            .where(BotFeedback.price_offer_used_at.is_(None))
+            .order_by(BotFeedback.price_offer_sent_at.desc())
+            .limit(1)
+        )
+        return result.scalar_one_or_none()
+
+    async def mark_latest_price_offer_used(self, telegram_id: int) -> None:
+        feedback = await self.get_latest_available_price_offer(telegram_id)
+        if not feedback:
+            return
+        now = datetime.now(timezone.utc)
+        feedback.price_offer_used_at = now
+        feedback.updated_at = now
+        await self.session.flush()

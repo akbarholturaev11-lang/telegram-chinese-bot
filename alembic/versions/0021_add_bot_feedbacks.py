@@ -31,6 +31,9 @@ def upgrade() -> None:
         sa.Column("prompted_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("completed_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("reward_granted_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("price_offer_due_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("price_offer_sent_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("price_offer_used_at", sa.DateTime(timezone=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_bot_feedbacks")),
@@ -39,12 +42,14 @@ def upgrade() -> None:
     op.create_index(op.f("ix_bot_feedbacks_telegram_id"), "bot_feedbacks", ["telegram_id"], unique=False)
     op.create_index(op.f("ix_bot_feedbacks_status"), "bot_feedbacks", ["status"], unique=False)
     op.create_index(op.f("ix_bot_feedbacks_completed_at"), "bot_feedbacks", ["completed_at"], unique=False)
+    op.create_index(op.f("ix_bot_feedbacks_price_offer_due_at"), "bot_feedbacks", ["price_offer_due_at"], unique=False)
 
     op.alter_column("bot_feedbacks", "language", server_default=None)
     op.alter_column("bot_feedbacks", "status", server_default=None)
 
 
 def downgrade() -> None:
+    op.drop_index(op.f("ix_bot_feedbacks_price_offer_due_at"), table_name="bot_feedbacks")
     op.drop_index(op.f("ix_bot_feedbacks_completed_at"), table_name="bot_feedbacks")
     op.drop_index(op.f("ix_bot_feedbacks_status"), table_name="bot_feedbacks")
     op.drop_index(op.f("ix_bot_feedbacks_telegram_id"), table_name="bot_feedbacks")

@@ -63,6 +63,7 @@ class AdminNotifyService:
             source_label = {
                 "referral": "Referral chegirma",
                 "admin_campaign": "Admin kampaniya",
+                "feedback_price_offer": "Feedback maxsus chegirma",
             }.get(discount_source, "Chegirma")
             title = f" — {discount_title}" if discount_title else ""
             lines.append("")
