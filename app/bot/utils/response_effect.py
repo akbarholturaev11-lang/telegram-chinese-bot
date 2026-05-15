@@ -41,11 +41,11 @@ class ResponseEffect:
         self.temp_message = await self.message.answer(self.states[0])
         self._task = asyncio.create_task(self._runner())
 
-    async def set_text(self, text: str):
+    async def set_text(self, text: str, **kwargs):
         if not self.temp_message:
             return
         try:
-            await self.temp_message.edit_text(text)
+            await self.temp_message.edit_text(text, **kwargs)
         except Exception:
             pass
 

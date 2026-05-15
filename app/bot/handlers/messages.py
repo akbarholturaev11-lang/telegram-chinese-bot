@@ -305,9 +305,15 @@ async def _process_translator_voice_transcript(
     lang: str,
     transcript: str,
     telegram_message_id: int | None = None,
+    cleanup_message: Message | None = None,
 ) -> None:
     can_use, message_key = await AccessService(session).can_use_text_ai(user.telegram_id)
     if not can_use:
+        if cleanup_message:
+            try:
+                await cleanup_message.delete()
+            except Exception:
+                pass
         await source_message.answer(
             t(message_key, lang),
             reply_markup=_voice_mode_cancel_keyboard(lang),
@@ -323,12 +329,20 @@ async def _process_translator_voice_transcript(
         if msg.content_type == "voice_translator" and msg.role in ("user", "assistant")
     ][-6:]
 
-    effect = ResponseEffect(
-        source_message,
-        step_delay=1.6,
-        states=(t("voice_status_answering", lang), "🌐", "🧠"),
-    )
-    await effect.start()
+    effect = None
+    if cleanup_message:
+        try:
+            await cleanup_message.edit_text(t("voice_status_answering", lang))
+        except Exception:
+            pass
+    else:
+        effect = ResponseEffect(
+            source_message,
+            step_delay=1.6,
+            states=(t("voice_status_answering", lang), "🌐", "🧠"),
+        )
+        await effect.start()
+
     try:
         translation_result = await AIService().translate_voice_with_usage(
             transcript=transcript,
@@ -336,18 +350,36 @@ async def _process_translator_voice_transcript(
             history=history,
         )
     except Exception:
-        await effect.stop()
-        await source_message.answer(t("voice_translation_failed", lang))
+        if effect:
+            await effect.stop()
+        if cleanup_message:
+            try:
+                await cleanup_message.delete()
+            except Exception:
+                pass
+        await source_message.answer(
+            t("voice_translation_failed", lang),
+            reply_markup=_voice_mode_cancel_keyboard(lang),
+        )
         return
     finally:
-        try:
-            await effect.stop()
-        except Exception:
-            pass
+        if effect:
+            try:
+                await effect.stop()
+            except Exception:
+                pass
 
     translation_text = (translation_result.content or "").strip()
     if not translation_text:
-        await source_message.answer(t("voice_translation_failed", lang))
+        if cleanup_message:
+            try:
+                await cleanup_message.delete()
+            except Exception:
+                pass
+        await source_message.answer(
+            t("voice_translation_failed", lang),
+            reply_markup=_voice_mode_cancel_keyboard(lang),
+        )
         return
 
     await _store_voice_transcript(
@@ -371,12 +403,18 @@ async def _process_translator_voice_transcript(
     )
     await session.commit()
 
-    await source_message.answer(
-        t("voice_transcript_preview", lang, text=escape(transcript[:1000])),
-        parse_mode="HTML",
+    if cleanup_message:
+        try:
+            await cleanup_message.delete()
+        except Exception:
+            pass
+
+    result_text = (
+        f"{t('voice_transcript_preview', lang, text=escape(transcript[:1000]))}\n\n"
+        f"{t('voice_translator_result', lang, text=escape(translation_text[:1500]))}"
     )
     await source_message.answer(
-        t("voice_translator_result", lang, text=escape(translation_text[:1500])),
+        result_text,
         reply_markup=_voice_mode_cancel_keyboard(lang),
         parse_mode="HTML",
     )
@@ -476,6 +514,7 @@ async def handle_voice_message(message: Message, state: FSMContext, session):
             lang=user_lang,
             transcript=transcript,
             telegram_message_id=message.message_id,
+            cleanup_message=effect.temp_message,
         )
         await _send_budget_notice(message.answer, voice_budget_record, user_lang)
         return
@@ -484,9 +523,12 @@ async def handle_voice_message(message: Message, state: FSMContext, session):
         pending_voice_transcript=transcript,
         pending_voice_message_id=message.message_id,
     )
-    await effect.set_text(t("voice_transcript_preview", user_lang, text=escape(transcript[:1000])))
-    await message.answer(
-        t("voice_mode_choose", user_lang),
+    choice_text = (
+        f"{t('voice_transcript_preview', user_lang, text=escape(transcript[:1000]))}\n\n"
+        f"{t('voice_mode_choose', user_lang)}"
+    )
+    await effect.set_text(
+        choice_text,
         reply_markup=_voice_mode_choice_keyboard(user_lang),
         parse_mode="HTML",
     )
@@ -515,11 +557,6 @@ async def voice_mode_select_handler(callback: CallbackQuery, state: FSMContext, 
     await state.update_data(pending_voice_transcript=None, pending_voice_message_id=None)
 
     await callback.answer()
-    await callback.message.answer(
-        t("voice_mode_activated_translator" if mode == VOICE_MODE_TRANSLATOR else "voice_mode_activated_qa", lang),
-        reply_markup=_voice_mode_cancel_keyboard(lang),
-        parse_mode="HTML",
-    )
 
     if mode == VOICE_MODE_TRANSLATOR:
         await _process_translator_voice_transcript(
@@ -529,9 +566,14 @@ async def voice_mode_select_handler(callback: CallbackQuery, state: FSMContext, 
             lang=lang,
             transcript=transcript,
             telegram_message_id=telegram_message_id,
+            cleanup_message=callback.message,
         )
         return
 
+    try:
+        await callback.message.delete()
+    except Exception:
+        pass
     await _process_qa_voice_transcript(
         source_message=callback.message,
         session=session,

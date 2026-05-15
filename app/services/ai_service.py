@@ -242,6 +242,12 @@ class AIService:
         }
         target_lang = lang_labels.get(user_language, "Russian")
         model = "gpt-4o-mini"
+        has_chinese = any("\u4e00" <= char <= "\u9fff" for char in transcript)
+        direction = (
+            f"The latest transcript contains Chinese. Translate only the latest transcript into {target_lang}."
+            if has_chinese
+            else "The latest transcript is not Chinese. Interpret only the latest transcript into natural Simplified Chinese."
+        )
 
         messages = [
             {
@@ -249,24 +255,38 @@ class AIService:
                 "content": (
                     "You are a context-aware Chinese conversation interpreter for real-life dialogue. "
                     f"The user's interface language is {target_lang}. "
-                    "Use recent context to choose the natural meaning, tone, and situation. "
-                    "If the latest transcript is mainly Chinese, reply only with a natural translation in the interface language. "
-                    "Do not repeat the Chinese text, because the app already shows the transcript. "
-                    "If the latest transcript is mainly not Chinese, reply only with a natural Simplified Chinese sentence that fits the context. "
-                    "Do not add explanations, markdown, labels, or alternatives unless the transcript is truly ambiguous."
+                    f"{direction} "
+                    "Use recent context only to resolve pronouns, tone, missing objects, and situation. "
+                    "Never answer the speaker's question, never continue the chat, and never translate older messages. "
+                    "Return only the translation text. Do not add labels, markdown, alternatives, explanations, or quotes. "
+                    "If a word is unclear, keep the closest natural meaning and preserve uncertainty briefly."
                 ),
             }
         ]
 
         if history:
+            context_lines = []
             for msg in history[-6:]:
-                if msg.get("role") in ("user", "assistant"):
-                    messages.append(msg)
+                role = msg.get("role")
+                content = (msg.get("content") or "").strip()
+                if role in ("user", "assistant") and content:
+                    context_lines.append(f"{role}: {content}")
+            if context_lines:
+                messages.append(
+                    {
+                        "role": "system",
+                        "content": (
+                            "Recent context for disambiguation only. "
+                            "Do not translate these lines unless they are repeated in the latest transcript.\n"
+                            + "\n".join(context_lines)
+                        ),
+                    }
+                )
 
         messages.append(
             {
                 "role": "user",
-                "content": f"Latest transcript:\n{transcript}",
+                "content": transcript,
             }
         )
 
