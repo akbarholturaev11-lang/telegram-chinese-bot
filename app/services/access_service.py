@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Tuple
 
 from sqlalchemy import select
@@ -33,6 +33,28 @@ class AccessService:
         user.status = "trial"
         user.end_date = None
         await self.session.flush()
+
+    def _is_paid_user(self, user) -> bool:
+        return user.payment_status == "approved"
+
+    async def _can_use_daily_image_limit(self, user) -> Tuple[bool, str]:
+        now = datetime.now(timezone.utc)
+
+        if not user.last_limit_reset_at:
+            user.last_limit_reset_at = now
+            user.questions_used = 0
+        elif now - user.last_limit_reset_at >= timedelta(days=1):
+            user.last_limit_reset_at = now
+            user.questions_used = 0
+
+        today_image_count = await self.message_repo.count_user_messages_today(
+            user_id=user.id,
+            content_type="image",
+        )
+        if today_image_count >= 2:
+            return False, "access_daily_image_limit_reached"
+
+        return True, ""
 
     async def downgrade_expired_active_users(self) -> int:
         result = await self.session.execute(
@@ -82,8 +104,6 @@ class AccessService:
             await self._downgrade_expired_user(user)
             # falls through to trial logic below
 
-        from datetime import datetime, timedelta, timezone    
-
         if user.status == "trial":
             now = datetime.now(timezone.utc)
 
@@ -120,6 +140,9 @@ class AccessService:
                 await self._downgrade_expired_user(user)
                 # falls through to trial logic below
             else:
+                if not self._is_paid_user(user):
+                    return await self._can_use_daily_image_limit(user)
+
                 budget_access = await AIUsageBudgetService(self.session).can_use_ai(telegram_id)
                 if not budget_access.allowed:
                     return False, budget_access.message_key
@@ -130,25 +153,7 @@ class AccessService:
             # falls through to trial logic below
 
         if user.status == "trial":
-
-            from datetime import datetime, timedelta, timezone
-            now = datetime.now(timezone.utc)
-
-            if not user.last_limit_reset_at:
-                user.last_limit_reset_at = now
-                user.questions_used = 0
-            elif now - user.last_limit_reset_at >= timedelta(days=1):
-                user.last_limit_reset_at = now
-                user.questions_used = 0
-
-            today_image_count = await self.message_repo.count_user_messages_today(
-                user_id=user.id,
-                content_type="image",
-            )
-            if today_image_count >= 2:
-                return False, "access_daily_image_limit_reached"
-
-            return True, ""
+            return await self._can_use_daily_image_limit(user)
 
         return False, "access_start_first"
 
@@ -156,8 +161,6 @@ class AccessService:
         user = await self.user_repo.get_by_telegram_id(telegram_id)
         if not user:
             return
-
-        from datetime import datetime, timedelta, timezone
 
         if user.status == "trial":
 

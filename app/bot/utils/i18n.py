@@ -7,8 +7,8 @@ TEXTS = {
         "language_selected": "Забон интихоб шуд ✅",
         "level_saved_explained": "✅ Сатҳи шумо сабт шуд. Ин ба мо кӯмак мекунад, ки дарсҳоро ба шумо мувофиқ кунем.",
         "trial_started_info": "🎁 Ба шумо дастрасии ройгон кушода шуд.",
-        "onboarding_special_welcome": "🌟 Шумо <b>{user_num}</b>-умин корбари мо шудед!\n\n<blockquote>🎁 Ба хотири ин, шумо 24 соат ба тамоми имкониятҳои бот бе ягон маҳдудият дастрасӣ доред!</blockquote>",
-        "trial_24h_info": "🎁 <b>24 соат дастрасии пурра кушода шуд!</b>\n\n<blockquote>Шумо метавонед ҳам режими савол-ҷавоб, ҳам режими курсро бе ягон маҳдудият истифода баред.\n\n⏰ 24 соат баъд лимити рӯзона фаъол мешавад.</blockquote>",
+        "onboarding_special_welcome": "🌟 Шумо <b>{user_num}</b>-умин корбари мо шудед!\n\n<blockquote>🎁 Ба хотири ин, ба шумо 24 соат дастрасии пурра кушода шуд. Фото-анализ бо лимити рӯзона кор мекунад.</blockquote>",
+        "trial_24h_info": "🎁 <b>24 соат дастрасии пурра кушода шуд!</b>\n\n<blockquote>Шумо метавонед режими савол-ҷавоб ва режими курсро истифода баред.\n\n📸 Фото-анализ бо лимити рӯзона кор мекунад.\n⏰ 24 соат баъд лимити рӯзонаи матн ҳам фаъол мешавад.</blockquote>",
         "send_first_message": "Акнун калима, ҷумла ё саволи хитоии худро фиристед — дарсро аз ҳамон ҷо оғоз мекунем.",
         "level_beginner": "Аз 0",
 
@@ -144,8 +144,8 @@ TEXTS = {
         "language_selected": "Язык выбран ✅",
         "level_saved_explained": "✅ Ваш уровень сохранён. Это поможет нам подстроить уроки под вас.",
         "trial_started_info": "🎁 Вам открыт бесплатный доступ.",
-        "onboarding_special_welcome": "🌟 Вы стали нашим <b>{user_num}-м</b> пользователем!\n\n<blockquote>🎁 В честь этого вам открыт полный доступ на <b>24 часа</b> без каких-либо ограничений!</blockquote>",
-        "trial_24h_info": "🎁 <b>24 часа полного доступа активированы!</b>\n\n<blockquote>Вы можете использовать режим вопрос-ответ и режим курса без каких-либо ограничений.\n\n⏰ Через 24 часа активируется дневной лимит.</blockquote>",
+        "onboarding_special_welcome": "🌟 Вы стали нашим <b>{user_num}-м</b> пользователем!\n\n<blockquote>🎁 В честь этого вам открыт полный доступ на <b>24 часа</b>. Фото-анализ работает с дневным лимитом.</blockquote>",
+        "trial_24h_info": "🎁 <b>24 часа полного доступа активированы!</b>\n\n<blockquote>Вы можете использовать режим вопрос-ответ и режим курса.\n\n📸 Фото-анализ работает с дневным лимитом.\n⏰ Через 24 часа активируется дневной лимит на текст.</blockquote>",
         "send_first_message": "Теперь отправьте китайское слово, фразу или свой вопрос — и начнём урок с этого.",
         "level_beginner": "С нуля",
 
@@ -277,8 +277,8 @@ TEXTS = {
         "language_selected": "Til tanlandi ✅",
         "level_saved_explained": "✅ Darajangiz saqlandi. Bu darslarni sizga moslashtirishga yordam beradi.",
         "trial_started_info": "🎁 Sizga bepul kirish ochildi.",
-        "onboarding_special_welcome": "🌟 Siz bizning <b>{user_num}-chi</b> foydalanuvchimiz bo’ldingiz!\n\n<blockquote>🎁 Buning sharofati bilan to’liq <b>24 soat</b> botni hech qanday limitlarsiz ishlata olasiz!</blockquote>",
-        "trial_24h_info": "🎁 <b>24 soatlik to’liq kirish faollashtirildi!</b>\n\n<blockquote>Savol-javob rejimi va kurs rejimidan hech qanday cheklovsiz foydalanishingiz mumkin.\n\n⏰ 24 soatdan keyin kunlik limit ishga tushadi.</blockquote>",
+        "onboarding_special_welcome": "🌟 Siz bizning <b>{user_num}-chi</b> foydalanuvchimiz bo’ldingiz!\n\n<blockquote>🎁 Buning sharofati bilan sizga to’liq <b>24 soat</b> kirish ochildi. Foto analiz kunlik limit bilan ishlaydi.</blockquote>",
+        "trial_24h_info": "🎁 <b>24 soatlik to’liq kirish faollashtirildi!</b>\n\n<blockquote>Savol-javob rejimi va kurs rejimidan foydalanishingiz mumkin.\n\n📸 Foto analiz kunlik limit bilan ishlaydi.\n⏰ 24 soatdan keyin matn uchun ham kunlik limit ishga tushadi.</blockquote>",
         "send_first_message": "Endi xitoycha so’z, gap yoki savolingizni yuboring — darsni o’sha yerdan boshlaymiz.",
         "level_beginner": "0 dan",
 
