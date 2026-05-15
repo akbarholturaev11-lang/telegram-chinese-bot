@@ -28,6 +28,14 @@ def _parse_title(raw: str) -> str:
     return raw
 
 
+def _uz_fallback(lang: str, value: Any) -> Any:
+    return value if lang == "uz" else None
+
+
+def _lesson_word(lang: str) -> str:
+    return {"uz": "Dars", "ru": "Урок", "tj": "Дарс"}.get(lang, "Урок")
+
+
 # ─── Emoji raqamlar ────────────────────────────────────────────────────────
 _NUMS = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"]
 
@@ -54,7 +62,7 @@ def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             continue
         zh = word.get("zh", "")
         pinyin = word.get("pinyin", "")
-        meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
+        meaning = word.get(lang) or _uz_fallback(lang, word.get("uz")) or word.get("meaning") or ""
         example_zh = word.get("example_zh", "")
         example_pinyin = word.get("example_pinyin", "")
         example_lang = word.get(f"example_{lang}") or word.get("example") or ""
@@ -95,7 +103,6 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         section = block.get("section_label", "")
         scene = (
             block.get(f"scene_{lang}")
-            or block.get("scene_uz")
             or block.get("scene_label_zh")
             or ""
         )
@@ -117,9 +124,9 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             pinyin = line.get("pinyin", "")
             # actual key is "translation", fallback to lang key
             translation = (
-                line.get("translation")
+                _uz_fallback(lang, line.get("translation"))
                 or line.get(lang)
-                or line.get("uz")
+                or _uz_fallback(lang, line.get("uz"))
                 or ""
             )
 
@@ -137,7 +144,7 @@ def format_dialogue(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             tip = {"uz": "💡 Bilasizmi?", "tj": "💡 Медонед?", "ru": "💡 Знаете ли вы?"}
             lines.append(tip.get(lang, tip["ru"]))
             for note in notes:
-                note_text = note.get(lang) or note.get("uz") or ""
+                note_text = note.get(lang) or _uz_fallback(lang, note.get("uz")) or ""
                 if note_text:
                     lines.append(note_text)
 
@@ -157,10 +164,10 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
         if not isinstance(g, dict):
             continue
 
-        g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
+        g_title = g.get(f"title_{lang}") or _uz_fallback(lang, g.get("title_uz")) or g.get("title_zh") or ""
         rule = (
             g.get(f"rule_{lang}") or
-            g.get("rule_uz") or
+            _uz_fallback(lang, g.get("rule_uz")) or
             g.get("explanation") or
             g.get("rule") or ""
         )
@@ -180,7 +187,7 @@ def format_grammar(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             for ex in examples:
                 zh = ex.get("zh", "")
                 pinyin = ex.get("pinyin", "")
-                meaning = ex.get(lang) or ex.get("uz") or ex.get("meaning") or ""
+                meaning = ex.get(lang) or _uz_fallback(lang, ex.get("uz")) or ex.get("meaning") or ""
                 lines.append(f"   • {zh} ({pinyin}) — {meaning}")
         lines.append("")
 
@@ -215,7 +222,7 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
         instruction = (
             ex.get(f"instruction_{lang}")
-            or ex.get("instruction_uz")
+            or _uz_fallback(lang, ex.get("instruction_uz"))
             or ex.get("instruction", "")
         )
         items = ex.get("items", [])
@@ -230,7 +237,7 @@ def format_exercise(lesson, lang: str, lesson_total_steps: int = 6) -> str:
                 continue
             prompt = (
                 item.get(f"prompt_{lang}")
-                or item.get("prompt_uz")
+                or _uz_fallback(lang, item.get("prompt_uz"))
                 or item.get("prompt", "")
             )
             if prompt:
@@ -252,7 +259,7 @@ def _format_word_block(word: dict, index: int, lang: str, lines: list):
     """Bitta so'z blokini lines ga qo'shadi (V2 style HTML)."""
     zh      = word.get("zh", "")
     pinyin  = word.get("pinyin", "")
-    meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
+    meaning = word.get(lang) or _uz_fallback(lang, word.get("uz")) or word.get("meaning") or ""
     ex_zh   = word.get("example_zh", "")
     ex_pin  = word.get("example_pinyin", "")
     ex_lang = word.get(f"example_{lang}") or word.get("example") or ""
@@ -291,7 +298,7 @@ def format_vocab_1(lesson, lang: str) -> str:
     }
 
     lines = [
-        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        f"<b>【{_lesson_word(lang)} {lesson.lesson_order}】 {title}</b>",
         hdr.get(lang, hdr["ru"]),
         "",
         hint_tpl.get(lang, hint_tpl["ru"]).format(total),
@@ -319,7 +326,7 @@ def format_vocab_2(lesson, lang: str) -> str:
     }
 
     lines = [
-        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        f"<b>【{_lesson_word(lang)} {lesson.lesson_order}】 {title}</b>",
         hdr.get(lang, hdr["ru"]),
         "",
     ]
@@ -343,8 +350,6 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
     section = block.get("section_label", "") or f"课文 {n}"
     scene   = (
         block.get(f"scene_{lang}")
-        or block.get("scene_uz")
-        or block.get("scene_ru")
         or block.get("scene_label_zh")
         or ""
     )
@@ -357,7 +362,7 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
     }
 
     lines = [
-        f"<b>【Dars {lesson.lesson_order}】 {title}</b>",
+        f"<b>【{_lesson_word(lang)} {lesson.lesson_order}】 {title}</b>",
         f"{dlg_hdr.get(lang, dlg_hdr['ru'])} {n}",
         "",
     ]
@@ -375,9 +380,9 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
         zh          = line.get("zh", "")
         pinyin      = line.get("pinyin", "")
         translation = (
-            line.get("translation")
+            _uz_fallback(lang, line.get("translation"))
             or line.get(lang)
-            or line.get("uz")
+            or _uz_fallback(lang, line.get("uz"))
             or ""
         )
         icon = "👤" if speaker == "A" else "👥"
@@ -405,16 +410,14 @@ def format_dialogue_n(lesson, lang: str, n: int) -> str:
             pattern = note.get("pattern", "")
             explanation = (
                 note.get(f"explanation_{lang}")
-                or note.get("explanation_uz")
-                or note.get("explanation_ru")
+                or _uz_fallback(lang, note.get("explanation_uz"))
                 or note.get("explanation", "")
             )
             ex_zh  = note.get("example_zh", "")
             ex_pin = note.get("example_pinyin", "")
             ex_tr  = (
                 note.get(f"example_{lang}")
-                or note.get("example_uz")
-                or note.get("example_ru")
+                or _uz_fallback(lang, note.get("example_uz"))
                 or note.get("example_translation", "")
             )
             if pattern:
@@ -455,10 +458,10 @@ def format_grammar_v2(lesson, lang: str) -> str:
         if not isinstance(g, dict):
             continue
 
-        g_title = g.get(f"title_{lang}") or g.get("title_uz") or g.get("title_zh") or ""
+        g_title = g.get(f"title_{lang}") or _uz_fallback(lang, g.get("title_uz")) or g.get("title_zh") or ""
         rule = (
             g.get(f"rule_{lang}")
-            or g.get("rule_uz")
+            or _uz_fallback(lang, g.get("rule_uz"))
             or g.get("explanation")
             or g.get("rule")
             or ""
@@ -478,7 +481,7 @@ def format_grammar_v2(lesson, lang: str) -> str:
             for ex in examples:
                 zh = ex.get("zh", "")
                 pinyin = ex.get("pinyin", "")
-                meaning = ex.get(lang) or ex.get("uz") or ex.get("meaning") or ""
+                meaning = ex.get(lang) or _uz_fallback(lang, ex.get("uz")) or ex.get("meaning") or ""
                 lines.append(f"   • <b>{zh}</b> <i>({pinyin})</i> — {meaning}")
             lines.append("")
 
@@ -524,7 +527,7 @@ def format_review(lesson, lang: str) -> str:
             for g in grammar_fallback
             if isinstance(g, dict) and g.get("title_zh")
         ]
-        review_title = item.get(f"title_{lang}") or item.get("title_uz") or title
+        review_title = item.get(f"title_{lang}") or _uz_fallback(lang, item.get("title_uz")) or title
     else:
         vocab = vocab_fallback[:10]
         dialogues = dialogue_fallback
@@ -553,7 +556,7 @@ def format_review(lesson, lang: str) -> str:
                 continue
             zh = word.get("zh", "")
             pinyin = word.get("pinyin", "")
-            meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
+            meaning = word.get(lang) or _uz_fallback(lang, word.get("uz")) or word.get("meaning") or ""
             lines.append(f"• <b>{zh}</b> <i>{pinyin}</i> — {meaning}")
         lines.append("")
 
@@ -563,7 +566,7 @@ def format_review(lesson, lang: str) -> str:
             if not isinstance(block, dict):
                 continue
             section = block.get("section_label", "")
-            scene = block.get(f"scene_{lang}") or block.get("scene_uz") or block.get("scene_label_zh") or ""
+            scene = block.get(f"scene_{lang}") or _uz_fallback(lang, block.get("scene_uz")) or block.get("scene_label_zh") or ""
             lines.append(f"• {' · '.join(filter(None, [section, scene]))}")
         lines.append("")
 
@@ -617,13 +620,13 @@ def format_intro(lesson, lang: str, lesson_total_steps: int = 6) -> str:
 
     try:
         intro_data = json.loads(intro_raw) if isinstance(intro_raw, str) else intro_raw
-        intro = intro_data.get(lang) or intro_data.get("uz") or str(intro_data)
+        intro = intro_data.get(lang) or _uz_fallback(lang, intro_data.get("uz")) or str(intro_data)
     except Exception:
         intro = intro_raw
 
     step_label = {"uz": "Darsga xush kelibsiz! 🎉", "tj": "Хуш омадед ба дарс! 🎉", "ru": "Добро пожаловать на урок! 🎉"}
     lines = [
-        f"【Dars {lesson.lesson_order}】 {title}",
+        f"【{_lesson_word(lang)} {lesson.lesson_order}】 {title}",
         "",
         step_label.get(lang, step_label["ru"]),
         "",

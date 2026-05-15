@@ -59,10 +59,12 @@ def _normalize_answer_text(value: str) -> str:
 def _answer_options(answer, lang: str) -> list[str]:
     if isinstance(answer, dict):
         values = [
+            answer.get(lang),
             answer.get("answer"),
             answer.get("zh"),
-            answer.get(lang),
-            answer.get("uz"),
+            answer.get("uz") if lang == "uz" else None,
+            answer.get("ru") if lang == "ru" else None,
+            answer.get("tj") if lang == "tj" else None,
         ]
     else:
         values = [str(answer)]
