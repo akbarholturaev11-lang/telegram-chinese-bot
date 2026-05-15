@@ -4,6 +4,7 @@ from typing import Optional
 from app.repositories.bot_feedback_repo import BotFeedbackRepository
 from app.repositories.user_repo import UserRepository
 from app.services.ai_usage_budget_service import AIUsageBudgetService
+from app.services.portfolio_service import PortfolioService
 
 
 PLAN_DURATIONS = {
@@ -55,6 +56,7 @@ class SubscriptionService:
                 starts_at=user.start_date,
                 ends_at=user.end_date,
             )
+            await PortfolioService(self.session).record_subscription_profit(payment)
 
         await self.session.flush()
         return True

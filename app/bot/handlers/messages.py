@@ -18,6 +18,7 @@ from aiogram.types import (
 from app.bot.fsm.admin_audio import AdminAudioStates
 from app.bot.fsm.admin_broadcast import BroadcastStates
 from app.bot.fsm.admin_discount import DiscountStates
+from app.bot.fsm.admin_portfolio import AdminPortfolioStates
 from app.bot.utils.response_effect import ResponseEffect
 from app.bot.handlers.course import (
     get_course_keyboard_for_step,
@@ -74,6 +75,8 @@ _ADMIN_FSM_STATES = {
     DiscountStates.waiting_repeat_days.state,
     DiscountStates.waiting_quota.state,
     DiscountStates.waiting_notify_media.state,
+    AdminPortfolioStates.waiting_amount.state,
+    AdminPortfolioStates.waiting_reason.state,
 }
 
 

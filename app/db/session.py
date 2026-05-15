@@ -81,6 +81,18 @@ _BOOTSTRAP_COLUMNS: dict[str, dict[str, str]] = {
         "cost_usd": "DOUBLE PRECISION DEFAULT 0 NOT NULL",
         "created_at": "TIMESTAMP WITH TIME ZONE",
     },
+    "portfolio_transactions": {
+        "transaction_type": "VARCHAR(16) DEFAULT 'expense' NOT NULL",
+        "source": "VARCHAR(40) DEFAULT 'manual_expense' NOT NULL",
+        "amount_usd": "DOUBLE PRECISION DEFAULT 0 NOT NULL",
+        "original_amount": "DOUBLE PRECISION",
+        "original_currency": "VARCHAR(16)",
+        "payment_id": "INTEGER",
+        "user_telegram_id": "BIGINT",
+        "admin_telegram_id": "BIGINT",
+        "note": "TEXT",
+        "created_at": "TIMESTAMP WITH TIME ZONE",
+    },
 }
 
 

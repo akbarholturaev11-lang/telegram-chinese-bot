@@ -5,6 +5,7 @@ from .discount_campaign import DiscountCampaign
 from .bot_feedback import BotFeedback
 from .message import Message
 from .ai_usage import AIUsageBudget, AIUsageEvent
+from .portfolio import PortfolioTransaction
 
 from .course_lessons import CourseLesson
 from .course_attempts import CourseAttempt
