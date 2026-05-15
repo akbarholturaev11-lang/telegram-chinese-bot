@@ -54,7 +54,7 @@ def format_vocab(lesson, lang: str, lesson_total_steps: int = 6) -> str:
             continue
         zh = word.get("zh", "")
         pinyin = word.get("pinyin", "")
-        meaning = word.get(lang) or word.get("meaning") or ""
+        meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
         example_zh = word.get("example_zh", "")
         example_pinyin = word.get("example_pinyin", "")
         example_lang = word.get(f"example_{lang}") or word.get("example") or ""
@@ -252,7 +252,7 @@ def _format_word_block(word: dict, index: int, lang: str, lines: list):
     """Bitta so'z blokini lines ga qo'shadi (V2 style HTML)."""
     zh      = word.get("zh", "")
     pinyin  = word.get("pinyin", "")
-    meaning = word.get(lang) or word.get("meaning") or ""
+    meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
     ex_zh   = word.get("example_zh", "")
     ex_pin  = word.get("example_pinyin", "")
     ex_lang = word.get(f"example_{lang}") or word.get("example") or ""
@@ -486,10 +486,99 @@ def format_grammar_v2(lesson, lang: str) -> str:
     return "\n".join(lines)
 
 
+def format_satisfaction_check(lesson, lang: str) -> str:
+    title = _parse_title(lesson.title or "")
+    labels = {
+        "uz": "Dars yakuni",
+        "tj": "Анҷоми дарс",
+        "ru": "Итог урока",
+    }
+    questions = {
+        "uz": "Darsdagi so'zlar, dialoglar va test tushunarli bo'ldimi?",
+        "tj": "Калимаҳо, муколамаҳо ва санҷиши дарс фаҳмо буданд?",
+        "ru": "Слова, диалоги и тест урока были понятны?",
+    }
+    return "\n".join(
+        [
+            f"<b>【{title}】</b>",
+            f"✅ {labels.get(lang, labels['ru'])}",
+            "",
+            questions.get(lang, questions["ru"]),
+        ]
+    )
+
+
+def format_review(lesson, lang: str) -> str:
+    review = _parse(getattr(lesson, "review_json", None), [])
+    vocab_fallback = _parse(getattr(lesson, "vocabulary_json", None), [])
+    dialogue_fallback = _parse(getattr(lesson, "dialogue_json", None), [])
+    grammar_fallback = _parse(getattr(lesson, "grammar_json", None), [])
+    title = _parse_title(lesson.title or "")
+
+    if isinstance(review, list) and review and isinstance(review[0], dict):
+        item = review[0]
+        vocab = item.get("vocabulary") or vocab_fallback[:10]
+        dialogues = item.get("dialogues") or dialogue_fallback
+        grammar = item.get("grammar") or [
+            g.get("title_zh", "")
+            for g in grammar_fallback
+            if isinstance(g, dict) and g.get("title_zh")
+        ]
+        review_title = item.get(f"title_{lang}") or item.get("title_uz") or title
+    else:
+        vocab = vocab_fallback[:10]
+        dialogues = dialogue_fallback
+        grammar = [
+            g.get("title_zh", "")
+            for g in grammar_fallback
+            if isinstance(g, dict) and g.get("title_zh")
+        ]
+        review_title = title
+
+    hdr = {
+        "uz": "🔁 Qisqa takrorlash",
+        "tj": "🔁 Такрори кӯтоҳ",
+        "ru": "🔁 Краткое повторение",
+    }
+    vocab_hdr = {"uz": "Asosiy so'zlar:", "tj": "Калимаҳои асосӣ:", "ru": "Ключевые слова:"}
+    dialog_hdr = {"uz": "Dialoglar:", "tj": "Муколамаҳо:", "ru": "Диалоги:"}
+    grammar_hdr = {"uz": "Grammatika:", "tj": "Грамматика:", "ru": "Грамматика:"}
+
+    lines = [f"<b>{review_title}</b>", hdr.get(lang, hdr["ru"]), ""]
+
+    if vocab:
+        lines.append(f"<b>{vocab_hdr.get(lang, vocab_hdr['ru'])}</b>")
+        for word in vocab[:10]:
+            if not isinstance(word, dict):
+                continue
+            zh = word.get("zh", "")
+            pinyin = word.get("pinyin", "")
+            meaning = word.get(lang) or word.get("uz") or word.get("meaning") or ""
+            lines.append(f"• <b>{zh}</b> <i>{pinyin}</i> — {meaning}")
+        lines.append("")
+
+    if dialogues:
+        lines.append(f"<b>{dialog_hdr.get(lang, dialog_hdr['ru'])}</b>")
+        for block in dialogues[:4]:
+            if not isinstance(block, dict):
+                continue
+            section = block.get("section_label", "")
+            scene = block.get(f"scene_{lang}") or block.get("scene_uz") or block.get("scene_label_zh") or ""
+            lines.append(f"• {' · '.join(filter(None, [section, scene]))}")
+        lines.append("")
+
+    if grammar:
+        lines.append(f"<b>{grammar_hdr.get(lang, grammar_hdr['ru'])}</b>")
+        for item in grammar[:6]:
+            lines.append(f"• {item}")
+
+    return "\n".join(lines).rstrip()
+
+
 def format_step(lesson, lang: str, step: str) -> str | None:
     """Universal dispatcher: har qanday step nomi uchun formatlangan matn qaytaradi.
 
-    Agar step formatter_map da bo'lmasa — None qaytaradi (AI tutor ishlatiladi).
+    Agar step formatter_map da bo'lmasa — None qaytaradi.
     """
     if step == "intro":
         return format_intro(lesson, lang)
@@ -511,7 +600,11 @@ def format_step(lesson, lang: str, step: str) -> str | None:
         return format_grammar_v2(lesson, lang)
     if step == "exercise":
         return format_exercise(lesson, lang)
-    return None  # AI tutor handle qiladi
+    if step == "satisfaction_check":
+        return format_satisfaction_check(lesson, lang)
+    if step == "review":
+        return format_review(lesson, lang)
+    return None
 
 
 # ─────────────────────────────────────────────────────────────────────────────

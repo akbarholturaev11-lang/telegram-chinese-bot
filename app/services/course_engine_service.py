@@ -1,12 +1,11 @@
 import json
+import re
 from typing import Optional
 
 from app.repositories.user_repo import UserRepository
 from app.repositories.course_lesson_repo import CourseLessonRepository
 from app.repositories.course_progress_repo import CourseProgressRepository
 from app.repositories.course_attempt_repo import CourseAttemptRepository
-from app.services.ai_usage_budget_service import AIUsageBudgetService
-from app.services.course_tutor_service import CourseTutorService
 
 
 # ─── V1: eski format (HSK1 va grammar_notes si yo'q darslar) ───────────────
@@ -30,6 +29,7 @@ COURSE_STEP_ORDER_V2_BASE = [
     "dialogue_2",       # bo'sh bo'lsa o'tkazib yuboriladi
     "dialogue_3",       # bo'sh bo'lsa o'tkazib yuboriladi
     "dialogue_4",       # bo'sh bo'lsa o'tkazib yuboriladi
+    "grammar",          # bo'sh bo'lsa o'tkazib yuboriladi
     "exercise",
     "satisfaction_check",
     "homework",
@@ -49,6 +49,48 @@ def _parse_json(value, default):
         return json.loads(value)
     except Exception:
         return default
+
+
+def _normalize_answer_text(value: str) -> str:
+    text = (value or "").lower()
+    return re.sub(r"[\s,.;:，。；：、!！?？'\"`]+", "", text)
+
+
+def _answer_options(answer, lang: str) -> list[str]:
+    if isinstance(answer, dict):
+        values = [
+            answer.get("answer"),
+            answer.get("zh"),
+            answer.get(lang),
+            answer.get("uz"),
+        ]
+    else:
+        values = [str(answer)]
+
+    options = []
+    for value in values:
+        if not value:
+            continue
+        text = str(value)
+        options.append(text)
+        options.extend(part.strip() for part in text.split("/") if part.strip())
+    return list(dict.fromkeys(options))
+
+
+def _flatten_expected_answers(answers_json, lang: str) -> list[list[str]]:
+    answers = _parse_json(answers_json, [])
+    expected = []
+    if not isinstance(answers, list):
+        return expected
+
+    for group in answers:
+        if not isinstance(group, dict):
+            continue
+        for answer in group.get("answers", []):
+            options = _answer_options(answer, lang)
+            if options:
+                expected.append(options)
+    return expected
 
 
 def is_v2_lesson(lesson) -> bool:
@@ -81,7 +123,11 @@ def get_step_order(lesson) -> list:
     if grammar:
         steps.append("grammar")
 
-    steps += ["exercise", "satisfaction_check", "homework", "completed"]
+    exercise = _parse_json(getattr(lesson, "exercise_json", None), [])
+    if exercise:
+        steps.append("exercise")
+
+    steps += ["satisfaction_check", "homework", "completed"]
     return steps
 
 
@@ -92,7 +138,6 @@ class CourseEngineService:
         self.lesson_repo = CourseLessonRepository(session)
         self.progress_repo = CourseProgressRepository(session)
         self.attempt_repo = CourseAttemptRepository(session)
-        self.tutor = CourseTutorService()
 
     def _allowed_level_candidates(self, level: str | None) -> tuple[str, ...]:
         normalized = (level or "").strip().lower()
@@ -191,6 +236,11 @@ class CourseEngineService:
         order = get_step_order(lesson) if lesson is not None else COURSE_STEP_ORDER_V1
 
         if current_step not in order:
+            for candidate in COURSE_STEP_ORDER_V2_BASE[
+                COURSE_STEP_ORDER_V2_BASE.index(current_step) + 1:
+            ] if current_step in COURSE_STEP_ORDER_V2_BASE else []:
+                if candidate in order:
+                    return candidate
             return "intro"
 
         idx = order.index(current_step)
@@ -289,6 +339,67 @@ class CourseEngineService:
 
         return user, progress, lesson, ""
 
+    async def mark_exercise_submitted(self, telegram_id: int, submission_text: str):
+        user, progress, lesson, error_key = await self.get_current_lesson(telegram_id)
+        if error_key:
+            return {"error_key": error_key}
+
+        submission_text = (submission_text or "").strip()
+        if not submission_text:
+            return {"error_key": "course_homework_empty"}
+
+        lang = user.language if getattr(user, "language", None) else "ru"
+        expected = _flatten_expected_answers(getattr(lesson, "answers_json", None), lang)
+        normalized_submission = _normalize_answer_text(submission_text)
+
+        correct = 0
+        expected_labels = []
+        for options in expected:
+            expected_labels.append(options[0])
+            normalized_options = [_normalize_answer_text(option) for option in options]
+            if any(option and option in normalized_submission for option in normalized_options):
+                correct += 1
+
+        total = len(expected)
+        score = int((correct / total) * 100) if total else 100
+        passed = correct >= max(1, (total + 1) // 2) if total else True
+
+        await self.attempt_repo.create(
+            user_id=user.id,
+            lesson_id=lesson.id,
+            attempt_type="exercise",
+            step_name="exercise",
+            score=score,
+            passed=passed,
+            answers_json=json.dumps(
+                {
+                    "submission_text": submission_text,
+                    "correct": correct,
+                    "total": total,
+                    "expected": expected_labels,
+                },
+                ensure_ascii=False,
+            ),
+            ai_feedback=None,
+        )
+
+        await self.progress_repo.set_current_lesson_and_step(
+            progress=progress,
+            lesson_id=progress.current_lesson_id,
+            step="satisfaction_check",
+            waiting_for="satisfaction_answer",
+        )
+        await self.session.commit()
+
+        return {
+            "error_key": None,
+            "correct": correct,
+            "total": total,
+            "score": score,
+            "passed": passed,
+            "expected": expected_labels,
+        }
+
     async def mark_homework_submitted(self, telegram_id: int, submission_text: str):
         user, progress, lesson, error_key = await self.get_current_lesson(telegram_id)
         if error_key:
@@ -299,48 +410,36 @@ class CourseEngineService:
             return {"error_key": "course_homework_empty"}
 
         user_lang = user.language if getattr(user, "language", None) else "ru"
-        user_level = user.level if getattr(user, "level", None) else "hsk1"
-
-        evaluation = await self.tutor.evaluate_homework(
-            user_language=user_lang,
-            user_level=user_level,
-            lesson=lesson,
-            submission_text=submission_text,
-        )
-
-        score = evaluation.get("score", 0)
-        passed = evaluation.get("passed", False)
-        feedback_text = evaluation.get("feedback_text", "")
+        feedback_map = {
+            "uz": "✅ Uyga vazifa qabul qilindi. Javobingiz saqlandi.",
+            "ru": "✅ Домашнее задание принято. Ваш ответ сохранён.",
+            "tj": "✅ Вазифаи хонагӣ қабул шуд. Ҷавоби шумо сабт шуд.",
+        }
+        feedback_text = feedback_map.get(user_lang, feedback_map["ru"])
 
         await self.attempt_repo.create(
             user_id=user.id,
             lesson_id=lesson.id,
             attempt_type="homework",
             step_name="homework",
-            score=score,
-            passed=passed,
+            score=100,
+            passed=True,
             answers_json=json.dumps({"submission_text": submission_text}, ensure_ascii=False),
             ai_feedback=feedback_text,
         )
 
         await self.progress_repo.set_homework_status(progress, "completed")
         await self.progress_repo.set_waiting_for(progress, "next_study_time")
-        usage_record = await AIUsageBudgetService(self.session).record_usage(
-            telegram_id=telegram_id,
-            result=self.tutor.last_ai_result,
-            source="course_homework",
-        )
-
         await self.session.commit()
 
         return {
             "error_key": None,
             "feedback_text": feedback_text,
             "ask_next_study_time": True,
-            "score": score,
-            "passed": passed,
-            "budget_cooldown_started": usage_record.cooldown_started,
-            "budget_message_key": usage_record.message_key,
+            "score": 100,
+            "passed": True,
+            "budget_cooldown_started": False,
+            "budget_message_key": "",
         }
 
     async def set_next_study_at(self, telegram_id: int, next_study_at):

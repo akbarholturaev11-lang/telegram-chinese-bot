@@ -28,7 +28,6 @@ from app.bot.handlers.course import (
     filter_unlocked_lessons,
     send_course_completion_prompt,
 )
-from app.bot.keyboards.course_context import course_tushundim_keyboard
 from app.bot.keyboards.course import (
     lesson_selection_keyboard,
     review_choice_keyboard,
@@ -43,7 +42,7 @@ from app.bot.keyboards.referral import photo_limit_subscription_keyboard
 from app.bot.keyboards.referral import referral_daily_limit_keyboard
 from app.bot.keyboards.mode import course_promo_keyboard
 from app.bot.keyboards.subscription import payment_method_keyboard
-from app.bot.utils.course_formatter import format_intro
+from app.bot.utils.course_formatter import format_intro, format_step
 from app.repositories.message_repo import MessageRepository
 from app.repositories.user_repo import UserRepository
 from app.services.access_service import AccessService
@@ -51,7 +50,6 @@ from app.services.ai_service import AIService
 from app.services.ai_usage_budget_service import AIUsageBudgetService
 from app.services.course_engine_service import CourseEngineService
 from app.services.course_progress_summary_service import CourseProgressSummaryService
-from app.services.course_tutor_service import CourseTutorService
 from app.services.image_input_service import ImageInputService
 from app.services.image_qa_service import ImageQAService
 from app.services.qa_service import QAService
@@ -95,6 +93,34 @@ def _parse_reminder_time(text: str):
     except (ValueError, AttributeError):
         pass
     return None
+
+
+def _format_static_exercise_result(result: dict, lang: str) -> str:
+    correct = result.get("correct", 0)
+    total = result.get("total", 0)
+    expected = result.get("expected", [])
+    passed = result.get("passed", False)
+
+    status = {
+        "uz": "✅ Test tekshirildi" if passed else "❌ Testda xatolar bor",
+        "ru": "✅ Тест проверен" if passed else "❌ В тесте есть ошибки",
+        "tj": "✅ Санҷиш тафтиш шуд" if passed else "❌ Дар санҷиш хато ҳаст",
+    }
+    answer_title = {
+        "uz": "To'g'ri javoblar:",
+        "ru": "Правильные ответы:",
+        "tj": "Ҷавобҳои дуруст:",
+    }
+    lines = [
+        status.get(lang, status["ru"]),
+        f"{correct}/{total}",
+    ]
+    if expected:
+        lines.append("")
+        lines.append(answer_title.get(lang, answer_title["ru"]))
+        for index, answer in enumerate(expected, 1):
+            lines.append(f"{index}. {answer}")
+    return "\n".join(lines)
 
 
 class _TextMessageProxy:
@@ -678,7 +704,6 @@ async def handle_text_message(message: Message, state: FSMContext, session):
 
     if user and user.learning_mode == "course":
         engine = CourseEngineService(session)
-        tutor = CourseTutorService()
 
         msg_text = (message.text or "").strip()
 
@@ -819,22 +844,6 @@ async def handle_text_message(message: Message, state: FSMContext, session):
             return
 
         if progress.waiting_for == "satisfaction_reason":
-            if not await _ensure_ai_available(access_service, message.from_user.id, message.answer, user_lang):
-                return
-
-            tutor_text = await tutor.generate_step_response(
-                user_language=current_user.language,
-                user_level=current_user.level,
-                lesson=lesson,
-                step=progress.current_step,
-                user_message=f"User did not understand this part: {message.text or ''}",
-            )
-            budget_record = await _record_ai_usage(
-                session=session,
-                telegram_id=message.from_user.id,
-                ai_result=tutor.last_ai_result,
-                source="course_satisfaction_reason",
-            )
             await engine.mark_not_satisfied_and_stay(message.from_user.id)
             refreshed_user, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(
                 message.from_user.id
@@ -843,76 +852,45 @@ async def handle_text_message(message: Message, state: FSMContext, session):
                 await message.answer(t(refreshed_error, user_lang))
                 return
 
+            await engine.progress_repo.set_waiting_for(refreshed_progress, "satisfaction_answer")
+            await session.commit()
+
+            text = format_step(refreshed_lesson, user_lang, "review")
+            await message.answer(t("course_lesson_reexplaining", user_lang))
             await message.answer(
-                tutor_text,
+                text or t("course_lesson_what_unclear", user_lang),
                 reply_markup=_keyboard_for_step(user_lang, refreshed_progress.current_step, refreshed_lesson),
                 parse_mode="HTML",
             )
-            await _send_budget_notice(message.answer, budget_record, user_lang)
             return
 
         if progress.waiting_for == "exercise_answer":
-            if not await _ensure_ai_available(access_service, message.from_user.id, message.answer, user_lang):
+            result = await engine.mark_exercise_submitted(
+                message.from_user.id,
+                message.text or "",
+            )
+            if isinstance(result, dict) and result.get("error_key"):
+                await message.answer(t(result["error_key"], user_lang))
                 return
 
-            _loading_ex = await message.answer("🔎")
-
-            eval_text = await tutor.generate_step_response(
-                user_language=current_user.language,
-                user_level=current_user.level,
-                lesson=lesson,
-                step="exercise",
-                user_message=message.text or "",
+            _, refreshed_progress, refreshed_lesson, refreshed_error = await engine.get_current_lesson(
+                message.from_user.id
             )
-            eval_budget_record = await _record_ai_usage(
-                session=session,
-                telegram_id=message.from_user.id,
-                ai_result=tutor.last_ai_result,
-                source="course_exercise",
-            )
+            if refreshed_error:
+                await message.answer(t(refreshed_error, user_lang))
+                return
 
-            try:
-                await _loading_ex.delete()
-            except Exception:
-                pass
+            satisfaction_text = format_step(refreshed_lesson, user_lang, "satisfaction_check")
 
-            await engine.progress_repo.set_current_lesson_and_step(
-                progress=progress,
-                lesson_id=progress.current_lesson_id,
-                step="satisfaction_check",
-                waiting_for="satisfaction_answer",
-            )
-            await session.commit()
-
-            satisfaction_text = await tutor.generate_step_response(
-                user_language=current_user.language,
-                user_level=current_user.level,
-                lesson=lesson,
-                step="satisfaction_check",
-                user_message="",
-            )
-            satisfaction_budget_record = await _record_ai_usage(
-                session=session,
-                telegram_id=message.from_user.id,
-                ai_result=tutor.last_ai_result,
-                source="course_satisfaction_check",
-            )
-            await session.commit()
-
-            await message.answer(eval_text, parse_mode="HTML")
+            await message.answer(_format_static_exercise_result(result, user_lang), parse_mode="HTML")
             await message.answer(
-                satisfaction_text,
+                satisfaction_text or t("course_lesson_satisfaction_question", user_lang),
                 reply_markup=get_course_keyboard_for_step(user_lang, "satisfaction_check"),
                 parse_mode="HTML",
             )
-            await _send_budget_notice(message.answer, eval_budget_record, user_lang)
-            await _send_budget_notice(message.answer, satisfaction_budget_record, user_lang)
             return
 
         if progress.waiting_for == "homework_submission":
-            if not await _ensure_ai_available(access_service, message.from_user.id, message.answer, user_lang):
-                return
-
             result = await engine.mark_homework_submitted(
                 message.from_user.id,
                 message.text or "",
@@ -944,9 +922,6 @@ async def handle_text_message(message: Message, state: FSMContext, session):
                             lang=user_lang,
                         )
 
-            if isinstance(result, dict) and result.get("budget_cooldown_started"):
-                await message.answer(t(result.get("budget_message_key") or "ai_budget_cooldown_notice", user_lang), parse_mode="HTML")
-
             return
 
         if progress.waiting_for == "next_study_time":
@@ -968,97 +943,11 @@ async def handle_text_message(message: Message, state: FSMContext, session):
                     )
             return
 
-        message_repo = MessageRepository(session)
-        recent = await message_repo.get_recent_by_user(
-            user_id=current_user.id,
-            limit=10,
-        )
-
-        current_step = progress.current_step
-        # For intro step, don't use history to avoid repetition
-        if current_step == "intro":
-            course_history = []
-        else:
-            course_history = [
-                {"role": m.role, "content": m.content}
-                for m in recent
-                if m.content_type == "course" and m.role in ("user", "assistant")
-            ][-4:]
-
-        if not await _ensure_ai_available(access_service, message.from_user.id, message.answer, user_lang):
-            return
-
-        await message_repo.create(
-            user_id=current_user.id,
-            role="user",
-            content=message.text or "",
-            content_type="course",
-        )
-
-        import asyncio as _asyncio
-        if current_step == "quiz":
-            _anim_msg = await message.answer("🔎")
-            _anim_task = None
-        else:
-            _emojis = ["🪄", "💫", "🪄", "💫", "🪄", "💫"]
-            _anim_msg = await message.answer(_emojis[0])
-
-            async def _animate():
-                for _i in range(1, 30):
-                    await _asyncio.sleep(1)
-                    try:
-                        await _anim_msg.edit_text(_emojis[_i % len(_emojis)])
-                    except Exception:
-                        break
-
-            _anim_task = _asyncio.create_task(_animate())
-
-        tutor_text = await tutor.generate_step_response(
-            user_language=current_user.language,
-            user_level=current_user.level,
-            lesson=lesson,
-            step=progress.current_step,
-            user_message=message.text or "",
-            history=course_history,
-        )
-        budget_record = await _record_ai_usage(
-            session=session,
-            telegram_id=message.from_user.id,
-            ai_result=tutor.last_ai_result,
-            source="course",
-        )
-
-        if _anim_task:
-            _anim_task.cancel()
-        try:
-            await _anim_msg.delete()
-        except Exception:
-            pass
-
-        await message_repo.create(
-            user_id=current_user.id,
-            role="assistant",
-            content=tutor_text,
-            content_type="course",
-        )
-        await session.commit()
-
-        _content_steps = {
-            "intro", "vocab", "vocabulary", "dialogue", "grammar",
-            "vocab_1", "vocab_2",
-            "dialogue_1", "dialogue_2", "dialogue_3", "dialogue_4",
-        }
-        if progress.current_step in _content_steps:
-            ai_keyboard = course_tushundim_keyboard(user_lang)
-        else:
-            ai_keyboard = _keyboard_for_step(user_lang, progress.current_step, lesson)
-
         await message.answer(
-            tutor_text,
-            reply_markup=ai_keyboard,
+            t("course_wait_for_answer", user_lang),
+            reply_markup=_keyboard_for_step(user_lang, progress.current_step, lesson),
             parse_mode="HTML",
         )
-        await _send_budget_notice(message.answer, budget_record, user_lang)
         return
 
     can_use, message_key = await access_service.can_use_text_ai(message.from_user.id)
