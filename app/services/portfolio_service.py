@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Optional
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, or_, select
 
 from app.db.models.payment import Payment
 from app.db.models.portfolio import PortfolioTransaction
@@ -50,6 +50,19 @@ class PortfolioService:
         )
         return result.scalar_one_or_none() is not None
 
+    async def _delete_stale_subscription_profits(self) -> None:
+        approved_payment_ids = select(Payment.id).where(Payment.payment_status == "approved")
+        await self.session.execute(
+            delete(PortfolioTransaction)
+            .where(PortfolioTransaction.source == "subscription_profit")
+            .where(
+                or_(
+                    PortfolioTransaction.payment_id.is_(None),
+                    ~PortfolioTransaction.payment_id.in_(approved_payment_ids),
+                )
+            )
+        )
+
     async def record_subscription_profit(self, payment: Payment) -> None:
         revenue_usd = self.amount_to_usd(payment.amount, payment.currency)
         if revenue_usd is None:
@@ -73,6 +86,7 @@ class PortfolioService:
         await self.session.flush()
 
     async def sync_approved_payments(self) -> None:
+        await self._delete_stale_subscription_profits()
         result = await self.session.execute(
             select(Payment).where(Payment.payment_status == "approved")
         )
