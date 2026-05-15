@@ -448,7 +448,37 @@ COURSE_I18N = {
         "course_back_to_qa": "↩️ Ба режими савол-ҷавоб",
         "qa_mode_title": "💬 Режими саволу ҷавоб",
         "course_mode_title": "📚 Режими курс",
-        "help_section_text": "<b>🤖 Бахши ёрӣ</b>\n\n<blockquote>💬 <b>Режими саволу ҷавоб</b>\n— Шумо метавонед ҳар гуна савол диҳед\n— Калима, ҷумла ва грамматикаро мефаҳмонад\n— Агар сурат фиристед, матнро дида мефаҳмонад\n— Барои истифодаи зуд ва озод\n\n📚 <b>Режими курс</b>\n— Омӯзиши дарс ба дарс\n— Дар ҳар дарс калимаҳо, грамматика ва машқҳо ҳастанд\n— Бо тартиб давом медиҳед\n— Барои пешрафти пайдарпай\n\n⚙️ <b>Фармонҳои асосӣ</b>\n👤 /profile — профили шумо\n💳 /subscription — бахши обуна\n🌐 /language — иваз кардани забон\n📖 /level — иваз кардани дараҷа\n📚 /course — режими курс\n💬 /qa — режими саволу ҷавоб\n🎁 /invite — силкаи даъват</blockquote>\n\n⚠️ <b>Aгар муаммо бошад, ба техподдержка нависед:</b>\n@akbarchina",
+        "help_section_text": (
+            "<b>🤖 Бахши ёрӣ</b>\n\n"
+            "<blockquote>💬 <b>Режими саволу ҷавоб</b>\n"
+            "— Дар бораи хитоӣ савол нависед: калима, ҷумла, грамматика, тарҷума ё мисол\n"
+            "— Сурат фиристед, бот иероглиф/матнро мехонад ва мефаҳмонад\n"
+            "— Баъд аз ҷавоби сурат метавонед аз рӯи ҳамон сурат саволи иловагӣ диҳед\n\n"
+            "🎙 <b>Voice ва тарҷумон</b>\n"
+            "— Voice танҳо барои обуначиён кор мекунад\n"
+            "— Дар voice-и аввал режим интихоб мешавад: Тарҷумон ё Истифодаи оддӣ\n"
+            "— Тарҷумон: voice-и хитоиро ба забони шумо, voice-и дигар забонро ба хитоии содда тарҷума мекунад\n"
+            "— Агар матн нависед, voice-режим худкор хомӯш мешавад\n\n"
+            "📚 <b>Режими курси HSK</b>\n"
+            "— Бо /course ё тугмаи «Режими курс» ворид мешавед\n"
+            "— Аз рӯи сатҳ дарс интихоб мекунед; дар HSK4 аввал 上 / 下 интихоб мешавад\n"
+            "— Дарсҳо: муқаддима, калимаҳо, аудио, диалог, грамматика, машқ, тест ва вазифаи хонагӣ\n"
+            "— Менюи поёнӣ: Танзимот, Пешрафт, Аз нав хондани дарс, Вақти ёдраскунак, Профил, Бозгашт ба савол-ҷавоб\n\n"
+            "💳 <b>Лимит ва обуна</b>\n"
+            "— Бо дастрасии 24-соата саволу ҷавоб ва курс кушода мешавад\n"
+            "— Анализи сурат бо лимити 2 сурат дар як рӯз кор мекунад\n"
+            "— Обуна имконияти AI ҷавобҳо, курс, сурат ва voice-ро васеъ мекунад\n\n"
+            "⚙️ <b>Фармонҳои асосӣ</b>\n"
+            "👤 /profile — профил\n"
+            "💳 /subscription — обуна\n"
+            "🌐 /language — забон\n"
+            "📖 /level — сатҳ\n"
+            "📚 /course — курс\n"
+            "💬 /qa — саволу ҷавоб\n"
+            "🎁 /invite — силкаи даъват</blockquote>\n\n"
+            "⚠️ <b>Агар муаммо бошад, ба техподдержка нависед:</b>\n"
+            "@akbarchina"
+        ),
 
         "course_intro_title": "📘 Муқаддимаи дарс",
         "course_vocab_title": "📝 Калимаҳои нав",
@@ -578,7 +608,37 @@ COURSE_I18N = {
         "course_back_to_qa": "↩️ В режим вопрос-ответ",
         "qa_mode_title": "💬 Вопрос-ответ",
         "course_mode_title": "📚 Режим курса",
-        "help_section_text": "<b>🤖 Раздел помощи</b>\n\n<blockquote>💬 <b>Режим вопрос-ответ</b>\n— Вы можете задать любой вопрос по китайскому языку\n— Бот объясняет слова, предложения и грамматику\n— Если отправите фото, бот разберёт текст\n— Для быстрого и свободного использования\n\n📚 <b>Режим курса</b>\n— Пошаговое обучение\n— В каждом уроке есть слова, грамматика и упражнения\n— Вы продолжаете по порядку\n— Для последовательного прогресса\n\n⚙️ <b>Основные команды</b>\n👤 /profile — ваш профиль\n💳 /subscription — раздел подписки\n🌐 /language — сменить язык\n📖 /level — сменить уровень\n📚 /course — режим курса\n💬 /qa — режим вопрос-ответ\n🎁 /invite — пригласительная ссылка</blockquote>\n\n⚠️ <b>Если возникнет проблема, напишите в техподдержку:</b>\n@akbarchina",
+        "help_section_text": (
+            "<b>🤖 Раздел помощи</b>\n\n"
+            "<blockquote>💬 <b>Режим вопрос-ответ</b>\n"
+            "— Напишите вопрос по китайскому: слово, фраза, грамматика, перевод или пример\n"
+            "— Отправьте фото, бот прочитает и объяснит иероглифы/текст\n"
+            "— После разбора фото можно задавать уточняющие вопросы по этому же изображению\n\n"
+            "🎙 <b>Voice и переводчик</b>\n"
+            "— Voice работает только для подписчиков\n"
+            "— При первом voice выбираете режим: Переводчик или Обычное использование\n"
+            "— Переводчик: китайский voice переводит на ваш язык, voice на другом языке переводит на упрощённый китайский\n"
+            "— Если написать текст, voice-режим автоматически отключится\n\n"
+            "📚 <b>Режим курса HSK</b>\n"
+            "— Вход через /course или кнопку «Режим курса»\n"
+            "— Выбираете урок по своему уровню; в HSK4 сначала выбирается 上 / 下\n"
+            "— Уроки: введение, слова, аудио, диалог, грамматика, упражнение, тест и домашнее задание\n"
+            "— Нижнее меню: Настройки, Прогресс, Перечитать урок, Напоминание, Профиль, Вернуться к вопрос-ответ\n\n"
+            "💳 <b>Лимиты и подписка</b>\n"
+            "— При доступе на 24 часа открыты вопрос-ответ и курс\n"
+            "— Фото-анализ работает с лимитом 2 фото в день\n"
+            "— Подписка расширяет доступ к AI-ответам, курсу, фото и voice\n\n"
+            "⚙️ <b>Основные команды</b>\n"
+            "👤 /profile — профиль\n"
+            "💳 /subscription — подписка\n"
+            "🌐 /language — язык\n"
+            "📖 /level — уровень\n"
+            "📚 /course — курс\n"
+            "💬 /qa — вопрос-ответ\n"
+            "🎁 /invite — пригласительная ссылка</blockquote>\n\n"
+            "⚠️ <b>Если возникнет проблема, напишите в техподдержку:</b>\n"
+            "@akbarchina"
+        ),
 
         "course_intro_title": "📘 Введение в урок",
         "course_vocab_title": "📝 Новые слова",
@@ -708,7 +768,37 @@ COURSE_I18N = {
         "course_back_to_qa": "↩️ Savol-javob rejimiga qaytish",
         "qa_mode_title": "💬 Savol-javob",
         "course_mode_title": "📚 Kurs rejimi",
-        "help_section_text": "<b>🤖 Yordam bo‘limi</b>\n\n<blockquote>💬 <b>Savol-javob rejimi</b>\n— Xitoy tili bo‘yicha istalgan savol berasiz\n— So‘z, gap va grammatikani tushuntiradi\n— Foto yuborsangiz, matnni ko‘rib tushuntiradi\n— Tez va erkin foydalanish uchun\n\n📚 <b>Kurs rejimi</b>\n— Darsma-dars o‘rganasiz\n— Har bir dars ichida so‘zlar, grammatika va mashqlar bor\n— Tartib bilan davom etasiz\n— Izchil progress uchun\n\n⚙️ <b>Asosiy komandalar</b>\n👤 /profile — profilingiz\n💳 /subscription — obuna bo‘limi\n🌐 /language — tilni o‘zgartirish\n📖 /level — darajani o‘zgartirish\n📚 /course — kurs rejimi\n💬 /qa — savol-javob rejimi\n🎁 /invite — taklif havolasi</blockquote>\n\n⚠️ <b>Agar muammo bo‘lsa, tex yordamga yozing:</b>\n@akbarchina",
+        "help_section_text": (
+            "<b>🤖 Yordam bo‘limi</b>\n\n"
+            "<blockquote>💬 <b>Savol-javob rejimi</b>\n"
+            "— Xitoy tili bo‘yicha savol yozing: so‘z, gap, grammatika, tarjima yoki misol\n"
+            "— Foto yuborsangiz, ieroglif/matnni o‘qib tushuntiradi\n"
+            "— Foto javobidan keyin shu rasm bo‘yicha qo‘shimcha savol berishingiz mumkin\n\n"
+            "🎙 <b>Voice va tarjimon</b>\n"
+            "— Voice faqat obunachilar uchun ishlaydi\n"
+            "— Birinchi voice yuborganda rejim tanlaysiz: Tarjimon yoki Oddiy savol\n"
+            "— Tarjimon: xitoycha voice’ni sizning tilingizga, boshqa tildagi voice’ni soddalashtirilgan xitoychaga tarjima qiladi\n"
+            "— Matn yozsangiz, voice rejimi avtomatik o‘chadi\n\n"
+            "📚 <b>HSK kurs rejimi</b>\n"
+            "— /course yoki «Kurs rejimi» tugmasi orqali kirasiz\n"
+            "— Darajangiz bo‘yicha dars tanlaysiz; HSK4 da avval 上 / 下 tanlanadi\n"
+            "— Darslar: kirish, so‘zlar, audio, dialog, grammatika, mashq, test va uyga vazifa\n"
+            "— Pastki menyu: Sozlamalar, Progress, Darsni qayta o‘qish, Eslatma vaqti, Profil, Savol-javobga qaytish\n\n"
+            "💳 <b>Limit va obuna</b>\n"
+            "— 24 soatlik kirishda savol-javob va kurs ochiladi\n"
+            "— Foto analiz kuniga 2 ta limit bilan ishlaydi\n"
+            "— Obuna AI javoblar, kurs, foto va voice imkoniyatlarini kengaytiradi\n\n"
+            "⚙️ <b>Asosiy komandalar</b>\n"
+            "👤 /profile — profil\n"
+            "💳 /subscription — obuna\n"
+            "🌐 /language — til\n"
+            "📖 /level — daraja\n"
+            "📚 /course — kurs\n"
+            "💬 /qa — savol-javob\n"
+            "🎁 /invite — taklif havolasi</blockquote>\n\n"
+            "⚠️ <b>Muammo bo‘lsa, tex yordam:</b>\n"
+            "@akbarchina"
+        ),
 
         "course_intro_title": "📘 Darsga kirish",
         "course_vocab_title": "📝 Yangi so‘zlar",
