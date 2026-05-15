@@ -17,6 +17,7 @@ from app.bot.keyboards.course import (
     course_grammar_keyboard, course_homework_keyboard,
     course_next_step_keyboard, course_vocab_v2_keyboard, course_dialogue_n_keyboard,
     next_study_time_inline_keyboard,
+    hsk4_part_selection_keyboard, filter_hsk4_lessons_by_part, normalize_hsk4_part,
 )
 from app.bot.keyboards.subscription import payment_method_keyboard
 from app.bot.keyboards.course_context import (
@@ -89,6 +90,16 @@ async def _resolve_lessons_for_user_level(engine: CourseEngineService, level: st
 def filter_unlocked_lessons(lessons: list, progress) -> list:
     unlocked_order = max(1, (getattr(progress, "completed_lessons_count", 0) or 0) + 1)
     return [lesson for lesson in lessons if lesson.lesson_order <= unlocked_order]
+
+
+def _hsk4_part_label(part: str | None) -> str:
+    return "下" if part == "lower" else "上"
+
+
+def _lesson_selection_markup(lessons: list, resolved_level: str, lang: str):
+    if resolved_level == "hsk4":
+        return hsk4_part_selection_keyboard()
+    return lesson_selection_keyboard(lessons, page=0, lang=lang)
 
 
 async def send_course_completion_prompt(*, respond, engine: CourseEngineService, lesson, lang: str) -> None:
@@ -210,16 +221,88 @@ async def course_lessons_page_handler(callback: CallbackQuery, session):
         )
         return
 
+    parts = callback.data.split(":")
     try:
-        page = int(callback.data.split(":")[-1])
+        page = int(parts[2])
     except Exception:
         page = 0
+    hsk4_part = normalize_hsk4_part(parts[3] if len(parts) > 3 else None)
 
-    lessons, _ = await _resolve_lessons_for_user_level(engine, user.level)
+    lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
+    if resolved_level == "hsk4":
+        if not hsk4_part:
+            await callback.answer()
+            await callback.message.edit_reply_markup(reply_markup=hsk4_part_selection_keyboard())
+            return
+        part_lessons = filter_hsk4_lessons_by_part(lessons, hsk4_part)
+        if not part_lessons:
+            await callback.answer(t("course_no_lessons_available", lang), show_alert=True)
+            return
 
     await callback.answer()
     await callback.message.edit_reply_markup(
-        reply_markup=lesson_selection_keyboard(lessons, page=page, lang=lang)
+        reply_markup=lesson_selection_keyboard(
+            lessons,
+            page=page,
+            lang=lang,
+            hsk4_part=hsk4_part,
+        )
+    )
+
+
+@router.callback_query(F.data.startswith("course:hsk4_part:"))
+async def course_hsk4_part_handler(callback: CallbackQuery, session):
+    if await _block_if_course_disabled(callback, session):
+        return
+
+    user_repo = UserRepository(session)
+    engine = CourseEngineService(session)
+
+    user = await user_repo.get_by_telegram_id(callback.from_user.id)
+    if not user:
+        await callback.answer()
+        return
+
+    lang = user.language if user.language else "ru"
+
+    if user.status != "active":
+        await callback.answer()
+        await callback.message.answer(
+            t("course_only_active_users", lang),
+            reply_markup=payment_method_keyboard(lang),
+            parse_mode="HTML",
+        )
+        return
+
+    hsk4_part = normalize_hsk4_part(callback.data.split(":")[-1])
+    if not hsk4_part:
+        await callback.answer()
+        return
+
+    lessons, resolved_level = await _resolve_lessons_for_user_level(engine, user.level)
+    if resolved_level != "hsk4":
+        await callback.answer()
+        await callback.message.edit_reply_markup(
+            reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang)
+        )
+        return
+
+    part_lessons = filter_hsk4_lessons_by_part(lessons, hsk4_part)
+    if not part_lessons:
+        await callback.answer(t("course_no_lessons_available", lang), show_alert=True)
+        return
+
+    text = f"HSK4 {_hsk4_part_label(hsk4_part)}. {t('course_choose_lesson', lang)}"
+
+    await callback.answer()
+    await callback.message.edit_text(
+        text,
+        reply_markup=lesson_selection_keyboard(
+            lessons,
+            page=0,
+            lang=lang,
+            hsk4_part=hsk4_part,
+        ),
     )
 
 
@@ -354,7 +437,7 @@ async def run_course_entry_flow(
         level_label = resolved_level.upper() if resolved_level else "HSK"
         await respond(
             f"{level_label}. {t('course_choose_lesson', lang)}",
-            reply_markup=lesson_selection_keyboard(lessons, page=0, lang=lang),
+            reply_markup=_lesson_selection_markup(lessons, resolved_level, lang),
         )
         return
 

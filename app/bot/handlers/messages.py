@@ -33,6 +33,7 @@ from app.bot.keyboards.course import (
     review_choice_keyboard,
     course_reminder_timezone_keyboard,
     reminder_time_keyboard,
+    hsk4_part_selection_keyboard,
 )
 from app.bot.keyboards.course import course_intro_keyboard
 from app.bot.keyboards.checkout import checkout_keyboard
@@ -686,9 +687,14 @@ async def handle_text_message(message: Message, state: FSMContext, session):
                 await message.answer(t("course_no_lessons_available", user_lang))
                 return
             level_label = resolved_level.upper() if resolved_level else "HSK"
+            reply_markup = (
+                hsk4_part_selection_keyboard()
+                if resolved_level == "hsk4"
+                else lesson_selection_keyboard(lessons, page=0, lang=user_lang)
+            )
             await message.answer(
                 f"{level_label}. {t('course_settings_choose_lesson', user_lang)}",
-                reply_markup=lesson_selection_keyboard(lessons, page=0, lang=user_lang),
+                reply_markup=reply_markup,
             )
             return
 
