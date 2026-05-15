@@ -1,5 +1,6 @@
 from aiogram import Router, F
 from aiogram.dispatcher.event.bases import SkipHandler
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import Command, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
@@ -20,6 +21,8 @@ from app.services.portfolio_service import PortfolioService
 
 router = Router()
 
+ADMIN_MENU_TEXT = "<b>🛠 Admin panel</b>\n\nQuyidagi amallardan birini tanlang:"
+
 
 def _is_admin(user_id: int) -> bool:
     admin_ids = [int(x.strip()) for x in settings.ADMIN_IDS.split(",") if x.strip()]
@@ -38,6 +41,12 @@ def admin_menu_keyboard() -> InlineKeyboardMarkup:
     ])
 
 
+def admin_back_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="⬅️ Admin panel", callback_data="adm:menu")],
+    ])
+
+
 def portfolio_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📜 History", callback_data="adm:portfolio_history")],
@@ -53,6 +62,95 @@ def portfolio_history_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⬅️ Portfel", callback_data="adm:portfolio")],
     ])
+
+
+def portfolio_cancel_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="❌ Bekor qilish", callback_data="adm:portfolio_cancel")],
+        [InlineKeyboardButton(text="⬅️ Portfel", callback_data="adm:portfolio")],
+    ])
+
+
+async def _edit_callback_message(
+    callback: CallbackQuery,
+    text: str,
+    *,
+    reply_markup: InlineKeyboardMarkup | None = None,
+    parse_mode: str = "HTML",
+) -> Message | None:
+    if not callback.message:
+        return None
+    try:
+        edited = await callback.message.edit_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+        )
+        return edited if isinstance(edited, Message) else callback.message
+    except TelegramBadRequest as exc:
+        if "message is not modified" in str(exc).lower():
+            return callback.message
+        return await callback.message.answer(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+        )
+
+
+async def _edit_message_by_id(
+    message: Message,
+    *,
+    chat_id: int | None,
+    message_id: int | None,
+    text: str,
+    reply_markup: InlineKeyboardMarkup | None = None,
+    parse_mode: str = "HTML",
+) -> bool:
+    if not chat_id or not message_id:
+        return False
+    try:
+        await message.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=message_id,
+            text=text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode,
+        )
+        return True
+    except TelegramBadRequest as exc:
+        if "message is not modified" in str(exc).lower():
+            return True
+        return False
+
+
+async def _send_or_edit_portfolio_prompt(
+    *,
+    state: FSMContext,
+    message: Message,
+    text: str,
+) -> None:
+    data = await state.get_data()
+    chat_id = data.get("portfolio_prompt_chat_id")
+    message_id = data.get("portfolio_prompt_message_id")
+    edited = await _edit_message_by_id(
+        message,
+        chat_id=chat_id,
+        message_id=message_id,
+        text=text,
+        reply_markup=portfolio_cancel_keyboard(),
+    )
+    if edited:
+        return
+
+    sent = await message.answer(
+        text,
+        reply_markup=portfolio_cancel_keyboard(),
+        parse_mode="HTML",
+    )
+    await state.update_data(
+        portfolio_prompt_chat_id=sent.chat.id,
+        portfolio_prompt_message_id=sent.message_id,
+    )
 
 
 def _usd(value: float) -> str:
@@ -88,7 +186,7 @@ def _parse_amount_currency(text: str) -> tuple[float, str] | None:
 async def _start_portfolio_flow(
     *,
     state: FSMContext,
-    respond,
+    callback: CallbackQuery,
     transaction_type: str,
 ) -> None:
     await state.clear()
@@ -96,15 +194,22 @@ async def _start_portfolio_flow(
     await state.set_state(AdminPortfolioStates.waiting_amount)
     icon = _portfolio_type_icon(transaction_type)
     label = _portfolio_type_label(transaction_type)
-    await respond(
+    edited = await _edit_callback_message(
+        callback,
         f"{icon} <b>{label.capitalize()} qo'shish</b>\n\n"
         "Avval summa va currency yuboring:\n"
         "<code>50 usd</code>\n"
         "<code>120 somoni</code>\n"
         "<code>200 ¥</code>\n\n"
         "Keyingi xabarda bot sababini so'raydi.",
+        reply_markup=portfolio_cancel_keyboard(),
         parse_mode="HTML",
     )
+    if edited:
+        await state.update_data(
+            portfolio_prompt_chat_id=edited.chat.id,
+            portfolio_prompt_message_id=edited.message_id,
+        )
 
 
 async def _ask_portfolio_reason(
@@ -116,7 +221,11 @@ async def _ask_portfolio_reason(
     currency: str,
 ) -> None:
     if PortfolioService(None).amount_to_usd(amount, currency) is None:
-        await message.answer("❌ Currency noto'g'ri. Faqat usd, somoni yoki ¥ ishlat.")
+        await _send_or_edit_portfolio_prompt(
+            state=state,
+            message=message,
+            text="❌ Currency noto'g'ri. Faqat usd, somoni yoki ¥ ishlat.",
+        )
         return
 
     await state.update_data(
@@ -127,13 +236,16 @@ async def _ask_portfolio_reason(
     await state.set_state(AdminPortfolioStates.waiting_reason)
     icon = _portfolio_type_icon(transaction_type)
     label = _portfolio_type_label(transaction_type)
-    await message.answer(
-        f"{icon} <b>{amount:g} {escape(currency)}</b> {label} uchun sababini yozing.\n\n"
-        "Masalan:\n"
-        "<code>OpenAI to'lov</code>\n"
-        "<code>Reklama tushumi</code>\n"
-        "<code>Railway oylik to'lov</code>",
-        parse_mode="HTML",
+    await _send_or_edit_portfolio_prompt(
+        state=state,
+        message=message,
+        text=(
+            f"{icon} <b>{amount:g} {escape(currency)}</b> {label} uchun sababini yozing.\n\n"
+            "Masalan:\n"
+            "<code>OpenAI to'lov</code>\n"
+            "<code>Reklama tushumi</code>\n"
+            "<code>Railway oylik to'lov</code>"
+        ),
     )
 
 
@@ -221,35 +333,39 @@ async def admin_menu_handler(message: Message, session):
     if not _is_admin(message.from_user.id):
         return
     await message.answer(
-        "<b>🛠 Admin panel</b>\n\nQuyidagi amallardan birini tanlang:",
+        ADMIN_MENU_TEXT,
         reply_markup=admin_menu_keyboard(),
         parse_mode="HTML",
     )
 
 
 @router.callback_query(F.data == "adm:menu")
-async def admin_menu_callback(callback: CallbackQuery, session):
+async def admin_menu_callback(callback: CallbackQuery, state: FSMContext, session):
     if not _is_admin(callback.from_user.id):
         await callback.answer()
         return
+    await state.clear()
     await callback.answer()
-    await callback.message.answer(
-        "<b>🛠 Admin panel</b>\n\nQuyidagi amallardan birini tanlang:",
+    await _edit_callback_message(
+        callback,
+        ADMIN_MENU_TEXT,
         reply_markup=admin_menu_keyboard(),
         parse_mode="HTML",
     )
 
 
 @router.callback_query(F.data == "adm:portfolio")
-async def admin_portfolio_callback(callback: CallbackQuery, session):
+async def admin_portfolio_callback(callback: CallbackQuery, state: FSMContext, session):
     if not _is_admin(callback.from_user.id):
         await callback.answer()
         return
 
+    await state.clear()
     summary = await PortfolioService(session).get_summary()
     await session.commit()
     await callback.answer()
-    await callback.message.answer(
+    await _edit_callback_message(
+        callback,
         _portfolio_summary_text(summary),
         reply_markup=portfolio_keyboard(),
         parse_mode="HTML",
@@ -265,7 +381,8 @@ async def admin_portfolio_history_callback(callback: CallbackQuery, session):
     rows = await PortfolioService(session).list_history(limit=20)
     await session.commit()
     await callback.answer()
-    await callback.message.answer(
+    await _edit_callback_message(
+        callback,
         _portfolio_history_text(rows),
         reply_markup=portfolio_history_keyboard(),
         parse_mode="HTML",
@@ -280,7 +397,7 @@ async def admin_portfolio_expense_info(callback: CallbackQuery, state: FSMContex
     await callback.answer()
     await _start_portfolio_flow(
         state=state,
-        respond=callback.message.answer,
+        callback=callback,
         transaction_type="expense",
     )
 
@@ -293,8 +410,26 @@ async def admin_portfolio_profit_info(callback: CallbackQuery, state: FSMContext
     await callback.answer()
     await _start_portfolio_flow(
         state=state,
-        respond=callback.message.answer,
+        callback=callback,
         transaction_type="profit",
+    )
+
+
+@router.callback_query(F.data == "adm:portfolio_cancel")
+async def admin_portfolio_cancel(callback: CallbackQuery, state: FSMContext, session):
+    if not _is_admin(callback.from_user.id):
+        await callback.answer()
+        return
+
+    await state.clear()
+    summary = await PortfolioService(session).get_summary()
+    await session.commit()
+    await callback.answer("Bekor qilindi")
+    await _edit_callback_message(
+        callback,
+        _portfolio_summary_text(summary),
+        reply_markup=portfolio_keyboard(),
+        parse_mode="HTML",
     )
 
 
@@ -336,9 +471,14 @@ async def admin_portfolio_amount_handler(message: Message, state: FSMContext, se
 
     parsed = _parse_amount_currency(message.text or "")
     if not parsed:
-        await message.answer(
-            "❌ Summa va currency yuboring. Masalan: <code>50 usd</code>",
-            parse_mode="HTML",
+        await _send_or_edit_portfolio_prompt(
+            state=state,
+            message=message,
+            text=(
+                "❌ Summa formati noto'g'ri.\n\n"
+                "Summa va currency yuboring. Masalan:\n"
+                "<code>50 usd</code>"
+            ),
         )
         return
 
@@ -359,7 +499,15 @@ async def admin_portfolio_reason_handler(message: Message, state: FSMContext, se
 
     note = (message.text or "").strip()
     if len(note) < 2:
-        await message.answer("❌ Sabab juda qisqa. Sababini yozing.")
+        await _send_or_edit_portfolio_prompt(
+            state=state,
+            message=message,
+            text=(
+                "❌ Sabab juda qisqa.\n\n"
+                "Sababini aniqroq yozing. Masalan:\n"
+                "<code>OpenAI to'lov</code>"
+            ),
+        )
         return
 
     data = await state.get_data()
@@ -384,13 +532,29 @@ async def admin_portfolio_reason_handler(message: Message, state: FSMContext, se
         return
 
     await session.commit()
+    summary = await PortfolioService(session).get_summary()
+    await session.commit()
     await state.clear()
     label = "Foyda" if transaction_type == "profit" else "Rasxod"
-    await message.answer(
-        f"✅ {label} qo'shildi: <b>{_usd(transaction.amount_usd)}</b>\n"
-        f"📝 Sabab: {escape(note)}",
-        parse_mode="HTML",
+    edited = await _edit_message_by_id(
+        message,
+        chat_id=data.get("portfolio_prompt_chat_id"),
+        message_id=data.get("portfolio_prompt_message_id"),
+        text=(
+            f"✅ {label} qo'shildi: <b>{_usd(transaction.amount_usd)}</b>\n"
+            f"📝 Sabab: {escape(note)}\n\n"
+            f"{_portfolio_summary_text(summary)}"
+        ),
+        reply_markup=portfolio_keyboard(),
     )
+    if not edited:
+        await message.answer(
+            f"✅ {label} qo'shildi: <b>{_usd(transaction.amount_usd)}</b>\n"
+            f"📝 Sabab: {escape(note)}\n\n"
+            f"{_portfolio_summary_text(summary)}",
+            reply_markup=portfolio_keyboard(),
+            parse_mode="HTML",
+        )
 
 
 @router.callback_query(F.data == "adm:stats")
@@ -565,7 +729,12 @@ async def admin_stats_callback(callback: CallbackQuery, session):
     )
 
     await callback.answer()
-    await callback.message.answer(text, parse_mode="HTML")
+    await _edit_callback_message(
+        callback,
+        text,
+        reply_markup=admin_back_keyboard(),
+        parse_mode="HTML",
+    )
 
 
 @router.callback_query(F.data == "adm:deleteuser_info")
@@ -574,10 +743,12 @@ async def admin_deleteuser_info(callback: CallbackQuery, session):
         await callback.answer()
         return
     await callback.answer()
-    await callback.message.answer(
+    await _edit_callback_message(
+        callback,
         "🗑 <b>Foydalanuvchini o'chirish</b>\n\n"
         "Buyruq: <code>/deleteuser TELEGRAM_ID</code>\n\n"
         "Misol: <code>/deleteuser 123456789</code>",
+        reply_markup=admin_back_keyboard(),
         parse_mode="HTML",
     )
 
@@ -615,11 +786,13 @@ async def admin_broadcast_info(callback: CallbackQuery, session):
         await callback.answer()
         return
     await callback.answer()
-    await callback.message.answer(
+    await _edit_callback_message(
+        callback,
         "📢 <b>Broadcast xabar yuborish</b>\n\n"
         "Panelni ochish: <code>/broadcast</code>\n\n"
         "Panelda segmentni tanlab, matn/foto/video + caption yuboring.\n\n"
         "⚠️ Filtrsiz hammaga yuborish kerak bo'lsa: <code>/broadcast_all Xabar matni</code>",
+        reply_markup=admin_back_keyboard(),
         parse_mode="HTML",
     )
 
@@ -655,11 +828,13 @@ async def admin_giveaccess_info(callback: CallbackQuery, session):
         await callback.answer()
         return
     await callback.answer()
-    await callback.message.answer(
+    await _edit_callback_message(
+        callback,
         "✅ <b>Obuna berish</b>\n\n"
         "Buyruq: <code>/giveaccess TELEGRAM_ID PLAN</code>\n\n"
         "Planlar: <code>10_days</code> | <code>1_month</code>\n\n"
         "Misol: <code>/giveaccess 123456789 1_month</code>",
+        reply_markup=admin_back_keyboard(),
         parse_mode="HTML",
     )
 
